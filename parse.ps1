@@ -1,0 +1,1 @@
+ = [xml](Get-Content docx_temp/word/document.xml);  = .SelectNodes(" //w:t\, ); = (.GetElementsByTagName(\w:t\) | ForEach-Object { .InnerText }) -join [Environment]::NewLine; Set-Content -Path plan_full.txt -Value 

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Venue Map | National Livestock Carnival 2026</title>
+  <meta name="description" content="Clean High-Resolution Live Google Satellite Map with Precision Numbered Location Pins (1, 2, 3, 4) for the 2026 Renewed Hope National Livestock Carnival at Old Parade Ground, Abuja.">
+  
+  <!-- Soft Modern Pastel Tokens & Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Plus Jakarta Sans & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Leaflet CSS & JS for High-Res Live Satellite Map Engine -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            canvas: '#FBFBFA',
+            surface: '#FFFFFF',
+            borderMain: '#E5E7EB',
+            sage: {
+              base: '#D8EADF',
+              border: '#B8D8C5',
+              deep: '#1E4D38',
+              subtle: '#EDF6F1'
+            },
+            gold: {
+              base: '#FEF3D6',
+              border: '#FCE6A8',
+              deep: '#8D6B1B',
+              subtle: '#FFF9EA'
+            },
+            charcoal: '#111827',
+            slateSub: '#4B5563',
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Leaflet Map Container styling */
+    .leaflet-container {
+      background-color: #FBFBFA !important;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+    
+    .leaflet-popup-content-wrapper {
+      background: rgba(255, 255, 255, 0.98) !important;
+      color: #111827 !important;
+      border: 1px solid #B8D8C5 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    }
+    
+    .leaflet-popup-tip {
+      background: #FFFFFF !important;
+      border: 1px solid #B8D8C5 !important;
+    }
+
+    /* Custom Leaflet Number Marker styling */
+    .custom-number-marker {
+      background: transparent;
+      border: none;
+    }
+    
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.85; }
+      50% { transform: scale(1.4); opacity: 0.35; }
+      100% { transform: scale(1.85); opacity: 0; }
+    }
+    .pulse-ring {
+      animation: pulse-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Glassmorphism Panel Blur */
+    .glass-panel {
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+  </style>
+</head>
+<body class="bg-canvas text-charcoal font-sans min-h-screen flex flex-col antialiased selection:bg-sage-base selection:text-sage-deep overflow-x-hidden">
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- A. CLEAN HEADER SECTION (UNBOXED & BORDERLESS)              -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <header class="border-b border-borderMain bg-white/95 backdrop-blur-md sticky top-0 z-50 py-3.5 px-4 sm:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      
+      <!-- Back Button & Directions -->
+      <div class="flex items-center gap-3 sm:gap-4 flex-wrap">
+        <a href="index.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface text-charcoal border border-borderMain hover:border-sage-border hover:bg-sage-subtle font-sans font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-sm">
+          <i data-lucide="arrow-left" class="w-4 h-4 text-sage-deep"></i>
+          Back to Home
+        </a>
+
+        <!-- GO TO VENUE / NAVIGATION BUTTON -->
+        <button onclick="openDirections()" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sage-deep text-white font-sans font-bold text-xs uppercase tracking-wider hover:bg-[#173B2B] transition-all duration-300 shadow-sm group">
+          <i data-lucide="navigation" class="w-4 h-4 text-white group-hover:rotate-45 transition-transform"></i>
+          Get Road Directions
+        </button>
+      </div>
+
+      <!-- Title & Unboxed Eyebrow Header -->
+      <div class="text-center">
+        <!-- Unboxed Eyebrow -->
+        <div class="inline-flex items-center gap-1.5 text-gold-deep font-sans font-bold text-xs uppercase tracking-[0.15em] mb-1">
+          <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gold-deep"></i>
+          Abuja National Headquarters
+        </div>
+        <h1 class="text-xl sm:text-2xl font-bold text-charcoal uppercase tracking-tight">
+          Interactive Venue Map
+        </h1>
+      </div>
+
+      <!-- Map Provider Switcher -->
+      <div class="flex items-center gap-2">
+        <div class="inline-flex p-1 rounded-xl bg-surface border border-borderMain shadow-sm">
+          <button id="btnSatelliteMode" onclick="setTileProvider('google')" class="px-3 py-1.5 rounded-lg bg-sage-deep text-white font-sans font-bold text-xs uppercase tracking-wider transition-all shadow-sm">
+            Live Google Satellite
+          </button>
+          <button id="btnEsriMode" onclick="setTileProvider('esri')" class="px-3 py-1.5 rounded-lg text-slateSub hover:text-sage-deep font-sans font-semibold text-xs uppercase tracking-wider transition-all">
+            Esri World Satellite
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Subtext Info Bar -->
+  <div class="bg-sage-subtle border-b border-sage-border py-2 px-4 sm:px-8 text-center text-xs sm:text-sm text-slateSub font-sans">
+    Ultra-Clean High-Resolution Satellite View of <strong>Old Parade Ground, Area 10, Garki, Abuja</strong>. Select a numbered pin <strong>(1, 2, 3, 4)</strong> on the map to explore details.
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- B. MAP VIEWPORT & REAL SATELLITE ENGINE                     -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+    
+    <div class="relative w-full h-[620px] sm:h-[700px] rounded-2xl overflow-hidden border border-borderMain shadow-card bg-surface group">
+      
+      <!-- Minimal Reset View Button (Top-Left) -->
+      <button id="resetMapBtn" onclick="resetMapView()" class="absolute top-4 left-4 z-[999] px-3.5 py-2 rounded-lg bg-white/95 text-charcoal border border-borderMain hover:bg-sage-subtle hover:border-sage-border font-sans font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-sm backdrop-blur-md transition-all">
+        <i data-lucide="maximize-2" class="w-4 h-4 text-sage-deep"></i>
+        Reset View
+      </button>
+
+      <!-- REAL HIGH-RES LIVE GOOGLE SATELLITE MAP CONTAINER -->
+      <div id="realSatelliteMap" class="w-full h-full relative z-10"></div>
+
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <!-- C. THE SLIDING INFO PANEL (Borderless Eyebrows)           -->
+      <!-- ═══════════════════════════════════════════════════════════ -->
+      <aside id="infoPanel" class="absolute top-0 right-0 bottom-0 w-full md:w-[420px] z-[1000] glass-panel bg-white/95 border-l border-borderMain shadow-modal p-6 overflow-y-auto transform translate-x-full transition-transform duration-500 ease-in-out flex flex-col justify-between">
+        
+        <div>
+          <!-- Panel Header & Close Button -->
+          <div class="flex items-center justify-between pb-4 mb-4 border-b border-borderMain">
+            <!-- Unboxed Eyebrow -->
+            <span id="panelBadge" class="font-sans font-bold text-xs uppercase tracking-[0.15em] text-gold-deep">
+              Zone 1 • NW WEST FIELD
+            </span>
+            <button onclick="closeInfoPanel()" class="w-8 h-8 rounded-full bg-surface text-slateSub hover:text-charcoal border border-borderMain hover:bg-canvas flex items-center justify-center transition-colors">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Zone Image Container -->
+          <div class="relative mb-5 rounded-xl overflow-hidden border border-borderMain shadow-sm group/img">
+            <img id="panelImage" src="assets/carnival_animal_parade.jpg" alt="Zone Image" class="h-48 w-full object-cover transition-transform duration-700 group-hover/img:scale-105 rounded-xl">
+          </div>
+
+          <!-- Zone Title & Subtitle -->
+          <h2 id="panelTitle" class="text-2xl font-bold text-charcoal mb-1 leading-tight">
+            Agro-Commerce Market
+          </h2>
+          <p id="panelSubtitle" class="text-xs font-sans font-bold text-gold-deep uppercase tracking-[0.15em] mb-4">
+            Zone 1: NW WEST FIELD
+          </p>
+
+          <!-- Zone Description -->
+          <p id="panelDescription" class="text-sm text-slateSub leading-relaxed mb-6">
+            The commercial heart of the expo. Witness the 2026 Live-Weight Pricing System live and connect directly with farmers.
+          </p>
+
+          <!-- Highlights List -->
+          <div class="space-y-3 mb-6">
+            <h4 class="font-sans text-xs font-bold text-charcoal uppercase tracking-wider">Key Zone Highlights</h4>
+            <ul id="panelHighlights" class="space-y-2 text-xs text-slateSub">
+              <!-- Injected dynamically by JavaScript -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Zone Registration CTA & Directions Button -->
+        <div class="pt-4 border-t border-borderMain space-y-2">
+          <button id="panelCTA" onclick="registerZone()" class="w-full py-3.5 px-4 rounded-full bg-sage-deep text-white font-sans font-bold text-sm uppercase tracking-wider hover:bg-[#173B2B] shadow-sm transition-all duration-300 flex items-center justify-center gap-2">
+            <span>Register for this Zone</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+
+          <button onclick="openDirections()" class="w-full py-2.5 px-4 rounded-full bg-surface text-charcoal border border-borderMain font-sans font-bold text-xs uppercase tracking-wider hover:bg-canvas transition-all duration-300 flex items-center justify-center gap-2">
+            <i data-lucide="navigation" class="w-4 h-4 text-sage-deep"></i>
+            <span>Get Road Directions to Venue</span>
+          </button>
+        </div>
+
+      </aside>
+
+    </div>
+
+    <!-- Quick Zone Selector Buttons Grid Below Map -->
+    <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+      
+      <!-- Zone 1 (Green/Sage) -->
+      <button onclick="selectZone(1)" class="p-4 rounded-xl bg-white border border-borderMain hover:border-sage-border text-left transition-all group shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sage-deep font-sans font-extrabold text-2xl group-hover:scale-110 transition-transform">1</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span>
+        </div>
+        <div class="text-[11px] font-bold text-gold-deep uppercase tracking-[0.15em] mb-0.5">NW WEST FIELD</div>
+        <div class="font-sans font-bold text-xs text-charcoal uppercase tracking-wider">Agro-Commerce Market</div>
+      </button>
+
+      <!-- Zone 2 (Blue) -->
+      <button onclick="selectZone(2)" class="p-4 rounded-xl bg-white border border-borderMain hover:border-blue-400 text-left transition-all group shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-blue-600 font-sans font-extrabold text-2xl group-hover:scale-110 transition-transform">2</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#3B82F6]"></span>
+        </div>
+        <div class="text-[11px] font-bold text-gold-deep uppercase tracking-[0.15em] mb-0.5">SW WEST FIELD</div>
+        <div class="font-sans font-bold text-xs text-charcoal uppercase tracking-wider">Suya &amp; Culinary Village</div>
+      </button>
+
+      <!-- Zone 3 (Red) -->
+      <button onclick="selectZone(3)" class="p-4 rounded-xl bg-white border border-borderMain hover:border-rose-400 text-left transition-all group shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-rose-600 font-sans font-extrabold text-2xl group-hover:scale-110 transition-transform">3</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#EF4444]"></span>
+        </div>
+        <div class="text-[11px] font-bold text-gold-deep uppercase tracking-[0.15em] mb-0.5">CENTRAL TRACK</div>
+        <div class="font-sans font-bold text-xs text-charcoal uppercase tracking-wider">Equestrian Arena &amp; Durbar</div>
+      </button>
+
+      <!-- Zone 4 (Gold/Amber) -->
+      <button onclick="selectZone(4)" class="p-4 rounded-xl bg-white border border-borderMain hover:border-gold-border text-left transition-all group shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-gold-deep font-sans font-extrabold text-2xl group-hover:scale-110 transition-transform">4</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-[#F59E0B]"></span>
+        </div>
+        <div class="text-[11px] font-bold text-gold-deep uppercase tracking-[0.15em] mb-0.5">EAST COMPLEX</div>
+        <div class="font-sans font-bold text-xs text-charcoal uppercase tracking-wider">Traceability &amp; Tech</div>
+      </button>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-borderMain bg-white py-6 text-center text-xs text-slateSub font-sans mt-8">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-3">
+      <p>&copy; 2026 National Livestock Carnival | 2026 Renewed Hope National Livestock Carnival. Headquartered at Old Parade Ground, Abuja.</p>
+      <div class="flex items-center gap-3 flex-wrap justify-center">
+        <!-- Unboxed Endorsement -->
+        <div class="inline-flex items-center gap-1.5 text-xs text-sage-deep font-bold uppercase tracking-wider">
+          <i data-lucide="shield-check" class="w-4 h-4 text-sage-deep"></i>
+          An official initiative of the Federal Government of Nigeria and NHESICS
+        </div>
+        <span class="text-muted">•</span>
+        <button onclick="openDirections()" class="px-3 py-1 rounded-full bg-surface text-charcoal border border-borderMain hover:bg-sage-subtle font-sans text-[11px] font-bold uppercase tracking-wider transition-all">
+          Open Directions
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- D. INTERACTIVITY LOGIC & PRECISION SATELLITE ENGINE        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // DYNAMIC ZONE DATA OBJECT (Strict real-world GPS alignment)
+    const zonesData = {
+      1: {
+        num: 1,
+        colorName: 'Green (Emerald)',
+        badge: 'Zone 1 • NW WEST FIELD',
+        title: 'Agro-Commerce Market',
+        subtitle: 'Zone 1: NW WEST FIELD',
+        description: 'The commercial heart of the expo located in the northwest sector (Area 10 Basketball Court area). Witness the 2026 Live-Weight Pricing System live and connect directly with farmers.',
+        imageSrc: 'assets/carnival_animal_parade.jpg',
+        highlights: [
+          'Live-Weight Digital Pricing System Demonstration',
+          'Gudali, Bunaji & Kuri Purebred Cattle Exhibition',
+          'Direct Farmer-to-Processor B2B Matchmaking',
+          'Bank of Agriculture Credit Facilitation Desk'
+        ],
+        // Exact user confirmed location above basketball court
+        lat: 9.042998005532722,
+        lng: 7.487429114828819
+      },
+      2: {
+        num: 2,
+        colorName: 'Blue (Royal)',
+        badge: 'Zone 2 • SW WEST FIELD',
+        title: 'Suya & Culinary Village',
+        subtitle: 'Zone 2: SW WEST FIELD',
+        description: 'Taste Nigeria\'s renowned culinary heritage in the southwest field along Ayere St / Buhari Wy. Featuring premium, hygienically prepared Suya and modular abattoir demonstrations.',
+        imageSrc: 'assets/suya_open_flame.jpg',
+        highlights: [
+          'Master Suya Chefs Live Grilling Competition',
+          'Standardized Modular Abattoir Inspection Demo',
+          'Global Food & Beverage Pavilion',
+          'NHESICS Quality Certification Showcase'
+        ],
+        // Exact SW Field (Ayere St / Buhari Wy)
+        lat: 9.0418,
+        lng: 7.4882
+      },
+      3: {
+        num: 3,
+        colorName: 'Red (Crimson)',
+        badge: 'Zone 3 • CENTRAL TRACK & FIELD',
+        title: 'Equestrian Arena & Durbar',
+        subtitle: 'Zone 3: CENTRAL TRACK & FIELD',
+        description: 'Experience the majestic heritage of the nation right on the main track, with high-end horse racing, spectacular Durbar displays, and cultural exhibitions.',
+        imageSrc: 'assets/durbar_horse_rider.jpg',
+        highlights: [
+          'Royal Durbar Equestrian Procession & Parade',
+          'High-Speed Horse Racing Competitions',
+          'Traditional Cultural Costumes & Crafts Exhibition',
+          'Presidential Trophy Presentation & Royal Stand'
+        ],
+        // Exact Dead Center of Old Parade Ground Oval Track
+        lat: 9.0428,
+        lng: 7.4890
+      },
+      4: {
+        num: 4,
+        colorName: 'Yellow (Amber)',
+        badge: 'Zone 4 • EAST COMPLEX',
+        title: 'Traceability & Tech Pavilion',
+        subtitle: 'Zone 4: EAST COMPLEX',
+        description: 'Witness the future of the National Livestock Strategy featuring live digital E-Tagging and export-grade logistics in the East Complex along Herbert Macaulay Wy.',
+        imageSrc: 'assets/fashion_crafts.jpg',
+        highlights: [
+          'Live Biometric RFID E-Tagging Scanner Demos',
+          'Farm-to-Fork Blockchain Traceability Portal',
+          '-18°C Cold-Chain Flight Deck Cargo Storage Demo',
+          'Digital Public Infrastructure Registration'
+        ],
+        // Exact East Complex Buildings (East of Track)
+        lat: 9.0435,
+        lng: 7.4900
+      }
+    };
+
+    let map = null;
+    let tileLayers = {};
+    let leafletMarkers = {};
+    let activeZoneNum = null;
+
+    // INITIALIZE PERFECTLY PINNED SATELLITE ENGINE
+    function initRealSatelliteMap() {
+      // Center accurately on Old Parade Ground Stadium: [9.0428, 7.4890]
+      map = L.map('realSatelliteMap', {
+        center: [9.0428, 7.4890],
+        zoom: 17,
+        zoomControl: false
+      });
+
+      L.control.zoom({ position: 'topright' }).addTo(map);
+
+      // Tile Layer 1: Google Hybrid Satellite
+      tileLayers.google = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        attribution: 'Map imagery &copy; Google Maps Satellite',
+        maxZoom: 20
+      }).addTo(map);
+
+      // Tile Layer 2: Esri World Imagery Satellite
+      tileLayers.esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri - Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid',
+        maxZoom: 19
+      });
+
+      // Add Huge Clickable Number Pins (1, 2, 3, 4)
+      Object.keys(zonesData).forEach(numKey => {
+        const zone = zonesData[numKey];
+
+        const ringBgColor = zone.num === 1 ? 'bg-emerald-400/40' : zone.num === 2 ? 'bg-blue-400/40' : zone.num === 3 ? 'bg-rose-500/40' : 'bg-amber-400/40';
+        const numBorderColor = zone.num === 1 ? 'border-emerald-500' : zone.num === 2 ? 'border-blue-500' : zone.num === 3 ? 'border-rose-500' : 'border-amber-500';
+        const numTextColor = zone.num === 1 ? 'text-emerald-700' : zone.num === 2 ? 'text-blue-700' : zone.num === 3 ? 'text-rose-700' : 'text-amber-700';
+
+        const customIcon = L.divIcon({
+          className: 'custom-number-marker',
+          html: `
+            <div onclick="selectZone(${zone.num})" class="relative flex items-center justify-center cursor-pointer group/num">
+              <div class="absolute -inset-4 rounded-full ${ringBgColor} pulse-ring pointer-events-none"></div>
+              <div class="relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-white border-4 ${numBorderColor} shadow-xl backdrop-blur-md group-hover/num:scale-125 group-hover/num:bg-sage-base transition-all duration-300">
+                <span class="text-3xl md:text-4xl font-sans font-black ${numTextColor} group-hover/num:text-sage-deep drop-shadow-sm transition-colors">${zone.num}</span>
+              </div>
+            </div>
+          `,
+          iconSize: [60, 60],
+          iconAnchor: [30, 30]
+        });
+
+        const marker = L.marker([zone.lat, zone.lng], { icon: customIcon }).addTo(map);
+        marker.on('click', () => selectZone(zone.num));
+        marker.bindTooltip(`<b>Zone ${zone.num}: ${zone.title}</b><br><span style="font-size:10px">${zone.subtitle}</span>`, { direction: 'top', offset: [0, -30] });
+
+        leafletMarkers[zone.num] = marker;
+      });
+    }
+
+    // TILE PROVIDER SWITCHER
+    function setTileProvider(provider) {
+      const btnSat = document.getElementById('btnSatelliteMode');
+      const btnEsri = document.getElementById('btnEsriMode');
+
+      if (provider === 'google') {
+        map.removeLayer(tileLayers.esri);
+        map.addLayer(tileLayers.google);
+        btnSat.className = "px-3 py-1.5 rounded-lg bg-sage-deep text-white font-sans font-bold text-xs uppercase tracking-wider transition-all shadow-sm";
+        btnEsri.className = "px-3 py-1.5 rounded-lg text-slateSub hover:text-sage-deep font-sans font-semibold text-xs uppercase tracking-wider transition-all";
+      } else {
+        map.removeLayer(tileLayers.google);
+        map.addLayer(tileLayers.esri);
+        btnEsri.className = "px-3 py-1.5 rounded-lg bg-sage-deep text-white font-sans font-bold text-xs uppercase tracking-wider transition-all shadow-sm";
+        btnSat.className = "px-3 py-1.5 rounded-lg text-slateSub hover:text-sage-deep font-sans font-semibold text-xs uppercase tracking-wider transition-all";
+      }
+    }
+
+    // GPS NAVIGATION / GET ROAD DIRECTIONS FUNCTION (ZERO EMOJIS)
+    function openDirections() {
+      const destLat = 9.0428;
+      const destLng = 7.4890;
+      const destQuery = encodeURIComponent("Old Parade Ground, Mohammadu Buhari Wy, Garki, Abuja");
+
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destLat},${destLng}&destination_place_id=Old+Parade+Ground+Abuja&travelmode=driving`;
+            window.open(mapsUrl, '_blank', 'noopener,noreferrer');
+          },
+          (error) => {
+            const fallbackUrl = `https://www.google.com/maps/dir/?api=1&destination=${destQuery}&travelmode=driving`;
+            window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
+          },
+          { timeout: 4000 }
+        );
+      } else {
+        const fallbackUrl = `https://www.google.com/maps/dir/?api=1&destination=${destQuery}&travelmode=driving`;
+        window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
+      }
+    }
+
+    // SELECT ZONE FUNCTION (Number Pin Click)
+    function selectZone(num) {
+      const zone = zonesData[num];
+      if (!zone) return;
+
+      activeZoneNum = num;
+
+      // Pan & Zoom Live Google Satellite Map smoothly to pin coordinates
+      if (map) {
+        let targetLng = zone.lng;
+        if (window.innerWidth < 768) {
+          targetLng -= 0.0010;
+        }
+        map.flyTo([zone.lat, targetLng], 18, { duration: 1.2 });
+      }
+
+      // Update Panel Content with Unboxed Eyebrow Header
+      const panelBadge = document.getElementById('panelBadge');
+      panelBadge.innerText = zone.badge;
+      panelBadge.className = 'font-sans font-bold text-xs uppercase tracking-[0.15em] text-gold-deep';
+
+      document.getElementById('panelTitle').innerText = zone.title;
+      document.getElementById('panelSubtitle').innerText = zone.subtitle;
+      document.getElementById('panelDescription').innerText = zone.description;
+
+      const panelImg = document.getElementById('panelImage');
+      panelImg.style.opacity = '0.3';
+      setTimeout(() => {
+        panelImg.src = zone.imageSrc;
+        panelImg.style.opacity = '1';
+      }, 200);
+
+      const highlightsList = document.getElementById('panelHighlights');
+      highlightsList.innerHTML = zone.highlights.map(item => `
+        <li class="flex items-start gap-2">
+          <span class="text-sage-deep font-bold">•</span>
+          <span>${item}</span>
+        </li>
+      `).join('');
+
+      document.getElementById('panelCTA').innerHTML = `
+        <span>Register for ${zone.title}</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      `;
+      lucide.createIcons();
+
+      // Slide Info Panel into View
+      document.getElementById('infoPanel').classList.remove('translate-x-full');
+    }
+
+    // CLOSE INFO PANEL FUNCTION
+    function closeInfoPanel() {
+      document.getElementById('infoPanel').classList.add('translate-x-full');
+      resetMapView();
+    }
+
+    // RESET MAP VIEW FUNCTION
+    function resetMapView() {
+      if (map) {
+        map.flyTo([9.0428, 7.4890], 17, { duration: 1 });
+      }
+      activeZoneNum = null;
+    }
+
+    // REGISTER FOR ZONE HANDLER
+    function registerZone() {
+      if (!activeZoneNum) return;
+      const zone = zonesData[activeZoneNum];
+      alert(`Registration request submitted for: ${zone.title} (${zone.subtitle})\nOur secretariat team will contact you shortly.`);
+    }
+
+    // Initialize Map on DOM Load
+    document.addEventListener('DOMContentLoaded', () => {
+      initRealSatelliteMap();
+    });
+
+    // Escape Key Handler to close panel
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeInfoPanel();
+    });
+  </script>
+</body>
+</html>

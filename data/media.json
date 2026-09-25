@@ -1,0 +1,80 @@
+{
+  "pressReleases": [
+    {
+      "id": "PR-2026-001",
+      "date": "2026-10-15",
+      "category": "Official Communique",
+      "title": "Federal Government Declares Abuja as Sole National Host for 2026 Renewed Hope National Livestock Carnival",
+      "summary": "The Federal Government of Nigeria and NHESICS unveil the master operational framework positioning Old Parade Ground as Nigeria's central agri-export showcase.",
+      "readTime": "4 min read",
+      "downloadUrl": "#",
+      "content": "The Federal Government of Nigeria, in strategic collaboration with the National Livestock Transformation Secretariat and NHESICS, has formally announced the comprehensive operational staging for the inaugural 2026 Renewed Hope National Livestock Carnival. Headquartered exclusively at the historic Old Parade Ground in Abuja, the three-day fixture will aggregate purebred cattle, camels, goats, sheep, poultry, and aquaculture genetic assets alongside institutional trade finance and state-of-the-art cold chain infrastructure under a unified national canopy."
+    },
+    {
+      "id": "PR-2026-002",
+      "date": "2026-10-02",
+      "category": "Investment & Policy",
+      "title": "Bank of Industry Commits Single-Digit Financing Facility for Modern Feedlots & Abattoirs",
+      "summary": "Concessionary capital window activated to back commercial pastoralists, veterinary telematics operators, and hygienic artisanal and industrial abattoir networks.",
+      "readTime": "3 min read",
+      "downloadUrl": "#",
+      "content": "A landmark memorandum has been structured between institutional development lenders and the livestock secretariat. Under the newly created Agri-Transform Window, verified livestock enterprises adopting biometric ear-tagging and standardized live-weight trading will access concessional expansion loans tailored to reduce production overheads and upgrade processing standards."
+    },
+    {
+      "id": "PR-2026-003",
+      "date": "2026-09-18",
+      "category": "Technology & Inspection",
+      "title": "Quality & Inspection Infrastructure Framework Achieves Bilateral Gulf Export Alignment",
+      "summary": "Harmonized standards ensure direct Nigerian beef, lamb, poultry, and aquaculture consignments meet stringent Gulf and Middle Eastern market import protocols.",
+      "readTime": "5 min read",
+      "downloadUrl": "#",
+      "content": "Nigeria's positioning within the global livestock export economy receives a decisive catalyst with the formal codification of the Quality & Inspection Infrastructure (QII). Integrating digital biometric RFID ear tags with tamper-proof veterinary ledgers and mobile processing modularity guarantees verifiable farm-to-cargo port provenance across all livestock categories."
+    },
+    {
+      "id": "PR-2026-004",
+      "date": "2026-08-25",
+      "category": "Cultural Heritage",
+      "title": "Royal Durbar Cavalry Contingents Confirm Historic Abuja Festival Procession",
+      "summary": "Premier emirates and northern cavalry councils will assemble over two hundred elite war horses and royal retinues in a spectacular display of equestrian skill.",
+      "readTime": "3 min read",
+      "downloadUrl": "#",
+      "content": "Centuries of regal horsemanship and equestrian pageantry will animate the Old Parade Ground track in Abuja. The 2026 Festival will host representative delegations from Kano, Katsina, Bauchi, Bida, and Adamawa in a calibrated parade celebrating national heritage, peacebuilding, and pastoral excellence."
+    }
+  ],
+  "mediaKits": [
+    {
+      "title": "Official 2026 Press Kit & Brand Guide",
+      "format": "PDF (Vector Logos, Color Codes & Institutional Lockups)",
+      "fileSize": "14.2 MB",
+      "updated": "October 2026",
+      "downloadUrl": "#"
+    },
+    {
+      "title": "High-Resolution Media Photography Pack",
+      "format": "ZIP (Curated 300DPI Images of Durbar, Livestock Breeds & Venues)",
+      "fileSize": "48.5 MB",
+      "updated": "October 2026",
+      "downloadUrl": "#"
+    },
+    {
+      "title": "Quality & Inspection Infrastructure Technical Whitepaper",
+      "format": "PDF (Full Export Standards, Traceability Specs & Regulatory Framework)",
+      "fileSize": "6.8 MB",
+      "updated": "September 2026",
+      "downloadUrl": "#"
+    },
+    {
+      "title": "Old Parade Ground GIS Venue & Traffic Access Blueprint",
+      "format": "PDF (Zone Layouts, Satellite Maps, Parking Gates & Security Corridors)",
+      "fileSize": "8.4 MB",
+      "updated": "October 2026",
+      "downloadUrl": "#"
+    }
+  ],
+  "mediaGuidelines": [
+    "Broadcast cameras must register tripod clearance during online accreditation.",
+    "Drone flights strictly prohibited without prior Office of the National Security Adviser (ONSA) airspace permit.",
+    "Accredited journalists receive full access to Media Center workstations with 1Gbps dedicated fiber backhaul.",
+    "Official press briefings occur daily at 11:00 AM and 4:00 PM in the Media Briefing Theatre."
+  ]
+}

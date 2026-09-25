@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "nlf-vendors"
+  },
+  "targets": {
+    "nlf-vendors": {
+      "hosting": {
+        "nlf-carnival": [
+          "nlf-carnival"
+        ]
+      }
+    }
+  }
+}

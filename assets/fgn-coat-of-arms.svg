@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" fill="none">
+  <!-- Eagle body -->
+  <ellipse cx="100" cy="100" rx="30" ry="38" fill="#1a1a1a"/>
+  <!-- Eagle head -->
+  <circle cx="100" cy="64" r="16" fill="#1a1a1a"/>
+  <!-- Eagle beak -->
+  <polygon points="100,72 108,78 100,82" fill="#C9A84C"/>
+  <!-- Eagle eye -->
+  <circle cx="104" cy="62" r="3" fill="white"/>
+  <circle cx="105" cy="62" r="1.5" fill="#1a1a1a"/>
+
+  <!-- Left wing -->
+  <path d="M70,90 Q30,60 10,85 Q25,95 40,90 Q25,110 20,130 Q45,115 70,110 Z" fill="#1a1a1a"/>
+  <!-- Right wing -->
+  <path d="M130,90 Q170,60 190,85 Q175,95 160,90 Q175,110 180,130 Q155,115 130,110 Z" fill="#1a1a1a"/>
+
+  <!-- Shield on chest -->
+  <path d="M82,95 L118,95 L118,132 Q100,145 82,132 Z" fill="white" stroke="#1a1a1a" stroke-width="1.5"/>
+  <!-- Shield left green panel -->
+  <path d="M82,95 L100,95 L100,142 Q91,143 82,132 Z" fill="#008751"/>
+  <!-- Shield right green panel -->
+  <path d="M100,95 L118,95 L118,132 Q109,143 100,142 Z" fill="#008751"/>
+  <!-- Shield white center stripe (Y-shape / rivers) -->
+  <path d="M100,95 L100,142" stroke="white" stroke-width="8"/>
+  <path d="M100,108 L88,96" stroke="white" stroke-width="6"/>
+  <path d="M100,108 L112,96" stroke="white" stroke-width="6"/>
+
+  <!-- Eagle talons / feet holding two horses representation -->
+  <!-- Left talon -->
+  <line x1="85" y1="138" x2="72" y2="155" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+  <line x1="72" y1="155" x2="62" y2="162" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="72" y1="155" x2="68" y2="165" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="72" y1="155" x2="76" y2="165" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Right talon -->
+  <line x1="115" y1="138" x2="128" y2="155" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+  <line x1="128" y1="155" x2="138" y2="162" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="128" y1="155" x2="132" y2="165" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="128" y1="155" x2="124" y2="165" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Supporting horses (left) -->
+  <g transform="translate(28,120) scale(0.55)">
+    <ellipse cx="30" cy="50" rx="18" ry="12" fill="#C9A84C"/>
+    <ellipse cx="44" cy="42" rx="10" ry="8" fill="#C9A84C"/>
+    <circle cx="52" cy="36" r="7" fill="#C9A84C"/>
+    <!-- horse legs -->
+    <line x1="20" y1="58" x2="18" y2="75" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <line x1="28" y1="60" x2="26" y2="77" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <line x1="36" y1="60" x2="38" y2="77" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <line x1="44" y1="58" x2="46" y2="75" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <!-- horse mane -->
+    <path d="M46,36 Q52,28 58,30" stroke="#8B6914" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- Supporting horses (right) -->
+  <g transform="translate(118,120) scale(0.55) scale(-1,1) translate(-60,0)">
+    <ellipse cx="30" cy="50" rx="18" ry="12" fill="#C9A84C"/>
+    <ellipse cx="44" cy="42" rx="10" ry="8" fill="#C9A84C"/>
+    <circle cx="52" cy="36" r="7" fill="#C9A84C"/>
+    <line x1="20" y1="58" x2="18" y2="75" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <line x1="28" y1="60" x2="26" y2="77" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <line x1="36" y1="60" x2="38" y2="77" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <line x1="44" y1="58" x2="46" y2="75" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <path d="M46,36 Q52,28 58,30" stroke="#8B6914" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- Wavy base / Niger river representation -->
+  <path d="M38,178 Q60,170 80,178 Q100,186 120,178 Q140,170 162,178" stroke="#C9A84C" stroke-width="2.5" fill="none"/>
+  <path d="M38,184 Q60,176 80,184 Q100,192 120,184 Q140,176 162,184" stroke="#C9A84C" stroke-width="2.5" fill="none"/>
+
+  <!-- Motto banner -->
+  <path d="M32,196 Q100,188 168,196 Q168,210 100,215 Q32,210 32,196 Z" fill="#008751"/>
+  <text x="100" y="208" text-anchor="middle" font-family="Georgia, serif" font-size="9" font-weight="bold" fill="white" letter-spacing="1">UNITY AND FAITH</text>
+</svg>

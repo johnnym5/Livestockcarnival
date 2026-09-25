@@ -1,0 +1,126 @@
+import Link from 'next/link';
+import Image from 'next/image';
+import { Shield } from 'lucide-react';
+
+export default function Footer() {
+  return (
+    <footer className="bg-[#111827] text-white w-full border-t border-white/10">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          {/* Brand Column */}
+          <div className="flex flex-col gap-4">
+            {/* FGN Coat of Arms */}
+            <div className="flex items-center gap-3">
+              <Image
+                src="/assets/coat_of_arms.png"
+                alt="Federal Republic of Nigeria Coat of Arms"
+                width={40}
+                height={46}
+                className="shrink-0 object-contain"
+              />
+              <div className="flex flex-col">
+                <span className="font-extrabold text-white text-base tracking-tight leading-snug">
+                  RENEWED HOPE NATIONAL LIVESTOCK CARNIVAL 2026
+                </span>
+                <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.2em] uppercase mt-0.5">
+                  GOLDEN CAMEL &amp; COW CARNIVAL
+                </span>
+              </div>
+            </div>
+            <p className="text-[#9CA3AF] text-sm leading-relaxed">
+              Official Federal Government of Nigeria sovereign public festival and trade gateway. Uniting pastoral heritage, cultural pageantry, and global agribusiness export wealth.
+            </p>
+            <div className="flex items-center gap-2 text-gray-300 mt-2 text-xs font-medium">
+              <Shield size={14} className="text-[#D4AF37] shrink-0" />
+              <span>Federal Republic of Nigeria Sovereign Staging</span>
+            </div>
+          </div>
+
+          {/* Festival Hubs */}
+          <div className="flex flex-col gap-4">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-white">Festival Hubs</h4>
+            <nav className="flex flex-col gap-2.5">
+              <Link href="/attractions#durbar" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Royal Durbar Pageantry
+              </Link>
+              <Link href="/attractions#suya" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Open-Flame Suya Village
+              </Link>
+              <Link href="/attractions" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Live Concerts &amp; Ijele Pageantry
+              </Link>
+              <Link href="/schedule" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Livestock Breed Judging
+              </Link>
+              <Link href="/venue-map" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                GIS Satellite Venue Map
+              </Link>
+            </nav>
+          </div>
+
+          {/* Policy & Media */}
+          <div className="flex flex-col gap-4">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-white">Policy &amp; Media</h4>
+            <nav className="flex flex-col gap-2.5">
+              <Link href="/about" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Presidential Mandate
+              </Link>
+              <Link href="/about#financing" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Agro-Industrial Financing Window
+              </Link>
+              <Link href="/media" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Press Releases &amp; Briefings
+              </Link>
+              <Link href="/media#kits" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Media Kit Downloads
+              </Link>
+              <Link href="/accreditation" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+                Journalist Accreditation
+              </Link>
+            </nav>
+          </div>
+
+          {/* External Portals & Venue */}
+          <div className="flex flex-col gap-4">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-white">External Portals &amp; Venue</h4>
+            <nav className="flex flex-col gap-2.5 mb-2">
+              <a
+                href="https://gcc-carnival.web.app/ticket"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#D4AF37] hover:underline text-sm font-semibold transition-colors"
+              >
+                Claim Free Gate Pass →
+              </a>
+              <a
+                href="https://nlf-vendors.web.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-white text-sm font-semibold transition-colors"
+              >
+                Exhibitor Booths →
+              </a>
+            </nav>
+            <div className="text-xs text-[#9CA3AF] leading-relaxed pt-2 border-t border-white/10">
+              <p className="font-semibold text-white">Abuja National Grounds</p>
+              <p>Old Parade Ground, Area 10, Garki, Abuja FCT</p>
+              <p className="mt-1">November 21 – 23, 2026</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Legal & Copyright */}
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#9CA3AF]">
+          <div>
+            &copy; 2026 Federal Republic of Nigeria · Renewed Hope National Livestock Carnival. All sovereign rights reserved.
+          </div>
+          <div className="flex gap-6">
+            <Link href="/contact" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/accreditation" className="hover:text-white transition-colors">Terms of Accreditation</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Security Protocols</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}

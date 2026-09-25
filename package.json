@@ -1,0 +1,11 @@
+{
+  "name": "goldencamelandcow",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix nextjs-app run dev",
+    "build": "npm --prefix nextjs-app run build",
+    "start": "npm --prefix nextjs-app run start",
+    "lint": "npm --prefix nextjs-app run lint"
+  }
+}

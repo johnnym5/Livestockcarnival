@@ -1,0 +1,110 @@
+[
+  {
+    "id": "durbar",
+    "zone": "Zone 3: Central Track & Field",
+    "title": "Royal Equestrian Durbar & Horse Pageantry",
+    "subtitle": "Centuries of Regal Cavalry Heritage on the Old Parade Ground Track",
+    "image": "assets/durbar_horse_rider.jpg",
+    "category": "Equestrian & Culture",
+    "badgeColor": "champagne",
+    "summary": "Witness over two hundred champion stallions adorned in brocade, velvet, and beaten brass, guided by traditional cavalry units from across northern and north-central emirates.",
+    "features": [
+      "Traditional cavalry salutes and high-speed gallop displays",
+      "Ancient brass instruments, kakaki trumpets, and ceremonial drums",
+      "Royal equestrian gear craft exhibition and harness leatherwork",
+      "Presidential box review and ceremonial honors parade"
+    ],
+    "scheduleWindow": "Daily 10:00 - 13:00",
+    "venueTarget": "venue-map.html#zone-3"
+  },
+  {
+    "id": "meat-market",
+    "zone": "Zone 1: NW West Field",
+    "title": "Fresh Meat & Live-Weight Market",
+    "subtitle": "Modernized Trade Exchange with Precision Electronic Scales",
+    "image": "assets/carnival_animal_parade.jpg",
+    "category": "Trade & Commerce",
+    "badgeColor": "sage",
+    "summary": "Experience the transformation of Nigerian livestock commerce from arbitrary eye-estimation to certified live-weight kilogram pricing with instant electronic settlement.",
+    "features": [
+      "Certified digital weighing platforms for cattle, sheep, and camels",
+      "Direct farm-gate price transparency with zero intermediary markups",
+      "Bank of Agriculture & commercial settlement kiosks for cash-free transactions",
+      "Mobile veterinary inspection tags guaranteeing disease-free stock"
+    ],
+    "scheduleWindow": "Daily 08:30 - 18:00",
+    "venueTarget": "venue-map.html#zone-1"
+  },
+  {
+    "id": "suya-village",
+    "zone": "Zone 2: SW West Field",
+    "title": "Twilight Suya & Culinary Village",
+    "subtitle": "Celebrating Nigeria's Renowned Artisanal Smoked Meats",
+    "image": "assets/suya_open_flame.jpg",
+    "category": "Gastronomy & Culinary",
+    "badgeColor": "champagne",
+    "summary": "Sample the finest cuts of beef, tender lamb, and spiced goat prepared over slow embers by the nation's premier suya artisans following verified hygienic standards.",
+    "features": [
+      "Master Suya Guild national championship and secret spice blend showcase",
+      "Hygienic prep zones with continuous temperature-controlled displays",
+      "Kilishi craft demonstrations and vacuum-sealed gift packaging for export",
+      "Open-air seating pavilion with traditional evening musical interludes"
+    ],
+    "scheduleWindow": "Daily 12:00 - 21:00",
+    "venueTarget": "venue-map.html#zone-2"
+  },
+  {
+    "id": "livestock-judging",
+    "zone": "Zone 1 & 3",
+    "title": "National Championship Breed Judging",
+    "subtitle": "Elite Pastoral Genetics, Conformation & Breed Excellence",
+    "image": "assets/kids_horse_petting.jpg",
+    "category": "Genetics & Competition",
+    "badgeColor": "sage",
+    "summary": "The premier stage for pastoralists showcasing purebred Sokoto Gudali, White Fulani, Red Bororo, and dual-hump Sahelian camels evaluated by certified veterinary judges.",
+    "features": [
+      "Comprehensive scoring: skeletal conformation, weight-for-age, and milk/meat ratios",
+      "Presidential gold medals, breed rosettes, and prize breeding bulls",
+      "AI (Artificial Insemination) and genetic improvement clinics for smallholders",
+      "Official breed studbook registry certificates issued on site"
+    ],
+    "scheduleWindow": "Days 2 & 3 09:00 - 14:00",
+    "venueTarget": "venue-map.html#zone-1"
+  },
+  {
+    "id": "traceability-hub",
+    "zone": "Zone 4: East Complex",
+    "title": "Digital Traceability & Cold-Chain Pavilion",
+    "subtitle": "Unlocking Global Export Markets Through Sovereign Quality Infrastructure",
+    "image": "assets/veterinary_pet_checkup.jpg",
+    "category": "Technology & Innovation",
+    "badgeColor": "sage",
+    "summary": "Explore cutting-edge biometric cattle ear-tagging, cloud-connected veterinary health ledgers, and containerized modular abattoirs meeting international export protocols.",
+    "features": [
+      "Live RFID ear-tag scanning and cloud ledger telemetry demonstrations",
+      "Mobile modular abattoir walk-through with sterile stainless steel processing lines",
+      "-18°C reefer transport and air cargo logistics coordination desks",
+      "NHESICS export certification registration and documentation support"
+    ],
+    "scheduleWindow": "Daily 09:00 - 17:30",
+    "venueTarget": "venue-map.html#zone-4"
+  },
+  {
+    "id": "cultural-carnival",
+    "zone": "Central Festival Grounds",
+    "title": "Renewed Hope Cultural & Unity Pageant",
+    "subtitle": "Unifying Geopolitical Zones Through Agricultural Heritage",
+    "image": "assets/cultural_dancing.jpg",
+    "category": "National Unity",
+    "badgeColor": "champagne",
+    "summary": "A colorful celebration bridging pastoral communities, agrarian feed producers, and coastal maritime export ports in a shared economic and cultural triumph.",
+    "features": [
+      "Traditional dance troupes from northern, eastern, and western pastoral corridors",
+      "Indigenous leatherwork, saddle embroidery, and cattle-horn artisanal crafts",
+      "Youth agricultural innovation fair and future farmers masterclasses",
+      "Grand evening national unity concert and illumination ceremony"
+    ],
+    "scheduleWindow": "Day 3 16:00 - 20:30",
+    "venueTarget": "venue-map.html"
+  }
+]

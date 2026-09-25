@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journalist Accreditation | National Livestock Carnival 2026</title>
+  <meta name="description" content="Official media accreditation application portal for local and international journalists covering the 2026 Renewed Hope National Livestock Carnival in Abuja.">
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="assets/company_logo_clean.png">
+</head>
+<body>
+
+  <!-- Masthead Mount -->
+  <div id="masthead-mount"></div>
+
+  <!-- Navigation Mount -->
+  <div id="nav-mount"></div>
+
+  <main>
+    <section style="padding: 4rem 0 5rem;">
+      <div class="container-custom" style="max-width: 860px;">
+        
+        <div style="text-align: center; margin-bottom: 3rem;">
+          <div class="hero-pill-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><circle cx="9" cy="10" r="2"></circle><line x1="15" y1="8" x2="17" y2="8"></line><line x1="15" y1="12" x2="17" y2="12"></line><line x1="7" y1="16" x2="17" y2="16"></line></svg>
+            Press Directorate Verification Portal
+          </div>
+          <h1 class="hero-title" style="font-size: 2.5rem; margin-bottom: 0.75rem;">
+            Journalist Accreditation Intake
+          </h1>
+          <p class="hero-lead" style="margin-left: auto; margin-right: auto;">
+            Accreditation is mandatory for all print, broadcast, digital, and freelance correspondents requesting access to the VIP enclosure, Durbar trackside, and Media Center.
+          </p>
+        </div>
+
+        <div class="form-card">
+          <form id="accreditation-form" novalidate>
+            
+            <div id="validation-alert" style="display: none; padding: 1rem 1.25rem; border-radius: var(--radius-md); background: #FEF2F2; border: 1px solid #F87171; color: #991B1B; font-size: 0.875rem; margin-bottom: 2rem;">
+              <ul id="validation-errors-list" style="margin-left: 1.25rem;"></ul>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="fullName">Full Legal Name (as on National ID) *</label>
+                <input type="text" id="fullName" name="fullName" class="form-control" placeholder="e.g. Ibrahim Abubakar" required>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="organization">Media Organization / Press House *</label>
+                <input type="text" id="organization" name="organization" class="form-control" placeholder="e.g. Nigerian Television Authority (NTA) / Reuters" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="email">Official Editorial Email *</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="editor@presshouse.com" required>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="phone">Direct Mobile / WhatsApp *</label>
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="+234 803 000 0000" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="nin">National Identity Number (NIN) - 11 Digits *</label>
+                <input type="text" id="nin" name="nin" maxlength="11" class="form-control" placeholder="11-digit numeric NIN" required>
+                <small class="text-muted" style="font-size: 0.75rem;">Required by State Protocol for presidential area security clearance.</small>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="roleCategory">Accreditation Category *</label>
+                <select id="roleCategory" name="roleCategory" class="form-control" required>
+                  <option value="Broadcast Television Crew">Broadcast Television Crew</option>
+                  <option value="Photojournalist / Still Camera">Photojournalist / Still Camera</option>
+                  <option value="Print / Wire Service Reporter">Print / Wire Service Reporter</option>
+                  <option value="Digital Media / Podcast Producer">Digital Media / Podcast Producer</option>
+                  <option value="Foreign Press Delegate">Foreign Press Delegate</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Drag and Drop Verification Area -->
+            <div class="form-group" style="margin-bottom: 2rem;">
+              <label class="form-label">Assignment Letter or Press Identification (PDF Only, Max 5MB) *</label>
+              
+              <div id="dropzone" class="dropzone-box">
+                <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                  <path d="M12 12v9"/>
+                  <path d="m16 16-4-4-4 4"/>
+                </svg>
+                <div style="font-weight: 700; font-size: 0.9375rem; color: var(--charcoal-obsidian); margin-bottom: 0.25rem;">
+                  Click to select file or drag and drop PDF here
+                </div>
+                <div class="text-subtle" style="font-size: 0.8125rem;">
+                  Official letterhead signed by Managing Editor or Editor-in-Chief.
+                </div>
+                <div id="file-status" style="margin-top: 0.75rem; font-weight: 600; font-size: 0.8125rem; color: var(--sage-deep);"></div>
+                <input type="file" id="credentialFile" name="credentialFile" accept="application/pdf" style="display: none;">
+              </div>
+            </div>
+
+            <!-- Agreement -->
+            <div style="margin-bottom: 2rem;">
+              <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer; font-size: 0.875rem; color: var(--slate-subtext);">
+                <input type="checkbox" id="termsCheck" required style="margin-top: 0.25rem;">
+                <span>
+                  I certify that all information submitted is truthful and agree to adhere strictly to the Secretariat's livestock safety, security clearance, and broadcast zoning regulations.
+                </span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+              Submit Accreditation Dossier
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Mount -->
+  <div id="footer-mount"></div>
+
+  <script src="main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.livestockApp.renderGlobalNav('media');
+      window.livestockApp.renderGlobalFooter();
+
+      const form = document.getElementById('accreditation-form');
+      const dropzone = document.getElementById('dropzone');
+      const fileInput = document.getElementById('credentialFile');
+      const fileStatus = document.getElementById('file-status');
+      const alertBox = document.getElementById('validation-alert');
+      const errorsList = document.getElementById('validation-errors-list');
+
+      let selectedFile = null;
+
+      // Dropzone interactions
+      dropzone.addEventListener('click', () => fileInput.click());
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropzone.classList.add('dragover');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('dragover');
+        });
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          handleFile(e.target.files[0]);
+        }
+      });
+
+      function handleFile(file) {
+        if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+          fileStatus.textContent = 'Invalid file format. Only PDF files are accepted.';
+          fileStatus.style.color = '#DC2626';
+          selectedFile = null;
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          fileStatus.textContent = 'File exceeds 5MB size limit. Please choose a smaller file.';
+          fileStatus.style.color = '#DC2626';
+          selectedFile = null;
+          return;
+        }
+        selectedFile = file;
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        fileStatus.textContent = `Selected: ${file.name} (${sizeMb} MB) - PDF Verified`;
+        fileStatus.style.color = 'var(--sage-deep)';
+      }
+
+      // Form submission validation
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alertBox.style.display = 'none';
+        errorsList.innerHTML = '';
+
+        const formData = new FormData(form);
+        const termsChecked = document.getElementById('termsCheck').checked;
+        const errors = window.livestockApp.validateAccreditationForm(formData, selectedFile);
+
+        if (!termsChecked) {
+          errors.push('You must accept the livestock safety and accreditation agreement.');
+        }
+
+        if (errors.length > 0) {
+          errorsList.innerHTML = errors.map(err => `<li>${window.livestockApp.escapeHTML(err)}</li>`).join('');
+          alertBox.style.display = 'block';
+          window.scrollTo({ top: alertBox.offsetTop - 120, behavior: 'smooth' });
+          return;
+        }
+
+        // Success Simulation
+        const appRef = 'ACC-' + Math.floor(100000 + Math.random() * 900000);
+        form.innerHTML = `
+          <div style="text-align: center; padding: 3rem 1.5rem;">
+            <div style="width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--sage-base); color: var(--sage-deep); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h2 style="font-size: 1.75rem; margin-bottom: 0.75rem;">Accreditation Dossier Received</h2>
+            <p class="text-subtle" style="margin-bottom: 1.5rem; max-width: 580px; margin-left: auto; margin-right: auto;">
+              Your press application has been submitted to the Joint Secretariat Verification Desk. Confirmation and security clearance notices will be dispatched to <strong>${window.livestockApp.escapeHTML(formData.get('email'))}</strong> within 48 hours.
+            </p>
+            <div class="inst-badge" style="font-size: 0.9375rem; padding: 0.5rem 1.25rem; margin-bottom: 2rem;">
+              Reference Number: ${appRef}
+            </div>
+            <div>
+              <a href="index.html" class="btn btn-primary">Return to Homepage</a>
+            </div>
+          </div>
+        `;
+        window.livestockApp.showToast(`Accreditation submitted. Reference: ${appRef}`);
+      });
+    });
+  </script>
+</body>
+</html>

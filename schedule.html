@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Program Schedule | National Livestock Carnival 2026</title>
+  <meta name="description" content="Explore the interactive 3-Day festival program timetable for the 2026 Renewed Hope National Livestock Carnival. Filter by track and export .ics calendar events.">
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="assets/company_logo_clean.png">
+</head>
+<body>
+
+  <!-- Masthead Mount -->
+  <div id="masthead-mount"></div>
+
+  <!-- Navigation Mount -->
+  <div id="nav-mount"></div>
+
+  <main>
+    <!-- Header Hero -->
+    <section style="padding: 4rem 0 3rem; background: linear-gradient(to bottom, var(--sage-subtle), var(--canvas-bg)); border-bottom: 1px solid var(--surface-border);">
+      <div class="container-custom">
+        <div style="max-width: 780px;">
+          <div class="hero-pill-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Interactive Timetable &amp; Calendar Sync
+          </div>
+          <h1 class="hero-title" style="font-size: 2.75rem; margin-bottom: 1rem;">
+            Official 3-Day Festival Program
+          </h1>
+          <p class="hero-lead">
+            Plan your attendance across high-stakes live breed auctions, the Grand Royal Durbar, B2B investment forums, and evening culinary showcases. Export events directly to your phone or desktop calendar.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Schedule Interactive Workspace -->
+    <section style="padding: 4rem 0 6rem;">
+      <div class="container-custom">
+        
+        <!-- Controls: Day Switcher & Track Filter -->
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem; margin-bottom: 2.5rem;">
+          <!-- Day Tabs -->
+          <div class="tab-group" id="day-tabs">
+            <button class="tab-btn active" data-day="1">Day 1: Royal Opening (Nov 12)</button>
+            <button class="tab-btn" data-day="2">Day 2: Championship &amp; B2B (Nov 13)</button>
+            <button class="tab-btn" data-day="3">Day 3: Awards &amp; Gala (Nov 14)</button>
+          </div>
+
+          <!-- Track Filter Dropdown / Pills -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span style="font-size: 0.8125rem; font-weight: 700; color: var(--slate-subtext);">Filter Track:</span>
+            <select id="track-filter" class="form-control" style="width: auto; padding: 0.45rem 1rem; font-size: 0.875rem; border-radius: var(--radius-full);">
+              <option value="all">All Event Tracks</option>
+              <option value="Ceremonial">Ceremonial &amp; Protocol</option>
+              <option value="Equestrian">Equestrian &amp; Durbar</option>
+              <option value="Livestock Judging">Livestock Judging &amp; Breed</option>
+              <option value="B2B">B2B Trade &amp; Finance</option>
+              <option value="Culinary">Culinary &amp; Food Fair</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Day Overview Notice -->
+        <div id="day-summary-box" class="surface-card" style="margin-bottom: 2rem; padding: 1.5rem; background-color: var(--sage-subtle); border-color: var(--sage-border);">
+          <h3 id="day-summary-title" style="font-size: 1.125rem; font-weight: 700; color: var(--sage-deep); margin-bottom: 0.25rem;">
+            Loading day program...
+          </h3>
+          <p id="day-summary-text" class="text-subtle" style="font-size: 0.875rem;">
+            Please select a day to view scheduled events.
+          </p>
+        </div>
+
+        <!-- Schedule Event List Container -->
+        <div class="schedule-feed" id="events-container">
+          <!-- Injected via JS from data/schedule.json -->
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Mount -->
+  <div id="footer-mount"></div>
+
+  <script src="main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.livestockApp.renderGlobalNav('schedule');
+      window.livestockApp.renderGlobalFooter();
+
+      let scheduleData = [];
+      let currentDay = 1;
+      let currentTrack = 'all';
+
+      // Load Schedule Data
+      fetch('data/schedule.json')
+        .then(res => res.json())
+        .then(days => {
+          scheduleData = days;
+          renderSchedule();
+        })
+        .catch(err => {
+          console.error('Failed to load schedule:', err);
+        });
+
+      // Day Tab Click Handlers
+      const dayTabs = document.querySelectorAll('#day-tabs .tab-btn');
+      dayTabs.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          dayTabs.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentDay = parseInt(btn.getAttribute('data-day'), 10);
+          renderSchedule();
+        });
+      });
+
+      // Track Filter Handler
+      const trackFilter = document.getElementById('track-filter');
+      if (trackFilter) {
+        trackFilter.addEventListener('change', (e) => {
+          currentTrack = e.target.value;
+          renderSchedule();
+        });
+      }
+
+      function renderSchedule() {
+        const dayRecord = scheduleData.find(d => d.day === currentDay);
+        if (!dayRecord) return;
+
+        // Render Day Summary
+        document.getElementById('day-summary-title').textContent = dayRecord.dayTitle;
+        document.getElementById('day-summary-text').textContent = dayRecord.summary;
+
+        // Filter Events by Track
+        let events = dayRecord.events;
+        if (currentTrack !== 'all') {
+          events = events.filter(ev => ev.track === currentTrack);
+        }
+
+        const container = document.getElementById('events-container');
+        if (!container) return;
+
+        if (events.length === 0) {
+          container.innerHTML = `
+            <div class="surface-card" style="text-align: center; padding: 3rem 1.5rem;">
+              <p class="text-subtle" style="font-size: 1rem; margin-bottom: 1rem;">No events match the selected track for this day.</p>
+              <button onclick="document.getElementById('track-filter').value='all'; document.getElementById('track-filter').dispatchEvent(new Event('change'));" class="btn btn-secondary btn-sm">Clear Filter</button>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = events.map(ev => `
+          <div class="event-row-card">
+            <div class="event-time-col">
+              <span class="event-time">${window.livestockApp.escapeHTML(ev.time)}</span>
+              <span class="event-track-badge">${window.livestockApp.escapeHTML(ev.track)}</span>
+            </div>
+
+            <div class="event-details-col">
+              <h3 class="event-title">${window.livestockApp.escapeHTML(ev.title)}</h3>
+              <div class="event-venue">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>${window.livestockApp.escapeHTML(ev.venue)}</span>
+                <span class="text-muted">•</span>
+                <span style="color: var(--sage-deep); font-weight: 600;">${window.livestockApp.escapeHTML(ev.speaker)}</span>
+              </div>
+              <p class="event-desc">${window.livestockApp.escapeHTML(ev.description)}</p>
+            </div>
+
+            <div>
+              <button class="btn btn-secondary btn-sm ics-btn" data-event-id="${ev.id}" style="width: 100%;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Sync .ics
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+        // Attach ICS listeners
+        container.querySelectorAll('.ics-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const evId = btn.getAttribute('data-event-id');
+            const targetEv = dayRecord.events.find(e => e.id === evId);
+            if (targetEv) {
+              window.livestockApp.generateICS(targetEv);
+            }
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

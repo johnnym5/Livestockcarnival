@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Next.js build & export outputs
+.next/
+out/
+nextjs-app/.next/
+nextjs-app/out/
+
+# Firebase
+.firebase/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Temporary scripts
+remove_bg.js
+remove_emdash.js
+replace_festival_title.js

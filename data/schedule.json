@@ -1,0 +1,158 @@
+[
+  {
+    "day": 1,
+    "date": "2026-11-12",
+    "dayTitle": "Day 1: Royal Opening & Heritage Durbar",
+    "summary": "State opening ceremony, Grand Equestrian Durbar, and the ceremonial launch of the National Livestock Transformation showcase.",
+    "events": [
+      {
+        "id": "EVT-101",
+        "time": "08:30 - 10:00",
+        "title": "VIP Arrival & Security Clearance",
+        "venue": "VIP Protocol Lounge & Gates 1-2",
+        "track": "Ceremonial",
+        "description": "Reception of Federal Government officials, royal delegations, state governors, and accredited diplomatic missions.",
+        "speaker": "State Protocol Directorate",
+        "startIso": "2026-11-12T08:30:00+01:00",
+        "endIso": "2026-11-12T10:00:00+01:00"
+      },
+      {
+        "id": "EVT-102",
+        "time": "10:15 - 12:30",
+        "title": "Grand Equestrian Durbar & Horse Pageantry",
+        "venue": "Equestrian Arena & Central Oval Track (Zone 3)",
+        "track": "Equestrian",
+        "description": "Ceremonial equestrian procession featuring decorated royal cavalry contingents from Kano, Bauchi, Katsina, and Adamawa emirates.",
+        "speaker": "Emirate Royal Cavalry Councils",
+        "startIso": "2026-11-12T10:15:00+01:00",
+        "endIso": "2026-11-12T12:30:00+01:00"
+      },
+      {
+        "id": "EVT-103",
+        "time": "13:30 - 15:30",
+        "title": "National Livestock Economy Keynote & Flag-Off",
+        "venue": "Presidential Pavilion",
+        "track": "B2B",
+        "description": "Official ministerial addresses on national agri-export opportunities and unlocking direct bilateral export channels.",
+        "speaker": "Hon. Minister of Livestock Development & NHESICS Secretariat",
+        "startIso": "2026-11-12T13:30:00+01:00",
+        "endIso": "2026-11-12T15:30:00+01:00"
+      },
+      {
+        "id": "EVT-104",
+        "time": "16:00 - 18:30",
+        "title": "Inaugural Night Food Fair & Twilight Suya Masters",
+        "venue": "Culinary Village (Zone 2)",
+        "track": "Culinary",
+        "description": "Evening live tasting exhibition of artisanal Nigerian beef, lamb, and goat delicacies prepared by master grillers.",
+        "speaker": "Guild of Nigerian Suya Masters",
+        "startIso": "2026-11-12T16:00:00+01:00",
+        "endIso": "2026-11-12T18:30:00+01:00"
+      }
+    ]
+  },
+  {
+    "day": 2,
+    "date": "2026-11-13",
+    "dayTitle": "Day 2: Livestock Championship & B2B Trade Exchange",
+    "summary": "Breed competitions, live-weight trading demonstrations, veterinary symposiums, and institutional financing roundtables.",
+    "events": [
+      {
+        "id": "EVT-201",
+        "time": "09:00 - 11:30",
+        "title": "National Purebred Cattle & Camel Championship Judging",
+        "venue": "Agro-Commerce Market Arena (Zone 1)",
+        "track": "Livestock Judging",
+        "description": "Rigorous breed evaluation for Bunaji, Gudali, Sokoto Red, and Sahelian Camels assessed on genetic vigor, conformation, and mass.",
+        "speaker": "National Veterinary Judges Panel",
+        "startIso": "2026-11-13T09:00:00+01:00",
+        "endIso": "2026-11-13T11:30:00+01:00"
+      },
+      {
+        "id": "EVT-202",
+        "time": "11:45 - 13:45",
+        "title": "Bank of Industry & Commercial Agrifinance Roundtable",
+        "venue": "Traceability & Tech Pavilion (Zone 4)",
+        "track": "B2B",
+        "description": "Structured financing facilities, concessionary loan facilities, and cold-chain infrastructure capital matching.",
+        "speaker": "Bank of Industry (BOI) & Development Finance Directors",
+        "startIso": "2026-11-13T11:45:00+01:00",
+        "endIso": "2026-11-13T13:45:00+01:00"
+      },
+      {
+        "id": "EVT-203",
+        "time": "14:15 - 16:30",
+        "title": "Live-Weight Digital Scale Trading & Feedlot Demo",
+        "venue": "Agro-Commerce Courts (Zone 1)",
+        "track": "Livestock Judging",
+        "description": "Transitioning from traditional visual estimation to precision live-weight kilogram pricing with instant electronic settlement.",
+        "speaker": "Commercial Feedlot Operators & Commodity Exchanges",
+        "startIso": "2026-11-13T14:15:00+01:00",
+        "endIso": "2026-11-13T16:30:00+01:00"
+      },
+      {
+        "id": "EVT-204",
+        "time": "16:45 - 18:30",
+        "title": "Modular Abattoir & Cold Chain Tech Exhibition",
+        "venue": "Culinary & Processing Court (Zone 2)",
+        "track": "Culinary",
+        "description": "Live demonstration of mobile hygienic slaughter units, quality protocol compliance, and continuous -18°C cold chain.",
+        "speaker": "Quality & Safety Infrastructure Directorate",
+        "startIso": "2026-11-13T16:45:00+01:00",
+        "endIso": "2026-11-13T18:30:00+01:00"
+      }
+    ]
+  },
+  {
+    "day": 3,
+    "date": "2026-11-14",
+    "dayTitle": "Day 3: Innovation Awards & National Unity Gala",
+    "summary": "Presidential grand champion trophies, digital traceability accreditation, and ceremonial closing concert.",
+    "events": [
+      {
+        "id": "EVT-301",
+        "time": "09:30 - 11:30",
+        "title": "Digital E-Tagging & Traceability Hackathon Demos",
+        "venue": "Traceability Pavilion (Zone 4)",
+        "track": "B2B",
+        "description": "Presentation of biometric RFID tags, ear-tag telematics, and farm-to-plate export traceability databases.",
+        "speaker": "Agritech Innovation Fellows & NITDA Partners",
+        "startIso": "2026-11-14T09:30:00+01:00",
+        "endIso": "2026-11-14T11:30:00+01:00"
+      },
+      {
+        "id": "EVT-302",
+        "time": "12:00 - 14:30",
+        "title": "National Grand Champion Bull & Stallion Honors",
+        "venue": "Main Arena & Central Track (Zone 3)",
+        "track": "Livestock Judging",
+        "description": "Presidential trophy awards, supreme championship rosettes, and presentation of pastoral excellence prizes.",
+        "speaker": "Federal Ministry Directorate & Royal Patrons",
+        "startIso": "2026-11-14T12:00:00+01:00",
+        "endIso": "2026-11-14T14:30:00+01:00"
+      },
+      {
+        "id": "EVT-303",
+        "time": "15:00 - 17:00",
+        "title": "Inter-Zonal Trade Accord Signing & 2027 Expansion Blueprint",
+        "venue": "Presidency Pavilion",
+        "track": "Ceremonial",
+        "description": "Signing of formal bilateral pasture-to-seaport supply contracts connecting northern pastoral hubs and southern consumer corridors.",
+        "speaker": "National Economic Council & Zonal Governors",
+        "startIso": "2026-11-14T15:00:00+01:00",
+        "endIso": "2026-11-14T17:00:00+01:00"
+      },
+      {
+        "id": "EVT-304",
+        "time": "17:30 - 20:00",
+        "title": "Renewed Hope Cultural Festival & Grand Fireworks",
+        "venue": "Old Parade Ground Central Grounds",
+        "track": "Ceremonial",
+        "description": "Grand musical performances, traditional cultural troupes, and closing festival illumination celebrating Nigerian unity.",
+        "speaker": "Federal Ministry of Arts, Culture and Creative Economy",
+        "startIso": "2026-11-14T17:30:00+01:00",
+        "endIso": "2026-11-14T20:00:00+01:00"
+      }
+    ]
+  }
+]
