@@ -3,13 +3,13 @@
 import { ReactNode } from 'react';
 import { motion, Variants, HTMLMotionProps } from 'framer-motion';
 
-export const EASE_CUSTOM = [0.16, 1, 0.3, 1] as const;
+export const EASE_CUSTOM = [0.22, 1, 0.36, 1] as const;
 
 export const containerVariants: Variants = {
   hidden: {},
   visible: (custom?: { stagger?: number; delay?: number }) => ({
     transition: {
-      staggerChildren: custom?.stagger ?? 0.2,
+      staggerChildren: custom?.stagger ?? 0.35,
       delayChildren: custom?.delay ?? 0,
     },
   }),
@@ -18,13 +18,15 @@ export const containerVariants: Variants = {
 export const itemVariants: Variants = {
   hidden: {
     opacity: 0,
-    y: 24,
+    y: 44,
+    scale: 0.98,
   },
   visible: {
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: {
-      duration: 1.1,
+      duration: 1.5,
       ease: EASE_CUSTOM,
     },
   },
@@ -41,9 +43,9 @@ export interface RevealContainerProps extends HTMLMotionProps<'div'> {
 export function RevealContainer({
   children,
   className = '',
-  staggerDelay = 0.2,
+  staggerDelay = 0.35,
   initialDelay = 0,
-  viewportAmount = 0.01,
+  viewportAmount = 0.1,
   ...props
 }: RevealContainerProps) {
   return (

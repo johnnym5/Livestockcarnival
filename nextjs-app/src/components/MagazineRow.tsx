@@ -34,24 +34,24 @@ export default function MagazineRow({
   const imageList = Array.isArray(images) && images.length > 0 ? images : [image];
   const [activeIdx, setActiveIdx] = useState(0);
 
-  // Auto-transition between images every 5 seconds if multiple exist
+  // Auto-transition between images every 6 seconds if multiple exist
   useEffect(() => {
     if (imageList.length <= 1) return;
     const interval = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % imageList.length);
-    }, 5000);
+    }, 6000);
     return () => clearInterval(interval);
   }, [imageList.length]);
 
   return (
     <section className="w-full relative min-h-[580px] lg:min-h-[640px] flex items-center overflow-hidden bg-white border-b border-[#E5E7EB]">
       <div className="w-full max-w-[1536px] mx-auto grid grid-cols-1 lg:grid-cols-12 min-h-[580px] lg:min-h-[640px]">
-        {/* TEXT COLUMN */}
+        {/* TEXT COLUMN - Slower, cinematic upward reveal */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.01 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 48, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
           className={`z-20 flex flex-col justify-center px-6 sm:px-12 lg:px-20 py-16 bg-white ${
             isTextLeft
               ? 'lg:col-span-6 lg:order-1'
@@ -87,12 +87,12 @@ export default function MagazineRow({
           </div>
         </motion.div>
 
-        {/* IMAGE COLUMN WITH SLOW CROSS-FADE & AMBIENT ZOOM */}
+        {/* IMAGE COLUMN WITH SLOW CROSS-FADE, STAGGERED REVEAL & AMBIENT ZOOM */}
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.01 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, y: 36, scale: 0.97 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 1.6, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className={`relative min-h-[360px] sm:min-h-[440px] lg:min-h-full overflow-hidden bg-slate-900 ${
             isTextLeft
               ? 'lg:col-span-6 lg:order-2'
@@ -106,13 +106,13 @@ export default function MagazineRow({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.4, ease: 'easeInOut' }}
+              transition={{ duration: 1.8, ease: 'easeInOut' }}
               className="absolute inset-0 w-full h-full"
             >
               <motion.div
                 animate={{ scale: [1.0, 1.08] }}
                 transition={{
-                  duration: 12,
+                  duration: 16,
                   repeat: Infinity,
                   repeatType: 'reverse',
                   ease: 'easeInOut',

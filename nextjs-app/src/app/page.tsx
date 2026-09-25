@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Compass, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Compass } from 'lucide-react';
 import MagazineRow from '@/components/MagazineRow';
 import carnivalData from '@/data/carnival.json';
 
@@ -65,9 +65,9 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="w-full bg-[#FBFBFA] flex flex-col items-center overflow-x-hidden">
+    <main className="w-full bg-white flex flex-col items-center overflow-x-hidden">
       {/* 1. HIGH-FASHION HERO SECTION WITH CYCLING INDIVIDUAL LIVESTOCK BACKGROUNDS */}
-      <section className="relative w-full min-h-[94vh] lg:min-h-screen flex items-center justify-center overflow-hidden bg-[#111827] pt-32 pb-24">
+      <section className="relative w-full min-h-[94vh] lg:min-h-screen flex items-center justify-center overflow-hidden bg-[#111827] pt-32 pb-32 md:pb-40">
         {/* Animated Background Display of Individual Livestock */}
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none">
           <AnimatePresence mode="sync">
@@ -95,12 +95,12 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(17,24,39,0.7)_100%)] z-10 pointer-events-none" />
 
         {/* Hero Content Container */}
-        <div className="relative z-20 max-w-5xl mx-auto px-6 sm:px-10 text-center flex flex-col items-center">
+        <div className="relative z-20 max-w-5xl mx-auto px-6 sm:px-10 text-center flex flex-col items-center pb-12">
           {/* Sovereign Eyebrow Banner */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-center gap-2 mb-6"
           >
             <span
@@ -117,9 +117,9 @@ export default function Home() {
 
           {/* Main Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 25 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1.4, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.08] tracking-tight max-w-4xl mb-6"
           >
             The Sovereign Festival of Culture, Gastronomy &amp; Agribusiness
@@ -127,9 +127,9 @@ export default function Home() {
 
           {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1.4, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="text-lg sm:text-xl text-gray-200 font-normal leading-relaxed max-w-3xl mb-10"
           >
             Showcasing the entire Nigerian livestock spectrum - championship bulls &amp; cows, golden camels, goats, sheep, poultry, and aquaculture - alongside royal Durbar pageantry, open-flame suya, and international trade.
@@ -137,9 +137,9 @@ export default function Home() {
 
           {/* Hero Action Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1.4, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mb-12"
           >
             <a
@@ -193,6 +193,9 @@ export default function Home() {
             Now Viewing: <strong className="text-white">{livestockList[activeHeroIndex].species}</strong> - {livestockList[activeHeroIndex].tag}
           </div>
         </div>
+
+        {/* Soft Multi-Stage Transition Gradient from Dark Hero into White Body */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 md:h-64 z-20 pointer-events-none bg-gradient-to-b from-transparent via-[#111827]/75 to-white" />
       </section>
 
       {/* 2. ALTERNATING FULL-BLEED MAGAZINE ROWS (ZIG-ZAG LAYOUT) */}
@@ -213,7 +216,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* 4. CLOSING EDITORIAL BANNER */}
+      {/* 3. CLOSING EDITORIAL BANNER */}
       <section className="w-full py-24 bg-[#111827] text-white relative overflow-hidden border-t border-white/10">
         <div className="max-w-5xl mx-auto px-6 sm:px-10 text-center relative z-10 flex flex-col items-center">
           <span
