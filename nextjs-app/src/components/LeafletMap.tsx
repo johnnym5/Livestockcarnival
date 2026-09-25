@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
-import { MapPin, Navigation, Compass, Layers } from 'lucide-react';
+import { Navigation, Compass, Layers } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { slidePanelRight, staggerParent, staggerChildItem } from '@/lib/motion';
 import 'leaflet/dist/leaflet.css';
 
 interface ZoneItem {
@@ -90,8 +92,13 @@ export default function LeafletMap() {
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-100px)] w-full overflow-hidden bg-[#FBFBFA]">
-      {/* Zone Navigator Side Panel */}
-      <div className="w-full lg:w-96 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0 z-10 shadow-lg lg:h-full">
+      {/* Zone Navigator Side Panel with Entrance Animation */}
+      <motion.div
+        variants={slidePanelRight}
+        initial="initial"
+        animate="animate"
+        className="w-full lg:w-96 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0 z-10 shadow-lg lg:h-full"
+      >
         {/* Panel Header */}
         <div className="p-6 border-b border-[#E5E7EB]">
           <div className="flex items-center gap-2 mb-1">
@@ -108,14 +115,21 @@ export default function LeafletMap() {
           </p>
         </div>
 
-        {/* Zones List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+        {/* Zones List with Staggered Entrance */}
+        <motion.div
+          variants={staggerParent}
+          initial="initial"
+          animate="animate"
+          className="flex-1 overflow-y-auto p-4 space-y-2.5"
+        >
           {zones.map((zone) => {
             const isSelected = selectedZoneId === zone.id;
 
             return (
-              <button
+              <motion.button
                 key={zone.id}
+                variants={staggerChildItem}
+                layout
                 onClick={() => {
                   setSelectedCoords([zone.lat, zone.lng]);
                   setSelectedZoneId(zone.id);
@@ -146,10 +160,10 @@ export default function LeafletMap() {
                     {zone.desc}
                   </p>
                 </div>
-              </button>
+              </motion.button>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Panel Footer */}
         <div className="p-4 bg-[#FEF3D6] border-t border-[#FCE6A8] text-[#8D6B1B]">
@@ -158,10 +172,10 @@ export default function LeafletMap() {
             <span>Venue Dispatch</span>
           </div>
           <p className="text-[11px] mt-1 text-[#8D6B1B]/90">
-            Pedestrian Gates 1 & 2 open from 08:00 AM daily. Show accredited digital pass or VIP badge at perimeter checkpoint.
+            Pedestrian Gates 1 &amp; 2 open from 08:00 AM daily. Show accredited digital pass or VIP badge at perimeter checkpoint.
           </p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Satellite Map Container */}
       <div className="flex-1 relative h-full min-h-[400px]">

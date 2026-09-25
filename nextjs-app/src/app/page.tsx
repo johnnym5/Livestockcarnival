@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Compass } from 'lucide-react';
 import MagazineRow from '@/components/MagazineRow';
+import CardStackContainer from '@/components/motion/CardStackContainer';
 import carnivalData from '@/data/carnival.json';
 
 // Individual livestock showcase items
@@ -65,7 +66,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="w-full bg-white flex flex-col items-center overflow-x-hidden">
+    <main className="w-full bg-[#FBFBFA] flex flex-col items-center overflow-x-hidden">
       {/* 1. HIGH-FASHION HERO SECTION WITH CYCLING INDIVIDUAL LIVESTOCK BACKGROUNDS */}
       <section className="relative w-full min-h-[94vh] lg:min-h-screen flex items-center justify-center overflow-hidden bg-[#111827] pt-32 pb-32 md:pb-40">
         {/* Animated Background Display of Individual Livestock */}
@@ -195,26 +196,37 @@ export default function Home() {
         </div>
 
         {/* Soft Multi-Stage Transition Gradient from Dark Hero into White Body */}
-        <div className="absolute bottom-0 left-0 right-0 h-40 md:h-64 z-20 pointer-events-none bg-gradient-to-b from-transparent via-[#111827]/75 to-white" />
+        <div className="absolute bottom-0 left-0 right-0 h-40 md:h-64 z-20 pointer-events-none bg-gradient-to-b from-transparent via-[#111827]/75 to-[#FBFBFA]" />
       </section>
 
-      {/* 2. ALTERNATING FULL-BLEED MAGAZINE ROWS (ZIG-ZAG LAYOUT) */}
-      <div className="w-full flex flex-col">
-        {rows.map((row: any, index: number) => (
-          <MagazineRow
-            key={row.id || index}
-            eyebrow={row.eyebrow || row.kicker || 'HIGHLIGHT'}
-            title={row.title || row.headline || ''}
-            body={row.body}
-            image={row.image}
-            images={row.images}
-            imageAlt={row.imageAlt}
-            ctaText={row.ctaText || row.cta?.label || 'Explore Details'}
-            ctaLink={row.ctaLink || row.cta?.href || '/attractions'}
-            isTextLeft={index % 2 === 0}
-          />
-        ))}
-      </div>
+      {/* 2. FRAMER MOTION 3D SCROLLING CARD STACK ENGINE FOR MAGAZINE ROWS */}
+      <section className="w-full py-16 md:py-24 bg-[#FBFBFA]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 sm:mb-16 text-center">
+          <span className="text-xs font-extrabold tracking-[0.25em] text-[#1E4D38] uppercase bg-[#D8EADF] px-4 py-1.5 rounded-full inline-block mb-3">
+            Sovereign Highlights &amp; Signature Arenas
+          </span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] tracking-tight">
+            Explore the Festival Story
+          </h2>
+        </div>
+
+        <CardStackContainer topOffsetStart={100} topOffsetIncrement={25}>
+          {rows.map((row: any, index: number) => (
+            <MagazineRow
+              key={row.id || index}
+              eyebrow={row.eyebrow || row.kicker || 'HIGHLIGHT'}
+              title={row.title || row.headline || ''}
+              body={row.body}
+              image={row.image}
+              images={row.images}
+              imageAlt={row.imageAlt}
+              ctaText={row.ctaText || row.cta?.label || 'Explore Details'}
+              ctaLink={row.ctaLink || row.cta?.href || '/attractions'}
+              isTextLeft={index % 2 === 0}
+            />
+          ))}
+        </CardStackContainer>
+      </section>
 
       {/* 3. CLOSING EDITORIAL BANNER */}
       <section className="w-full py-24 bg-[#111827] text-white relative overflow-hidden border-t border-white/10">

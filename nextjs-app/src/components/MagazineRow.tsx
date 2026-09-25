@@ -44,15 +44,11 @@ export default function MagazineRow({
   }, [imageList.length]);
 
   return (
-    <section className="w-full relative min-h-[580px] lg:min-h-[640px] flex items-center overflow-hidden bg-white border-b border-[#E5E7EB]">
-      <div className="w-full max-w-[1536px] mx-auto grid grid-cols-1 lg:grid-cols-12 min-h-[580px] lg:min-h-[640px]">
-        {/* TEXT COLUMN - Slower, cinematic upward reveal */}
-        <motion.div
-          initial={{ opacity: 0, y: 48, scale: 0.98 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-          className={`z-20 flex flex-col justify-center px-6 sm:px-12 lg:px-20 py-16 bg-white ${
+    <div className="w-full relative min-h-[520px] lg:min-h-[580px] flex items-center overflow-hidden bg-white">
+      <div className="w-full max-w-[1536px] mx-auto grid grid-cols-1 lg:grid-cols-12 min-h-[520px] lg:min-h-[580px]">
+        {/* TEXT COLUMN */}
+        <div
+          className={`z-20 flex flex-col justify-center px-6 sm:px-12 lg:px-16 py-12 lg:py-16 bg-white ${
             isTextLeft
               ? 'lg:col-span-6 lg:order-1'
               : 'lg:col-span-6 lg:col-start-7 lg:order-2'
@@ -60,17 +56,17 @@ export default function MagazineRow({
         >
           <div className="max-w-xl">
             {/* Unboxed Eyebrow */}
-            <span className="text-[11px] sm:text-xs font-extrabold tracking-[0.25em] text-[#8D6B1B] uppercase block mb-4">
+            <span className="text-[11px] sm:text-xs font-extrabold tracking-[0.25em] text-[#8D6B1B] uppercase block mb-3 sm:mb-4">
               {eyebrow}
             </span>
 
             {/* Title */}
-            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold text-[#111827] leading-[1.15] tracking-tight mb-6">
+            <h2 className="text-2xl sm:text-3xl lg:text-[40px] font-extrabold text-[#111827] leading-[1.15] tracking-tight mb-4 sm:mb-6">
               {title}
             </h2>
 
             {/* Body Text */}
-            <p className="text-base sm:text-lg text-[#4B5563] leading-relaxed mb-8">
+            <p className="text-sm sm:text-base lg:text-lg text-[#4B5563] leading-relaxed mb-6 sm:mb-8">
               {body}
             </p>
 
@@ -85,15 +81,11 @@ export default function MagazineRow({
               </Link>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* IMAGE COLUMN WITH SLOW CROSS-FADE, STAGGERED REVEAL & AMBIENT ZOOM */}
-        <motion.div
-          initial={{ opacity: 0, y: 36, scale: 0.97 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 1.6, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className={`relative min-h-[360px] sm:min-h-[440px] lg:min-h-full overflow-hidden bg-slate-900 ${
+        {/* IMAGE COLUMN WITH SLOW CROSS-FADE, GRADIENT MASK & AMBIENT ZOOM */}
+        <div
+          className={`relative min-h-[320px] sm:min-h-[400px] lg:min-h-full overflow-hidden bg-slate-900 ${
             isTextLeft
               ? 'lg:col-span-6 lg:order-2'
               : 'lg:col-span-6 lg:col-start-1 lg:order-1'
@@ -106,13 +98,13 @@ export default function MagazineRow({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.8, ease: 'easeInOut' }}
+              transition={{ duration: 1.6, ease: 'easeInOut' }}
               className="absolute inset-0 w-full h-full"
             >
               <motion.div
                 animate={{ scale: [1.0, 1.08] }}
                 transition={{
-                  duration: 16,
+                  duration: 14,
                   repeat: Infinity,
                   repeatType: 'reverse',
                   ease: 'easeInOut',
@@ -156,7 +148,7 @@ export default function MagazineRow({
             </div>
           )}
 
-          {/* Seamless gradient mask fade */}
+          {/* White-to-transparent background gradient mask */}
           <div
             className={`absolute inset-0 pointer-events-none hidden lg:block z-20 ${
               isTextLeft
@@ -172,8 +164,8 @@ export default function MagazineRow({
 
           {/* Mobile bottom fade */}
           <div className="absolute inset-0 pointer-events-none lg:hidden z-20 bg-gradient-to-t from-white via-transparent to-transparent opacity-60" />
-        </motion.div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

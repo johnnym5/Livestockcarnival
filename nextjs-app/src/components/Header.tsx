@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { slideDownDrawer, backdropBlurFade } from '@/lib/motion';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -110,45 +112,60 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ── Mobile & Tablet Navigation Drawer ── */}
-      {isMobileMenuOpen && (
-        <div className="2xl:hidden w-full bg-white shadow-xl border-b border-[#E5E7EB] flex flex-col p-6 max-h-[calc(100vh-100px)] overflow-y-auto">
-          <nav className="flex flex-col gap-3 mb-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`text-sm font-semibold uppercase tracking-wider py-2 border-b border-gray-100 ${
-                  pathname === link.href ? 'text-[#1E4D38]' : 'text-[#4B5563]'
-                }`}
+      {/* ── Mobile & Tablet Navigation Drawer with AnimatePresence ── */}
+      <AnimatePresence mode="wait">
+        {isMobileMenuOpen && (
+          <motion.div
+            key="mobile-drawer"
+            variants={backdropBlurFade}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="2xl:hidden w-full bg-white/98 shadow-xl border-b border-[#E5E7EB] flex flex-col p-6 max-h-[calc(100vh-100px)] overflow-y-auto"
+          >
+            <motion.nav
+              variants={slideDownDrawer}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="flex flex-col gap-3 mb-6"
+            >
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`text-sm font-semibold uppercase tracking-wider py-2 border-b border-gray-100 ${
+                    pathname === link.href ? 'text-[#1E4D38]' : 'text-[#4B5563]'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </motion.nav>
+            <div className="flex flex-col gap-3 pt-2 sm:hidden">
+              <a
+                href="https://nlf-vendors.web.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-center text-xs font-bold uppercase tracking-wider text-[#1E4D38] border border-[#B8D8C5] py-3 rounded-xl hover:bg-[#D8EADF]/30"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex flex-col gap-3 pt-2 sm:hidden">
-            <a
-              href="https://nlf-vendors.web.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-center text-xs font-bold uppercase tracking-wider text-[#1E4D38] border border-[#B8D8C5] py-3 rounded-xl hover:bg-[#D8EADF]/30"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Exhibitor Booths
-            </a>
-            <a
-              href="https://gcc-carnival.web.app/ticket"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-center bg-[#D4AF37] hover:bg-[#C49F27] text-[#111827] py-3 rounded-xl text-xs font-bold uppercase tracking-wider"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Claim Free Gate Pass
-            </a>
-          </div>
-        </div>
-      )}
+                Exhibitor Booths
+              </a>
+              <a
+                href="https://gcc-carnival.web.app/ticket"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-center bg-[#D4AF37] hover:bg-[#C49F27] text-[#111827] py-3 rounded-xl text-xs font-bold uppercase tracking-wider"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Claim Free Gate Pass
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
