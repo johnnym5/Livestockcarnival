@@ -195,74 +195,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. DIVERSE LIVESTOCK SPECTRUM GALLERY SECTION (INDIVIDUAL SHOWCASE CARDS) */}
-      <section className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="text-center mb-16">
-          <span className="text-xs font-bold tracking-[0.2em] text-[#1E4D38] uppercase bg-[#D8EADF] px-4 py-1.5 rounded-full inline-block mb-3">
-            National Livestock Spectrum
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] tracking-tight mb-4">
-            Celebrating Every Sector of Nigerian Livestock Wealth
-          </h2>
-          <p className="text-base sm:text-lg text-[#4B5563] max-w-3xl mx-auto leading-relaxed">
-            The 2026 Festival unites pastoralists, breeders, poultry farmers, and fish cultivators from all 36 States and the FCT.
-          </p>
-        </div>
-
-        {/* 5-Card High-Fashion Livestock Showcase */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {livestockList.map((animal) => (
-            <div
-              key={animal.id}
-              className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-card hover:shadow-card-hover hover:-translate-y-1.5 transition-all duration-300 flex flex-col group"
-            >
-              {/* Individual Animal Image Frame */}
-              <div className="relative w-full h-64 overflow-hidden bg-slate-100">
-                <Image
-                  src={animal.image}
-                  alt={animal.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute top-4 right-4 bg-[#111827]/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">
-                  {animal.tag}
-                </div>
-              </div>
-
-              {/* Card Body */}
-              <div className="p-6 sm:p-7 flex flex-col flex-grow justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-[#111827] mb-1.5 group-hover:text-[#1E4D38] transition-colors">
-                    {animal.name}
-                  </h3>
-                  <div className="text-xs font-semibold text-[#8D6B1B] uppercase tracking-wider mb-3">
-                    {animal.species}
-                  </div>
-                  <p className="text-sm text-[#4B5563] leading-relaxed mb-6">
-                    {animal.description}
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-medium text-[#1E4D38]">
-                    <ShieldCheck className="w-4 h-4 text-[#1E4D38]" />
-                    <span>Certified Exhibition Breed</span>
-                  </div>
-                  <Link
-                    href="/attractions#meat-market"
-                    className="text-xs font-bold text-[#1E4D38] hover:text-[#8D6B1B] transition-colors inline-flex items-center gap-1"
-                  >
-                    <span>View Stalls</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. ALTERNATING FULL-BLEED MAGAZINE ROWS (ZIG-ZAG LAYOUT) */}
+      {/* 2. ALTERNATING FULL-BLEED MAGAZINE ROWS (ZIG-ZAG LAYOUT) */}
       <div className="w-full flex flex-col">
         {rows.map((row: any, index: number) => (
           <MagazineRow
