@@ -16,7 +16,7 @@ export default function About() {
       <section className="w-full py-16 md:py-24 text-center px-6">
         <div className="max-w-4xl mx-auto">
           <span className="text-xs font-bold tracking-[0.25em] text-[#8D6B1B] uppercase block mb-4">
-            Presidential Mandate &amp; Sovereign Vision
+            Presidential Mandate &amp; Vision
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#111827] mb-6 leading-tight">
             Transforming Nigeria's Livestock Economy Into a Global Export Powerhouse
@@ -63,7 +63,7 @@ export default function About() {
                   Quality &amp; Safety Infrastructure (QSI)
                 </h3>
                 <p className="text-sm text-[#4B5563] leading-relaxed">
-                  Codifying sovereign hygiene standards, cold-chain preservation protocols, and bilateral export accreditation to access international agri-export corridors.
+                  Codifying hygiene standards, cold-chain preservation protocols, and bilateral export accreditation to access international agri-export corridors.
                 </p>
               </div>
 
@@ -141,7 +141,7 @@ export default function About() {
                   <li className="flex items-start space-x-3.5">
                     <CheckCircle className="w-5 h-5 text-[#1E4D38] shrink-0 mt-0.5" />
                     <div>
-                      <h4 className="text-sm font-bold text-[#111827]">Sovereign Brand Exposure</h4>
+                      <h4 className="text-sm font-bold text-[#111827]">Brand Exposure</h4>
                       <p className="text-xs text-[#4B5563] mt-0.5">VIP arena branding, ministerial trade briefings, and national media coverage across all festival zones.</p>
                     </div>
                   </li>
@@ -163,7 +163,7 @@ export default function About() {
               2027 Six-Zone National Rollout
             </h2>
             <p className="text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
-              While the 2026 inaugural pilot is centralized in Abuja at the Old Parade Ground, the sovereign roadmap transitions into a synchronized multi-zone festival in 2027:
+              While the 2026 inaugural pilot is centralized in Abuja at the Old Parade Ground, the roadmap transitions into a synchronized multi-zone festival in 2027:
             </p>
           </div>
 

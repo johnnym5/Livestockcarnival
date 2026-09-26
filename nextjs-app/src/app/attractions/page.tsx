@@ -16,7 +16,7 @@ const livestockList = [
     id: 'bull-cow',
     name: 'Bulls & Cattle',
     species: 'White Fulani · Sokoto Gudali · Bunaji',
-    description: 'Prized sovereign genetics, conformation judging, and live-weight precision trading.',
+    description: 'Prized genetics, conformation judging, and live-weight precision trading.',
     image: '/assets/livestock_bull_cow.jpg',
     tag: 'Elite Genetics',
   },

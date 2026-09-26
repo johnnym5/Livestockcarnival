@@ -132,7 +132,7 @@ function renderGlobalFooter() {
               <span style="font-weight: 800; font-size: 1.125rem; letter-spacing: -0.02em;">LIVESTOCK CARNIVAL 2026</span>
             </div>
             <p class="text-subtle" style="font-size: 0.875rem; line-height: 1.6;">
-              The sovereign gateway and public festival portal for the 2026 Pilot Livestock Show and Agri-Export Expo. Headquartered and operational in Abuja at the Old Parade Ground.
+              The gateway and public festival portal for the 2026 Pilot Livestock Show and Agri-Export Expo. Headquartered and operational in Abuja at the Old Parade Ground.
             </p>
             <div class="footer-endorsement">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -177,7 +177,7 @@ function renderGlobalFooter() {
 
         <div class="footer-bottom-bar">
           <div>
-            &copy; 2026 National Livestock Carnival Secretariat. All sovereign rights reserved.
+            &copy; 2026 National Livestock Carnival Secretariat. All rights reserved.
           </div>
           <div style="display: flex; gap: 1.5rem;">
             <a href="contact.html" class="footer-nav-link">Privacy Policy</a>

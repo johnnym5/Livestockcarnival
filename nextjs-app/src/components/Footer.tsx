@@ -28,11 +28,11 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-[#9CA3AF] text-sm leading-relaxed">
-              Official Federal Government of Nigeria sovereign public festival and trade gateway. Uniting pastoral heritage, cultural pageantry, and global agribusiness export wealth.
+              Official Federal Government of Nigeria public festival and trade gateway. Uniting pastoral heritage, cultural pageantry, and global agribusiness export wealth.
             </p>
             <div className="flex items-center gap-2 text-gray-300 mt-2 text-xs font-medium">
               <Shield size={14} className="text-[#D4AF37] shrink-0" />
-              <span>Federal Republic of Nigeria Sovereign Staging</span>
+              <span>Federal Republic of Nigeria Staging</span>
             </div>
           </div>
 
@@ -112,7 +112,7 @@ export default function Footer() {
         {/* Legal & Copyright */}
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#9CA3AF]">
           <div>
-            &copy; 2026 Federal Republic of Nigeria · Renewed Hope National Livestock Carnival. All sovereign rights reserved.
+            &copy; 2026 Federal Republic of Nigeria · Renewed Hope National Livestock Carnival. All rights reserved.
           </div>
           <div className="flex gap-6">
             <Link href="/contact" className="hover:text-white transition-colors">Privacy Policy</Link>

@@ -15,7 +15,7 @@ const livestockList = [
     id: 'bull-cow',
     name: 'Bulls & Cattle',
     species: 'White Fulani · Sokoto Gudali · Bunaji',
-    description: 'Prized sovereign genetics, conformation judging, and live-weight precision trading.',
+    description: 'Prized genetics, conformation judging, and live-weight precision trading.',
     image: '/assets/livestock_bull_cow.jpg',
     tag: 'Elite Genetics',
   },
@@ -97,7 +97,7 @@ export default function Home() {
 
         {/* Hero Content Container */}
         <div className="relative z-20 max-w-5xl mx-auto px-6 sm:px-10 text-center flex flex-col items-center pb-12">
-          {/* Sovereign Eyebrow Banner */}
+          {/* Eyebrow Banner */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,7 +112,7 @@ export default function Home() {
               }}
               className="font-extrabold uppercase"
             >
-              FEDERAL REPUBLIC OF NIGERIA · OFFICIAL SOVEREIGN CARNIVAL &amp; EXPO
+              FEDERAL REPUBLIC OF NIGERIA · OFFICIAL CARNIVAL &amp; EXPO
             </span>
           </motion.div>
 
@@ -203,7 +203,7 @@ export default function Home() {
       <section className="w-full py-16 md:py-24 bg-[#FBFBFA]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 sm:mb-16 text-center">
           <span className="text-xs font-extrabold tracking-[0.25em] text-[#1E4D38] uppercase bg-[#D8EADF] px-4 py-1.5 rounded-full inline-block mb-3">
-            Sovereign Highlights &amp; Signature Arenas
+            Highlights &amp; Signature Arenas
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] tracking-tight">
             Explore the Festival Story
@@ -243,7 +243,7 @@ export default function Home() {
           </span>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight max-w-3xl mb-6">
-            Join the Sovereign Celebration of Heritage, Culture &amp; Agribusiness
+            Join the Celebration of Heritage, Culture &amp; Agribusiness
           </h2>
 
           <p className="text-base sm:text-lg text-gray-300 max-w-2xl mb-10 leading-relaxed font-normal">
