@@ -2,12 +2,12 @@
   {
     "id": "durbar",
     "zone": "Zone 3: Central Track & Field",
-    "title": "Royal Equestrian Durbar & Horse Pageantry",
-    "subtitle": "Centuries of Regal Cavalry Heritage on the Old Parade Ground Track",
-    "image": "/assets/durbar_horse_rider.jpg",
+    "title": "Royal Horse Cavalry & Camel Parade",
+    "subtitle": "Centuries of Regal Heritage on the Old Parade Ground Track",
+    "image": "/assets/carnival_animal_parade.jpg",
     "category": "Equestrian & Culture",
     "badgeColor": "champagne",
-    "summary": "Witness over two hundred champion stallions adorned in brocade, velvet, and beaten brass, guided by traditional cavalry units from across northern and north-central emirates.",
+    "summary": "Witness over two hundred champion stallions adorned in brocade, velvet, and beaten brass, guided by traditional cavalry units and royal camel parades across the central arena.",
     "features": [
       "Traditional cavalry salutes and high-speed gallop displays",
       "Ancient brass instruments, kakaki trumpets, and ceremonial drums",
@@ -15,25 +15,25 @@
       "Presidential box review and ceremonial honors parade"
     ],
     "scheduleWindow": "Daily 10:00 - 13:00",
-    "venueTarget": "/venue-map#zone-3"
+    "venueTarget": "venue-map.html#zone-3"
   },
   {
     "id": "meat-market",
     "zone": "Zone 1: NW West Field",
     "title": "Fresh Meat & Live-Weight Market",
     "subtitle": "Modernized Trade Exchange with Precision Electronic Scales",
-    "image": "/assets/carnival_animal_parade.jpg",
+    "image": "/assets/bbq_catfish_vendor.jpg",
     "category": "Trade & Commerce",
     "badgeColor": "sage",
-    "summary": "Experience the transformation of Nigerian livestock commerce - from cattle, camels, goats, and sheep to poultry and aquaculture - with certified live-weight kilogram pricing and instant electronic settlement.",
+    "summary": "Experience the transformation of Nigerian livestock commerce from arbitrary eye-estimation to certified live-weight kilogram pricing with instant electronic settlement.",
     "features": [
-      "Certified digital weighing platforms for cattle, sheep, camels, and goats",
+      "Certified digital weighing platforms for cattle, sheep, and camels",
       "Direct farm-gate price transparency with zero intermediary markups",
       "Bank of Agriculture & commercial settlement kiosks for cash-free transactions",
       "Mobile veterinary inspection tags guaranteeing disease-free stock"
     ],
     "scheduleWindow": "Daily 08:30 - 18:00",
-    "venueTarget": "/venue-map#zone-1"
+    "venueTarget": "venue-map.html#zone-1"
   },
   {
     "id": "suya-village",
@@ -43,7 +43,7 @@
     "image": "/assets/suya_open_flame.jpg",
     "category": "Gastronomy & Culinary",
     "badgeColor": "champagne",
-    "summary": "Sample the finest cuts of beef, tender lamb, spiced goat, and seasoned poultry prepared over slow embers by the nation's premier suya artisans following verified hygienic standards.",
+    "summary": "Sample the finest cuts of beef, tender lamb, and spiced goat prepared over slow embers by the nation's premier suya artisans following verified hygienic standards.",
     "features": [
       "Master Suya Guild national championship and secret spice blend showcase",
       "Hygienic prep zones with continuous temperature-controlled displays",
@@ -51,7 +51,7 @@
       "Open-air seating pavilion with traditional evening musical interludes"
     ],
     "scheduleWindow": "Daily 12:00 - 21:00",
-    "venueTarget": "/venue-map#zone-2"
+    "venueTarget": "venue-map.html#zone-2"
   },
   {
     "id": "livestock-judging",
@@ -61,7 +61,7 @@
     "image": "/assets/kids_horse_petting.jpg",
     "category": "Genetics & Competition",
     "badgeColor": "sage",
-    "summary": "The premier stage for pastoralists showcasing purebred Sokoto Gudali cattle, White Fulani, Red Bororo, dual-hump Sahelian camels, Yankasa sheep, West African Dwarf goats, and champion poultry breeds - all evaluated by certified veterinary judges.",
+    "summary": "The premier stage for pastoralists showcasing purebred Sokoto Gudali, White Fulani, Red Bororo, and dual-hump Sahelian camels evaluated by certified veterinary judges.",
     "features": [
       "Comprehensive scoring: skeletal conformation, weight-for-age, and milk/meat ratios",
       "Presidential gold medals, breed rosettes, and prize breeding bulls",
@@ -69,43 +69,25 @@
       "Official breed studbook registry certificates issued on site"
     ],
     "scheduleWindow": "Days 2 & 3 09:00 - 14:00",
-    "venueTarget": "/venue-map#zone-1"
+    "venueTarget": "venue-map.html#zone-1"
   },
   {
     "id": "traceability-hub",
     "zone": "Zone 4: East Complex",
     "title": "Digital Traceability & Cold-Chain Pavilion",
-    "subtitle": "Unlocking Global Export Markets Through Quality & Inspection Infrastructure",
+    "subtitle": "Unlocking Global Export Markets Through Quality Infrastructure",
     "image": "/assets/veterinary_pet_checkup.jpg",
-    "category": "Technology & Inspection",
+    "category": "Technology & Innovation",
     "badgeColor": "sage",
-    "summary": "Explore cutting-edge biometric cattle ear-tagging, cloud-connected veterinary health ledgers, and containerized modular abattoir units designed to meet international export protocols for all livestock categories.",
+    "summary": "Explore cutting-edge biometric cattle ear-tagging, cloud-connected veterinary health ledgers, and containerized modular abattoirs meeting international export protocols.",
     "features": [
       "Live RFID ear-tag scanning and cloud ledger telemetry demonstrations",
       "Mobile modular abattoir walk-through with sterile stainless steel processing lines",
       "-18°C reefer transport and air cargo logistics coordination desks",
-      "National export certification registration and documentation support"
+      "NHESICS export certification registration and documentation support"
     ],
     "scheduleWindow": "Daily 09:00 - 17:30",
-    "venueTarget": "/venue-map#zone-4"
-  },
-  {
-    "id": "aquaculture-poultry",
-    "zone": "Zone 1: NW West Field",
-    "title": "Aquaculture & Poultry Innovation Pavilion",
-    "subtitle": "Nigeria's Fastest-Growing Protein Production Sectors on Display",
-    "image": "/assets/bbq_catfish_vendor.jpg",
-    "category": "Aquaculture & Poultry",
-    "badgeColor": "sage",
-    "summary": "Discover Nigeria's booming fish farming and poultry sectors - from catfish and tilapia aquaculture tanks to broiler and layer chicken production systems, showcasing integrated value chains for domestic and export markets.",
-    "features": [
-      "Live catfish, tilapia, and ornamental fish display tanks with expert commentary",
-      "Integrated poultry incubation and broiler management demonstrations",
-      "Aqua-feed milling, water quality, and cage-culture technology pavilion",
-      "Youth agripreneur pitches from leading poultry and aquaculture startups"
-    ],
-    "scheduleWindow": "Daily 09:00 - 17:00",
-    "venueTarget": "/venue-map#zone-1"
+    "venueTarget": "venue-map.html#zone-4"
   },
   {
     "id": "cultural-carnival",
@@ -123,6 +105,6 @@
       "Grand evening national unity concert and illumination ceremony"
     ],
     "scheduleWindow": "Day 3 16:00 - 20:30",
-    "venueTarget": "/venue-map"
+    "venueTarget": "venue-map.html"
   }
 ]
