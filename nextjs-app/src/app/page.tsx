@@ -121,9 +121,9 @@ export default function Home() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.08] tracking-tight max-w-4xl mb-6"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight max-w-5xl mb-6"
           >
-            The Sovereign Festival of Culture, Gastronomy &amp; Agribusiness
+            Welcome to the RENEWED HOPE NATIONAL LIVESTOCK CARNIVAL 2026
           </motion.h1>
 
           {/* Subtitle */}
@@ -131,9 +131,9 @@ export default function Home() {
             initial={{ opacity: 0, y: 35 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="text-lg sm:text-xl text-gray-200 font-normal leading-relaxed max-w-3xl mb-10"
+            className="text-base sm:text-lg md:text-xl text-gray-200 font-normal leading-relaxed max-w-3xl mb-10"
           >
-            Showcasing the entire Nigerian livestock spectrum - championship bulls &amp; cows, golden camels, goats, sheep, poultry, and aquaculture - alongside royal Durbar pageantry, open-flame suya, and international trade.
+            Experience Nigeria's grandest celebration of culture, music, food, and farming - featuring royal horses, camels, championship cattle, open-flame suya, live concerts, and trade exhibitions.
           </motion.p>
 
           {/* Hero Action Buttons */}

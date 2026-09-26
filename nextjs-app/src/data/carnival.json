@@ -3,13 +3,13 @@
     "title": "Renewed Hope National Livestock Carnival 2026",
     "subTitle": "Golden Camel & Cow Carnival",
     "kicker": "OFFICIAL SOVEREIGN CARNIVAL & PUBLIC EXPO",
-    "tagline": "The Sovereign Festival of Culture, Gastronomy, Music & Agribusiness",
-    "description": "Experience 3 days of grand Durbar equestrian cavalry, live music concerts, open-flame Suya villages, fashion & crafts, purebred livestock auctions, and cutting-edge tech exhibitions.",
+    "tagline": "Welcome to the Renewed Hope National Livestock Carnival 2026",
+    "description": "Experience Nigeria's grandest celebration of culture, music, food, and farming - featuring royal horses, camels, championship cattle, open-flame suya, live concerts, and trade exhibitions.",
     "ticketUrl": "https://gcc-carnival.web.app/ticket",
     "vendorUrl": "https://nlf-vendors.web.app/",
     "ctaTicket": "https://gcc-carnival.web.app/ticket",
     "ctaExhibitor": "https://nlf-vendors.web.app/",
-    "dates": "21 – 23 November 2026",
+    "dates": "21 - 23 November 2026",
     "venue": "Abuja National Grounds (Old Parade Ground, FCT)",
     "coordinates": { "lat": 9.0428, "lng": 7.4890 }
   },
@@ -18,14 +18,10 @@
       "id": "durbar-cavalry",
       "align": "left",
       "kicker": "EQUESTRIAN PAGEANTRY",
-      "headline": "Grand Durbar Cavalry & Royal Horse Races",
+      "headline": "Royal Horse Cavalry & Camel Parade",
       "body": "Witness over 200 ceremonial cavalry war stallions, traditional Northern horsemen, camel pageantry, and royal racing displays in a breathtaking celebration of national heritage.",
-      "image": "/assets/durbar_horse_rider.jpg",
-      "images": [
-        "/assets/durbar_horse_rider.jpg",
-        "/assets/kano_durbar.jpg"
-      ],
-      "imageAlt": "Royal Durbar Equestrian Cavalry in Abuja",
+      "image": "/assets/kano_durbar.jpg",
+      "imageAlt": "Royal Horse Cavalry in Abuja",
       "cta": { "label": "Explore Equestrian Arena", "href": "/attractions#durbar" }
     },
     {
@@ -33,61 +29,39 @@
       "align": "right",
       "kicker": "GASTRONOMY & STREET FOOD",
       "headline": "Open-Flame Suya Village & Artisanal Culinary Fest",
-      "body": "Indulge in Nigeria's largest open-flame grilling arena. Featuring master Suya chefs, artisanal smoked meats, organic spice markets, and family festival dining across beef, lamb, goat, and poultry.",
-      "image": "/assets/suya_open_flame.jpg",
-      "images": [
-        "/assets/suya_open_flame.jpg",
-        "/assets/suya_couples_market.jpg",
-        "/assets/gourmet_steak_fish.jpg"
-      ],
+      "body": "Indulge in Nigeria's largest open-flame grilling arena. Featuring master Suya chefs, artisanal smoked meats, organic spice markets, and family festival dining.",
+      "image": "/assets/hqi_halal_abattoir.jpg",
       "imageAlt": "Open-flame Suya Village and Culinary Pavilion",
-      "cta": { "label": "Discover Culinary Village", "href": "/attractions#suya-village" }
+      "cta": { "label": "Discover Culinary Village", "href": "/attractions#suya" }
     },
     {
       "id": "culture-fashion",
       "align": "left",
       "kicker": "MUSIC, CONCERTS & CRAFTS",
       "headline": "Live Performances, Fashion & Cultural Arts",
-      "body": "Immerse yourself in live music concerts, traditional masquerades, energetic native dance troupes, contemporary African fashion showcases, and indigenous arts & crafts markets.",
-      "image": "/assets/cultural_dancing.jpg",
-      "images": [
-        "/assets/cultural_dancing.jpg",
-        "/assets/cultural_festival_party.jpg",
-        "/assets/live_concert_stage.jpg",
-        "/assets/carnival_night_dj.jpg"
-      ],
-      "imageAlt": "Cultural Dance Troupes and Performing Arts in Abuja",
-      "cta": { "label": "Explore Cultural Arts", "href": "/attractions#cultural-carnival" }
+      "body": "Immerse yourself in live music concerts, traditional masquerades including the monumental Ijele, contemporary African fashion showcases, and indigenous arts & crafts markets.",
+      "image": "/assets/ijele.jpg",
+      "imageAlt": "Cultural Arts and Ijele Masquerade in Abuja",
+      "cta": { "label": "Explore Cultural Arts", "href": "/attractions" }
     },
     {
       "id": "trade-tech",
       "align": "right",
       "kicker": "TRADE & INNOVATION",
       "headline": "Agribusiness, Tech & Fashion Vendor Hub",
-      "body": "Explore multi-sector commercial pavilions featuring high-tech agricultural machinery, digital livestock e-tagging platforms, fabric and fashion vendors, and direct B2B trade matchmaking.",
-      "image": "/assets/fashion_crafts.jpg",
-      "images": [
-        "/assets/fashion_crafts.jpg",
-        "/assets/abuja_carnival_entrance.jpg",
-        "/assets/veterinary_pet_checkup.jpg"
-      ],
-      "imageAlt": "Fashion, Crafts, Ankara Fabrics and Agribusiness Tech Hub",
-      "cta": { "label": "Visit Innovation Hub", "href": "/attractions#traceability-hub" }
+      "body": "Explore multi-sector commercial pavilions featuring high-tech agricultural machinery, digital livestock e-tagging platforms, clothing vendors, and direct B2B trade matchmaking.",
+      "image": "/assets/hqi_etagging.jpg",
+      "imageAlt": "Digital Traceability and Agribusiness Tech Hub",
+      "cta": { "label": "Visit Innovation Hub", "href": "/attractions" }
     },
     {
       "id": "championship-judging",
       "align": "left",
       "kicker": "LIVESTOCK CHAMPIONSHIP",
-      "headline": "National Champion Bull & Golden Camel Parade",
-      "body": "Watch supreme livestock judging competitions across cattle, camels, goats, sheep, and poultry - with electronic live-weight trading demonstrations and purebred genetics showcases from top pastoralists nationwide.",
-      "image": "/assets/carnival_animal_parade.jpg",
-      "images": [
-        "/assets/carnival_animal_parade.jpg",
-        "/assets/kids_horse_petting.jpg",
-        "/assets/puppy_petting_family.jpg",
-        "/assets/family_petting_zoo.jpg"
-      ],
-      "imageAlt": "Abuja Animal Carnival Parade and Breed Showcase",
+      "headline": "National Champion Bull & Golden Camel Judging",
+      "body": "Watch supreme livestock judging competitions, electronic live-weight trading demonstrations, and purebred genetics showcases from top pastoralists across the country.",
+      "image": "/assets/modern_ranch.jpg",
+      "imageAlt": "National Championship Breed Judging",
       "cta": { "label": "View Championship Schedule", "href": "/schedule" }
     }
   ]
