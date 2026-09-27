@@ -11,6 +11,9 @@ nextjs-app/out/
 # Firebase
 .firebase/
 
+# Environment files
+.env*
+
 # OS / IDE
 .DS_Store
 Thumbs.db
@@ -20,7 +23,15 @@ Thumbs.db
 # Logs
 *.log
 
-# Temporary scripts
+# Temporary scripts & utilities
 remove_bg.js
 remove_emdash.js
 replace_festival_title.js
+remove_sovereign.js
+make_transparent.ps1
+clean.ps1
+parse.ps1
+process_logo.cs
+docx_temp/
+*.docx
+*.txt
