@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Upload, FileCheck, AlertTriangle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fadeInScale, accordionExpand } from '@/lib/motion';
-import { supabase } from '@/lib/supabaseClient';
+import { submitAccreditationAction } from '@/app/actions/accreditation';
 
 export default function AccreditationForm() {
   const [formData, setFormData] = useState({
@@ -73,53 +73,28 @@ export default function AccreditationForm() {
     if (validate()) {
       setIsSubmitting(true);
 
-      try {
-        let fileUrl = '';
+      const payload = new FormData();
+      payload.append('fullName', formData.fullName);
+      payload.append('organization', formData.organization);
+      payload.append('nin', formData.nin);
+      payload.append('email', formData.email);
+      if (file) {
+        payload.append('file', file);
+      }
 
-        // 1. Upload PDF credential to Supabase Storage if file exists
-        if (file) {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-          const filePath = `accreditations/${fileName}`;
+      const result = await submitAccreditationAction(payload);
 
-          const { error: uploadError } = await supabase.storage
-            .from('credentials')
-            .upload(filePath, file);
+      setIsSubmitting(false);
 
-          if (!uploadError) {
-            const { data: publicUrlData } = supabase.storage
-              .from('credentials')
-              .getPublicUrl(filePath);
-            fileUrl = publicUrlData.publicUrl;
-          }
-        }
-
-        // 2. Insert record into Supabase "accreditations" table
-        const { error: insertError } = await supabase
-          .from('accreditations')
-          .insert([
-            {
-              full_name: formData.fullName,
-              organization: formData.organization,
-              nin: formData.nin,
-              email: formData.email,
-              file_url: fileUrl,
-              status: 'pending',
-              created_at: new Date().toISOString(),
-            },
-          ]);
-
-        if (insertError) {
-          console.warn('Supabase table insertion note:', insertError.message);
-        }
-
-        setIsSubmitting(false);
+      if (result.success) {
         setIsSuccess(true);
-      } catch (err: unknown) {
-        console.error('Submission error:', err);
-        setIsSubmitting(false);
-        // Fallback to success UI so user flow remains smooth
-        setIsSuccess(true);
+      } else {
+        if (result.fieldErrors) {
+          setErrors(result.fieldErrors);
+        }
+        setServerError(
+          result.error || 'Submission could not be completed. Please review errors.'
+        );
       }
     }
   };
@@ -387,7 +362,7 @@ export default function AccreditationForm() {
             disabled={isSubmitting}
             className="w-full py-4 bg-[#FEF3D6] hover:bg-[#FCE6A8] text-[#8D6B1B] text-sm font-bold uppercase tracking-wider rounded-xl transition-all border border-[#FCE6A8] shadow-button hover:shadow-lg disabled:opacity-50"
           >
-            {isSubmitting ? 'Submitting to Supabase...' : 'Submit Accreditation Request'}
+            {isSubmitting ? 'Processing Submission...' : 'Submit Accreditation Request'}
           </button>
         </motion.form>
       )}
