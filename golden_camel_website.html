@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Golden Camel & Livestock Showcase | Supabase Dynamic Catalog</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            desert: {
+              950: '#090D16',
+              900: '#0F172A',
+              800: '#1E293B',
+            },
+            gold: {
+              400: '#F59E0B',
+              500: '#D97706',
+              600: '#B45309',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #090D16; color: #F8FAFC; font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 sm:p-8 space-y-8">
+
+  <!-- Header Banner -->
+  <header class="max-w-7xl mx-auto w-full bg-slate-900 border border-amber-900/40 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+    <div class="absolute -right-20 -top-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="relative z-10 space-y-3">
+      <div class="inline-block px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold uppercase tracking-widest rounded-full">
+        Golden Camel & Cow Carnival Catalog
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-amber-500">
+        Dynamic Livestock Showcase
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+        Powered by Supabase PostgreSQL and Storage CDN. Real-time catalog of championship camels, royal cavalry, and certified cattle herds.
+      </p>
+    </div>
+  </header>
+
+  <!-- Filter Buttons -->
+  <section class="max-w-7xl mx-auto w-full flex flex-wrap items-center justify-center gap-2 pb-4 border-b border-amber-900/30">
+    <button onclick="filterCategory('all')" class="cat-btn px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-lg">All</button>
+    <button onclick="filterCategory('camels')" class="cat-btn px-4 py-2 bg-slate-900 text-slate-300 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider hover:border-amber-500">Golden Camels</button>
+    <button onclick="filterCategory('horses')" class="cat-btn px-4 py-2 bg-slate-900 text-slate-300 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider hover:border-amber-500">Royal Cavalry</button>
+    <button onclick="filterCategory('cattle')" class="cat-btn px-4 py-2 bg-slate-900 text-slate-300 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider hover:border-amber-500">Cattle Herds</button>
+    <button onclick="filterCategory('small-ruminants')" class="cat-btn px-4 py-2 bg-slate-900 text-slate-300 border border-slate-800 rounded-xl text-xs font-bold uppercase tracking-wider hover:border-amber-500">Small Ruminants</button>
+  </section>
+
+  <!-- Dynamic Grid Container -->
+  <main class="max-w-7xl mx-auto w-full flex-1">
+    <div id="livestockGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="col-span-full text-center py-12 text-amber-400 font-semibold animate-pulse text-sm">
+        Loading Supabase Livestock Catalog...
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Popup -->
+  <div id="modalBackdrop" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-lg w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-bold text-lg">&times;</button>
+      <img id="modalImage" src="" alt="Livestock" class="w-full h-56 object-cover rounded-2xl bg-slate-950" />
+      <div>
+        <div class="flex items-center justify-between">
+          <h3 id="modalName" class="text-xl font-bold text-amber-200"></h3>
+          <span id="modalAge" class="text-xs font-mono text-amber-400 bg-amber-950/60 px-3 py-1 rounded-full border border-amber-800"></span>
+        </div>
+        <p id="modalMeta" class="text-xs text-amber-400/90 mt-1 font-medium"></p>
+        <p id="modalDesc" class="text-xs text-slate-300 mt-3 pt-3 border-t border-slate-800 leading-relaxed"></p>
+      </div>
+      <div class="pt-2 text-right">
+        <button onclick="closeModal()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="max-w-7xl mx-auto w-full text-center py-6 text-xs text-slate-500 border-t border-slate-800/60">
+    &copy; 2026 Livestock Carnival (`livestockcarnival.ng`) &bull; Supabase Dynamic System
+  </footer>
+
+  <script>
+    // Supabase Credentials
+    const SUPABASE_URL = 'https://bqwohpjschaditdkrdra.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_HYjA-ZuSRTwNMTYBdsMfmA_Kvot5Ylg';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let allLivestock = [];
+    let currentCategory = 'all';
+
+    async function loadLivestock() {
+      const grid = document.getElementById('livestockGrid');
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('livestock')
+          .select('*')
+          .order('is_featured', { ascending: false });
+
+        if (error || !data || data.length === 0) {
+          allLivestock = getFallbackData();
+        } else {
+          allLivestock = data;
+        }
+      } catch (err) {
+        allLivestock = getFallbackData();
+      }
+
+      renderGrid();
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('livestockGrid');
+      const filtered = allLivestock.filter(item => currentCategory === 'all' ? true : item.category === currentCategory);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400 text-xs font-bold uppercase">No entries in this category.</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => `
+        <div class="bg-slate-900 border border-amber-900/30 hover:border-amber-500/50 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col">
+          <div class="relative h-56 bg-slate-950 overflow-hidden">
+            <img
+              src="${item.image_url}"
+              alt="${item.name}"
+              onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400/0F172A/F59E0B?text=${encodeURIComponent(item.name)}';"
+              class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+            />
+            <span class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md text-amber-300 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-amber-500/30">
+              ${item.category}
+            </span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-baseline justify-between mb-1">
+                <h3 class="font-bold text-amber-100 text-base">${item.name}</h3>
+                <span class="text-xs text-amber-400 font-mono">${item.age || ''}</span>
+              </div>
+              <p class="text-xs text-amber-300/80 mb-2">Breed: ${item.breed || 'Heritage Breed'}</p>
+              <p class="text-xs text-slate-300/80 line-clamp-2">${item.description || ''}</p>
+            </div>
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+              <span class="text-slate-400">Exhibitor: <strong class="text-slate-200">${item.exhibitor || 'Heritage Stock'}</strong></span>
+              <button onclick="openModal('${item.id}')" class="text-amber-400 hover:underline font-bold">Dossier &rarr;</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCategory(cat) {
+      currentCategory = cat;
+      renderGrid();
+    }
+
+    function openModal(id) {
+      const item = allLivestock.find(i => i.id === id);
+      if (!item) return;
+
+      document.getElementById('modalImage').src = item.image_url;
+      document.getElementById('modalName').innerText = item.name;
+      document.getElementById('modalAge').innerText = item.age || 'Age Certified';
+      document.getElementById('modalMeta').innerText = `Breed: ${item.breed || 'Purebred'} | Exhibitor: ${item.exhibitor || 'National Registry'}`;
+      document.getElementById('modalDesc').innerText = item.description || 'No additional notes.';
+
+      document.getElementById('modalBackdrop').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.add('hidden');
+    }
+
+    function getFallbackData() {
+      return [
+        {
+          id: '1',
+          name: 'Rajputana Gold',
+          breed: 'Bikaneri Dromedary',
+          category: 'camels',
+          age: '5 Years',
+          exhibitor: 'Golden Camel Estate',
+          description: 'Championship breeding dromedary known for high endurance, distinctive golden coat, and grand ceremonial posture.',
+          image_url: 'https://bqwohpjschaditdkrdra.supabase.co/storage/v1/object/public/livestock-images/livestock_camel.jpg',
+        },
+        {
+          id: '2',
+          name: 'Cheetak Lineage',
+          breed: 'Marwari Stallion',
+          category: 'horses',
+          age: '4 Years',
+          exhibitor: 'Kano Durbar Cavalry',
+          description: 'Famous inward-turning ears, athletic build, and heritage lineage trained for ceremonial Durbar parades.',
+          image_url: 'https://bqwohpjschaditdkrdra.supabase.co/storage/v1/object/public/livestock-images/durbar_horse_rider.jpg',
+        },
+        {
+          id: '3',
+          name: 'Nandi Crest',
+          breed: 'White Fulani Zebu',
+          category: 'cattle',
+          age: '6 Years',
+          exhibitor: 'National Livestock Ranch',
+          description: 'Prize-winning indigenous Zebu bull with iconic lyre-shaped horns, robust heat tolerance, and premium genetics.',
+          image_url: 'https://bqwohpjschaditdkrdra.supabase.co/storage/v1/object/public/livestock-images/livestock_bull_cow.jpg',
+        }
+      ];
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', loadLivestock);
+  </script>
+</body>
+</html>
