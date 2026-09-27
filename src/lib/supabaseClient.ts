@@ -1,4 +1,8 @@
-// Re-export browser client for backward compatibility
-import { supabase, createBrowserClient } from './supabase/client';
+import { createClient } from '@supabase/supabase-js';
 
-export { supabase, createBrowserClient };
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://bqwohpjschaditdkrdra.supabase.co';
+const supabaseAnonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_HYjA-ZuSRTwNMTYBdsMfmA_Kvot5Ylg';
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
