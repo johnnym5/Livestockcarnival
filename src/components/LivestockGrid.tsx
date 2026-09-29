@@ -71,7 +71,6 @@ export default function LivestockGrid() {
             return {
               ...record,
               fallback_url: fallback,
-              // Use local path directly if image_url is missing or unseeded remote url
               image_url: record.image_url && record.image_url.startsWith('/assets')
                 ? record.image_url
                 : fallback,
@@ -112,9 +111,9 @@ export default function LivestockGrid() {
 
   return (
     <div className="w-full space-y-8">
-      {/* Category Filter Bar */}
-      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 border-b border-amber-900/30 pb-6">
-        <span className="text-xs uppercase font-bold tracking-widest text-amber-400/80 mr-2 flex items-center gap-1">
+      {/* Category Filter Bar in Forest Green / White System Colors */}
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 border-b border-slate-200/80 pb-6">
+        <span className="text-xs uppercase font-bold tracking-widest text-[#1E4D38] mr-2 flex items-center gap-1">
           <Filter className="w-3.5 h-3.5" /> Filter Category:
         </span>
         {CATEGORIES.map((cat) => (
@@ -123,8 +122,8 @@ export default function LivestockGrid() {
             onClick={() => setSelectedCategory(cat.id)}
             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 border cursor-pointer ${
               selectedCategory === cat.id
-                ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-500 shadow-lg shadow-amber-950/40 scale-105'
-                : 'bg-slate-900/80 text-slate-300 border-slate-800 hover:border-amber-700/50 hover:text-amber-200'
+                ? 'bg-[#1E4D38] text-white border-[#1E4D38] shadow-md scale-105'
+                : 'bg-white text-[#4B5563] border-slate-200 hover:border-[#1E4D38] hover:text-[#1E4D38] hover:bg-[#D8EADF]/30'
             }`}
           >
             {cat.label}
@@ -138,16 +137,16 @@ export default function LivestockGrid() {
           {[1, 2, 3, 4, 5, 6].map((idx) => (
             <div
               key={idx}
-              className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 animate-pulse space-y-4"
+              className="bg-white border border-slate-200/80 rounded-2xl p-4 animate-pulse space-y-4 shadow-card"
             >
-              <div className="h-56 bg-slate-800/60 rounded-xl" />
-              <div className="h-4 bg-slate-800/80 rounded w-3/4" />
-              <div className="h-3 bg-slate-800/60 rounded w-1/2" />
+              <div className="h-56 bg-slate-100 rounded-xl" />
+              <div className="h-4 bg-slate-200 rounded w-3/4" />
+              <div className="h-3 bg-slate-100 rounded w-1/2" />
             </div>
           ))}
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="p-12 text-center bg-slate-900/50 border border-slate-800 rounded-2xl text-slate-400">
+        <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl text-[#4B5563] shadow-card">
           <p className="text-sm uppercase font-bold tracking-wider">
             No entries found for this category.
           </p>
@@ -165,22 +164,22 @@ export default function LivestockGrid() {
               <ThreeDCard
                 key={item.id}
                 variant="glass"
-                glowColor="rgba(245, 158, 11, 0.3)"
-                maxTilt={12}
-                scaleOnHover={1.03}
-                depth={28}
-                className="border-amber-900/40 hover:border-amber-500/60"
+                glowColor="rgba(30, 77, 56, 0.15)"
+                maxTilt={10}
+                scaleOnHover={1.02}
+                depth={20}
+                className="bg-white border-slate-200/80 hover:border-[#1E4D38]/50 shadow-card hover:shadow-card-hover"
               >
-                <div className="flex flex-col h-full [transform-style:preserve-3d]">
+                <div className="flex flex-col h-full bg-white rounded-2xl overflow-hidden [transform-style:preserve-3d]">
                   {/* Image Container */}
                   <div
-                    style={{ transform: 'translateZ(20px)' }}
-                    className="relative h-60 w-full overflow-hidden bg-slate-950 rounded-t-2xl"
+                    style={{ transform: 'translateZ(15px)' }}
+                    className="relative h-60 w-full overflow-hidden bg-slate-100 rounded-t-2xl"
                   >
                     {isFailed ? (
-                      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-slate-500 bg-slate-950 border-b border-amber-900/20">
-                        <ImageOff className="w-10 h-10 mb-2 text-amber-600/50" />
-                        <span className="text-xs uppercase font-bold tracking-wider text-amber-500/70">
+                      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-slate-400 bg-slate-100 border-b border-slate-200">
+                        <ImageOff className="w-10 h-10 mb-2 text-slate-400" />
+                        <span className="text-xs uppercase font-bold tracking-wider text-slate-500">
                           {item.name}
                         </span>
                       </div>
@@ -189,67 +188,67 @@ export default function LivestockGrid() {
                         src={imageSrc}
                         alt={item.name}
                         onError={() => handleImageError(item)}
-                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-108"
+                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-106"
                       />
                     )}
 
-                    {/* Category Badge */}
+                    {/* Category Badge in Sage Green */}
                     <div
-                      style={{ transform: 'translateZ(40px)' }}
-                      className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-md border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg"
+                      style={{ transform: 'translateZ(35px)' }}
+                      className="absolute top-3 left-3 bg-[#D8EADF]/95 backdrop-blur-md border border-[#B8D8C5] text-[#1E4D38] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm"
                     >
-                      <Tag className="w-3 h-3 text-amber-400" />
+                      <Tag className="w-3 h-3 text-[#1E4D38]" />
                       {item.category}
                     </div>
 
-                    {/* Featured Badge */}
+                    {/* Featured Badge in Gold */}
                     {item.is_featured && (
                       <div
-                        style={{ transform: 'translateZ(40px)' }}
-                        className="absolute top-3 right-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg flex items-center gap-1 border border-amber-400/40"
+                        style={{ transform: 'translateZ(35px)' }}
+                        className="absolute top-3 right-3 bg-[#FEF3D6] text-[#8D6B1B] border border-[#FCE6A8] text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm flex items-center gap-1"
                       >
-                        <Shield className="w-3 h-3 text-amber-200" /> Grand Champion
+                        <Shield className="w-3 h-3 text-[#8D6B1B]" /> Grand Champion
                       </div>
                     )}
                   </div>
 
                   {/* Content Details */}
                   <div
-                    style={{ transform: 'translateZ(25px)' }}
+                    style={{ transform: 'translateZ(20px)' }}
                     className="p-6 flex-1 flex flex-col justify-between space-y-4"
                   >
                     <div>
                       <div className="flex items-baseline justify-between gap-2 mb-1">
-                        <h3 className="text-lg font-bold text-amber-100 group-hover:text-amber-400 transition-colors">
+                        <h3 className="text-lg font-bold text-[#111827] group-hover:text-[#1E4D38] transition-colors">
                           {item.name}
                         </h3>
                         {item.age && (
-                          <span className="text-xs text-amber-400/80 font-mono">
+                          <span className="text-xs text-[#8D6B1B] font-mono font-semibold">
                             {item.age}
                           </span>
                         )}
                       </div>
                       {item.breed && (
-                        <p className="text-xs text-amber-300/80 font-medium tracking-wide mb-2">
+                        <p className="text-xs text-[#1E4D38] font-bold tracking-wide mb-2">
                           Breed: {item.breed}
                         </p>
                       )}
                       {item.description && (
-                        <p className="text-xs text-slate-300/80 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-[#4B5563] line-clamp-2 leading-relaxed">
                           {item.description}
                         </p>
                       )}
                     </div>
 
                     {/* Footer & Exhibitor info */}
-                    <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400 font-medium truncate max-w-[170px]">
-                        Exhibitor: <strong className="text-slate-200">{item.exhibitor || 'Heritage Stock'}</strong>
+                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[11px] text-[#6B7280] font-medium truncate max-w-[170px]">
+                        Exhibitor: <strong className="text-[#111827]">{item.exhibitor || 'Heritage Stock'}</strong>
                       </span>
                       <button
                         onClick={() => setActiveModalItem(item)}
-                        style={{ transform: 'translateZ(35px)' }}
-                        className="text-xs font-bold text-amber-400 hover:text-amber-300 uppercase tracking-wider flex items-center gap-1 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-500/20 hover:border-amber-400 transition-all hover:scale-105 cursor-pointer shrink-0"
+                        style={{ transform: 'translateZ(30px)' }}
+                        className="text-xs font-bold text-[#1E4D38] hover:text-white uppercase tracking-wider flex items-center gap-1 bg-[#D8EADF] hover:bg-[#1E4D38] px-3.5 py-1.5 rounded-xl border border-[#B8D8C5] transition-all cursor-pointer shrink-0 shadow-xs"
                       >
                         Dossier <Info className="w-3.5 h-3.5" />
                       </button>
@@ -269,50 +268,50 @@ export default function LivestockGrid() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md"
             onClick={() => setActiveModalItem(null)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-slate-900 border border-amber-500/40 rounded-3xl max-w-xl w-full p-6 sm:p-8 overflow-hidden shadow-2xl space-y-6 relative"
+              className="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-6 sm:p-8 overflow-hidden shadow-2xl space-y-6 relative"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setActiveModalItem(null)}
-                className="absolute top-4 right-4 p-2 bg-slate-800/80 text-slate-300 hover:text-white rounded-full transition-colors cursor-pointer"
+                className="absolute top-4 right-4 p-2 bg-slate-100 text-slate-600 hover:text-[#111827] rounded-full transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="relative h-64 w-full rounded-2xl overflow-hidden bg-slate-950">
+              <div className="relative h-64 w-full rounded-2xl overflow-hidden bg-slate-100">
                 <img
                   src={getImageSrc(activeModalItem)}
                   alt={activeModalItem.name}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                <div className="absolute top-3 left-3 bg-[#D8EADF] border border-[#B8D8C5] text-[#1E4D38] text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
                   {activeModalItem.category}
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold text-amber-200">
+                  <h3 className="text-2xl font-bold text-[#111827]">
                     {activeModalItem.name}
                   </h3>
-                  <span className="text-xs font-mono text-amber-400 bg-amber-950/60 border border-amber-800/50 px-3 py-1 rounded-full">
+                  <span className="text-xs font-mono text-[#8D6B1B] bg-[#FEF3D6] border border-[#FCE6A8] px-3 py-1 rounded-full font-bold">
                     {activeModalItem.age || 'Age Certified'}
                   </span>
                 </div>
 
-                <div className="text-xs text-amber-400/90 font-medium">
+                <div className="text-xs text-[#1E4D38] font-bold">
                   Breed: {activeModalItem.breed || 'Purebred Heritage Stock'} | Exhibitor:{' '}
-                  <span className="text-white">{activeModalItem.exhibitor || 'National Registry'}</span>
+                  <span className="text-[#111827] font-semibold">{activeModalItem.exhibitor || 'National Registry'}</span>
                 </div>
 
-                <p className="text-sm text-slate-300 leading-relaxed pt-2 border-t border-slate-800">
+                <p className="text-sm text-[#4B5563] leading-relaxed pt-2 border-t border-slate-100">
                   {activeModalItem.description}
                 </p>
               </div>
@@ -320,7 +319,7 @@ export default function LivestockGrid() {
               <div className="pt-4 flex justify-end">
                 <button
                   onClick={() => setActiveModalItem(null)}
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
+                  className="px-6 py-2.5 bg-[#1E4D38] hover:bg-[#163B2B] text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-colors cursor-pointer shadow-button"
                 >
                   Close Dossier
                 </button>
