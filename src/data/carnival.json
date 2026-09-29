@@ -70,14 +70,15 @@
       "kicker": "TRADE & INNOVATION",
       "headline": "Agribusiness, Tech & Fashion Vendor Hub",
       "body": "Explore multi-sector commercial pavilions featuring high-tech agricultural machinery, digital livestock e-tagging platforms, clothing vendors, and direct B2B trade matchmaking.",
-      "image": "/assets/home/story-carnival-entrance-gate.jpg",
+      "image": "/assets/home/story-digital-rfid-livestock-tag.jpg",
       "images": [
-        "/assets/home/story-carnival-entrance-gate.jpg",
+        "/assets/home/story-digital-rfid-livestock-tag.jpg",
         "/assets/home/story-etagging-veterinary.jpg",
-        "/assets/home/story-digital-rfid-livestock-tag.jpg"
+        "/assets/attractions/arena-traceability-coldchain-hub.jpg",
+        "/assets/fashion-parade/veterinarian-examining-dairy-cow.jpg"
       ],
       "imageAlt": "Digital Traceability and Agribusiness Tech Hub",
-      "cta": { "label": "Visit Innovation Hub", "href": "/attractions" }
+      "cta": { "label": "Visit Innovation Hub", "href": "/nhesics" }
     },
     {
       "id": "championship-judging",
@@ -85,13 +86,13 @@
       "kicker": "LIVESTOCK CHAMPIONSHIP",
       "headline": "National Champion Bull & Golden Camel Judging",
       "body": "Watch supreme livestock judging competitions, electronic live-weight trading demonstrations, and purebred genetics showcases from top pastoralists across the country.",
-      "image": "/assets/home/story-modern-ranch-pasture.jpg",
+      "image": "/assets/fashion-parade/exhibition-bull-and-horse-pens.jpg",
       "images": [
-        "/assets/home/story-modern-ranch-pasture.jpg",
+        "/assets/fashion-parade/exhibition-bull-and-horse-pens.jpg",
+        "/assets/attractions/arena-breed-judging-court.jpg",
+        "/assets/fashion-parade/balami-ram-and-goat-shed.jpg",
         "/assets/livestock/breed-bull-cattle.jpg",
-        "/assets/livestock/breed-golden-camel.jpg",
-        "/assets/home/story-family-petting-zoo.jpg",
-        "/assets/home/story-puppy-petting-kids.jpg"
+        "/assets/livestock/breed-golden-camel.jpg"
       ],
       "imageAlt": "National Championship Breed Judging",
       "cta": { "label": "View Championship Schedule", "href": "/schedule" }
