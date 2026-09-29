@@ -5,11 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Compass } from 'lucide-react';
 
-/* ─── Card content for the 4 deep-dive cards ────────────────────────── */
+/* ─── 10 Highlight Cards Connecting to All Major Site Pages ─────────── */
 const cards = [
   {
     id: 'card-1',
-    eyebrow: 'DAY 1 · ROYAL CAVALRY & HERITAGE',
+    eyebrow: 'DAY 1 · ROYAL CAVALRY & EQUESTRIAN',
     title: 'Royal Horse Cavalry & Durbar Parade',
     body: 'Witness over 200 ceremonial war stallions, traditional Northern horsemen, camel pageantry and royal racing displays in a breathtaking celebration of national heritage.',
     image: '/assets/home/story-equestrian-durbar-parade.jpg',
@@ -18,30 +18,84 @@ const cards = [
   },
   {
     id: 'card-2',
-    eyebrow: 'GASTRONOMY & STREET FOOD CULTURE',
-    title: 'Open-Flame Suya Village & Artisanal Fest',
-    body: "Nigeria's largest outdoor open-flame grilling arena. Master Suya chefs, artisanal Kilishi, organic spice markets, and family festival dining.",
+    eyebrow: 'EXHIBITION · CHAMPIONSHIP LIVESTOCK',
+    title: 'Elite Breeds & Championship Pavilion',
+    body: 'Explore Nigeria’s premier White Fulani bulls, Sokoto Gudali, Azawak Camels, Red Sokoto Goats, Balami Sheep, and high-yield indigenous poultry.',
+    image: '/assets/livestock/showcase-spectrum-hero.jpg',
+    link: '/livestock',
+    cta: 'Explore All Livestock Breeds',
+  },
+  {
+    id: 'card-3',
+    eyebrow: 'GASTRONOMY · SUYA VILLAGE & FOOD FEST',
+    title: 'Open-Flame Suya Village & Artisanal Feast',
+    body: "Nigeria's largest outdoor open-flame grilling arena featuring master Suya chefs, artisanal Kilishi, gourmet catfish BBQ, organic spice markets, and family festival dining.",
     image: '/assets/home/story-suya-grill-fire.jpg',
     link: '/attractions#suya-village',
     cta: 'Discover Culinary Village',
   },
   {
-    id: 'card-3',
-    eyebrow: 'SIGNATURE RUNWAY & CULTURAL ARTS',
+    id: 'card-4',
+    eyebrow: 'RUNWAY · CULTURAL ARTS & PAGEANTRY',
     title: 'Livestock Cultural Fashion & Pageant',
-    body: "Nigeria's first livestock fashion runway with prize cattle draped in Aso-Oke, dance troupes from 36 states, and the Queen/King NLC Pageant.",
-    image: '/assets/home/story-live-concert-stage.jpg',
+    body: "Nigeria's first livestock fashion runway where prize cattle and camels are draped in hand-woven Aso-Oke, featuring cultural dancers and the Queen/King NLC Pageant.",
+    image: '/assets/attractions/cultural-fashion-runway.jpg',
     link: '/fashion-parade',
-    cta: 'Explore Fashion Showcase',
+    cta: 'Explore Cultural Fashion Showcase',
   },
   {
-    id: 'card-4',
-    eyebrow: 'COMMERCIAL LIVESTOCK EXCHANGE',
-    title: 'Live Auction & Digital RFID Bidding',
-    body: 'Precision live-weight trading, certified digital scales, transparent farm-gate pricing, and high-stakes seedstock auctions.',
+    id: 'card-5',
+    eyebrow: 'TECHNOLOGY · NHESICS REGISTRY',
+    title: 'National Herd Health, Security & Traceability',
+    body: 'Discover the FGN digital herd management framework: RFID microchip tagging, real-time epidemic monitoring, biometric cattle passports, and ranch security.',
     image: '/assets/home/story-digital-rfid-livestock-tag.jpg',
+    link: '/nhesics',
+    cta: 'Explore NHESICS System',
+  },
+  {
+    id: 'card-6',
+    eyebrow: 'NAVIGATION · ABUJA NATIONAL GROUNDS',
+    title: 'Interactive 3D Venue Map & Zone Guide',
+    body: 'Navigate Old Parade Ground, Abuja: Equestrian Durbar Fields, Suya Village, Live Auction Arenas, Exhibition Pavilions, VIP Lounges, and Parking Hubs.',
+    image: '/assets/venue-map/old-parade-ground-map-annotated.jpg',
+    link: '/venue-map',
+    cta: 'Open Interactive Venue Map',
+  },
+  {
+    id: 'card-7',
+    eyebrow: 'ENTERTAINMENT · LIVE STAGE & ARTS',
+    title: 'Grand Concerts & 36-State Cultural Festival',
+    body: 'Nightly headline music concerts, traditional masquerades, 36-state cultural dance troupes, kids petting zoo, and family entertainment arenas.',
+    image: '/assets/home/story-live-concert-stage.jpg',
+    link: '/attractions',
+    cta: 'View Carnival Attractions',
+  },
+  {
+    id: 'card-8',
+    eyebrow: 'COMMERCIAL · TRADING & LIVE AUCTION',
+    title: 'Live Auction & Commercial Bidding',
+    body: 'Precision live-weight trading, certified digital scales, transparent farm-gate pricing, seedstock auctions, and B2B agribusiness matchmaking.',
+    image: '/assets/home/story-etagging-veterinary.jpg',
     link: '/schedule',
-    cta: 'View Trading Schedule',
+    cta: 'View Bidding & Trading Schedule',
+  },
+  {
+    id: 'card-9',
+    eyebrow: 'ACCREDITATION · VIP & PRESS PASSES',
+    title: 'Official Accreditation & Pass Registration',
+    body: 'Register for fast-track VIP entrance badges, international delegation clearance, press credentials, and official carnival passes.',
+    image: '/assets/home/story-carnival-entrance-gate.jpg',
+    link: '/accreditation',
+    cta: 'Apply For Accreditation',
+  },
+  {
+    id: 'card-10',
+    eyebrow: 'INITIATIVE · RENEWED HOPE VISION',
+    title: 'About the Carnival & Agricultural Heritage',
+    body: "Learn about the Federal Ministry of Livestock Development's master plan to modernize agribusiness, transform pastoral livelihoods, and drive national growth.",
+    image: '/assets/home/story-modern-ranch-pasture.jpg',
+    link: '/about',
+    cta: 'Read Initiative Vision',
   },
 ];
 
@@ -81,8 +135,11 @@ export default function Home() {
         /* ── Center all scene elements ───────────────────────────────── */
         gsap.set('.scene-element', { xPercent: -50, yPercent: -50 });
 
-        /* ── Initial states: Cards are hidden at bottom; Header fades in on load ── */
-        gsap.set('#card-1, #card-2, #card-3, #card-4', {
+        const cardSelectors = cards.map((c) => `#${c.id}`).join(', ');
+
+        /* ── Initial states: Welcome Title is visible at top; Cards are hidden at bottom ── */
+        gsap.set('#welcome-title', { opacity: 1, scale: 1, y: 0, z: 0, filter: 'none' });
+        gsap.set(cardSelectors, {
           x: 0,
           y: '100vh',
           scale: 0.85,
@@ -92,27 +149,12 @@ export default function Home() {
           pointerEvents: 'none',
         });
 
-        /* ── On-Load Slow Smooth Fade-In for Welcome Title ── */
-        gsap.fromTo(
-          '#welcome-title',
-          { opacity: 0, y: 35, scale: 0.96, filter: isMobile ? 'none' : 'blur(6px)' },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: 'none',
-            duration: 1.6,
-            ease: 'power3.out',
-            delay: 0.15,
-          }
-        );
-
-        /* ── Slow, Smooth Master Scroll Timeline ────── */
+        /* ── Slow, Smooth Master Scroll Timeline across all 10 highlight cards ────── */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sceneEl,
             start: 'top top',
-            end: isMobile ? '+=6000' : '+=7800',
+            end: isMobile ? `+=${cards.length * 1400}` : `+=${cards.length * 1700}`,
             scrub: 1.2,
             pin: true,
             anticipatePin: 1,
@@ -126,32 +168,58 @@ export default function Home() {
         const blurTitleOut = isMobile ? 'none' : 'blur(16px)';
         const blurFocus = isMobile ? 'none' : 'blur(0px)';
 
-        /* Phase 1: Welcome title floats up and dissolves as user scrolls down */
-        tl.to('#welcome-title', { y: '-45vh', opacity: 0, filter: blurTitleOut, duration: 2.5, ease: 'power2.inOut' }, 0)
-          /* Card 1 enters and settles in center */
-          .to('#card-1', { y: 0, scale: 0.98, opacity: 1, filter: blurFocus, pointerEvents: 'auto', duration: 2.5, ease: 'power2.out' }, 0.8)
-          /* Card 1 Hold in center for comfortable reading */
-          .to('#card-1', { scale: 1.02, z: isMobile ? 40 : 100, duration: 2.2, ease: 'none' })
-          /* Card 1 zooms forward past camera & Card 2 enters */
-          .to('#card-1', { scale: maxZoomScale, opacity: 0, filter: blurOut, pointerEvents: 'none', duration: 2.2, ease: 'power3.in' })
-          .to('#card-2', { y: 0, scale: 0.98, opacity: 1, filter: blurFocus, pointerEvents: 'auto', duration: 2.5, ease: 'power3.out' }, '<0.8')
+        /* Phase 1: Welcome title starts at 100% opacity on load and floats up as user scrolls down */
+        tl.fromTo(
+          '#welcome-title',
+          { opacity: 1, y: 0, scale: 1, filter: 'none' },
+          { y: '-45vh', opacity: 0, filter: blurTitleOut, duration: 2.5, ease: 'power2.inOut' },
+          0
+        );
 
-          /* Card 2 Hold in center */
-          .to('#card-2', { scale: 1.02, z: isMobile ? 40 : 100, duration: 2.2, ease: 'none' })
-          /* Card 2 zooms forward & Card 3 enters */
-          .to('#card-2', { scale: maxZoomScale, opacity: 0, filter: blurOut, pointerEvents: 'none', duration: 2.2, ease: 'power3.in' })
-          .to('#card-3', { y: 0, scale: 0.98, opacity: 1, filter: blurFocus, pointerEvents: 'auto', duration: 2.5, ease: 'power3.out' }, '<0.8')
+        /* Phase 2: Sequence through each card with entry, focal reading hold, and zoom transition */
+        cards.forEach((card, index) => {
+          const cardId = `#${card.id}`;
+          const startTime = 0.8 + index * 4.8;
 
-          /* Card 3 Hold in center */
-          .to('#card-3', { scale: 1.02, z: isMobile ? 40 : 100, duration: 2.2, ease: 'none' })
-          /* Card 3 zooms forward & Card 4 enters */
-          .to('#card-3', { scale: maxZoomScale, opacity: 0, filter: blurOut, pointerEvents: 'none', duration: 2.2, ease: 'power3.in' })
-          .to('#card-4', { y: 0, scale: 0.98, opacity: 1, filter: blurFocus, pointerEvents: 'auto', duration: 2.5, ease: 'power3.out' }, '<0.8')
+          tl.to(
+            cardId,
+            {
+              y: 0,
+              scale: 0.98,
+              opacity: 1,
+              filter: blurFocus,
+              pointerEvents: 'auto',
+              duration: 2.5,
+              ease: 'power2.out',
+            },
+            startTime
+          ).to(cardId, {
+            scale: 1.02,
+            z: isMobile ? 40 : 100,
+            duration: 2.2,
+            ease: 'none',
+          });
 
-          /* Card 4 Hold in center */
-          .to('#card-4', { scale: 1.02, z: isMobile ? 30 : 80, duration: 2.2, ease: 'none' })
-          /* Card 4 slides up and dissolves out to reveal closing editorial banner */
-          .to('#card-4', { y: '-100vh', opacity: 0, filter: isMobile ? 'none' : 'blur(20px)', pointerEvents: 'none', duration: 2.2, ease: 'power2.in' });
+          if (index < cards.length - 1) {
+            tl.to(cardId, {
+              scale: maxZoomScale,
+              opacity: 0,
+              filter: blurOut,
+              pointerEvents: 'none',
+              duration: 2.2,
+              ease: 'power3.in',
+            });
+          } else {
+            tl.to(cardId, {
+              y: '-100vh',
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(20px)',
+              pointerEvents: 'none',
+              duration: 2.2,
+              ease: 'power2.in',
+            });
+          }
+        });
 
         ScrollTrigger.refresh();
       }, containerRef);
@@ -193,7 +261,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(228,176,58,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
 
         {/* ── WELCOME TITLE ── */}
-        <div id="welcome-title" className="scene-element w-[92vw] max-w-4xl text-center z-10 px-3 sm:px-4 opacity-0">
+        <div id="welcome-title" className="scene-element w-[92vw] max-w-4xl text-center z-10 px-3 sm:px-4">
           {/* Logo */}
           <div className="relative w-28 h-16 sm:w-40 sm:h-24 md:w-48 md:h-28 mx-auto mb-2 sm:mb-4">
             <Image
@@ -270,25 +338,16 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── CARD 1: Durbar (rises from bottom) ── */}
-        <div id="card-1" className="scene-element z-20 w-[90vw] max-w-2xl opacity-0 pointer-events-none">
-          <GlassCard card={cards[0]} />
-        </div>
-
-        {/* ── CARD 2: Suya (rises from bottom) ── */}
-        <div id="card-2" className="scene-element z-20 w-[90vw] max-w-2xl opacity-0 pointer-events-none">
-          <GlassCard card={cards[1]} />
-        </div>
-
-        {/* ── CARD 3: Fashion (rises from bottom) ── */}
-        <div id="card-3" className="scene-element z-20 w-[90vw] max-w-2xl opacity-0 pointer-events-none">
-          <GlassCard card={cards[2]} />
-        </div>
-
-        {/* ── CARD 4: Auction (rises from bottom) ── */}
-        <div id="card-4" className="scene-element z-20 w-[90vw] max-w-2xl opacity-0 pointer-events-none">
-          <GlassCard card={cards[3]} />
-        </div>
+        {/* ── 10 HIGHLIGHT CARDS (Connecting to all major pages) ── */}
+        {cards.map((card) => (
+          <div
+            key={card.id}
+            id={card.id}
+            className="scene-element z-20 w-[90vw] max-w-2xl opacity-0 pointer-events-none"
+          >
+            <GlassCard card={card} />
+          </div>
+        ))}
       </div>
 
       {/* ═══════════════ EDITORIAL CLOSING BANNER (Natural Reveal) ═══════════════ */}
