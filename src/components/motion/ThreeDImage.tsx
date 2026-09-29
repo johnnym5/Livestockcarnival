@@ -40,6 +40,9 @@ export default function ThreeDImage({
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
+    if (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches) {
+      return;
+    }
     const rect = containerRef.current.getBoundingClientRect();
     const xPct = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
     const yPct = ((e.clientY - rect.top) / rect.height - 0.5) * 2;

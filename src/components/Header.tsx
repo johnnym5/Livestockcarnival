@@ -39,14 +39,14 @@ export default function Header() {
 
       {/* ── Main Navigation Bar (90% opaque white background with backdrop blur) ── */}
       <div
-        className={`w-full bg-white/90 backdrop-blur-lg border-b border-[#E5E7EB] transition-all duration-300 ${
+        className={`w-full bg-white/95 backdrop-blur-lg border-b border-[#E5E7EB] transition-all duration-300 ${
           isScrolled ? 'shadow-md py-2' : 'py-2.5 sm:py-3'
         }`}
       >
-        <div className="w-full max-w-[1536px] mx-auto px-3 sm:px-6 lg:px-8 flex justify-between items-center gap-2 lg:gap-4">
+        <div className="w-full max-w-[1536px] mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 lg:gap-4">
 
-          {/* ── App Logo: Livestock Carnival Emblem ── */}
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+          {/* ── App Logo: Responsive & Constrained to prevent pushing hamburger offscreen ── */}
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group min-w-0 shrink flex-1 sm:flex-none">
             <Image
               src="/assets/branding/carnival-logo-transparent.png"
               alt="Livestock Carnival Official Logo"
@@ -55,17 +55,17 @@ export default function Header() {
               className="shrink-0 object-contain w-auto h-7 sm:h-8 lg:h-9 transition-transform group-hover:scale-105"
               priority
             />
-            <div className="flex flex-col leading-tight pr-1">
-              <span className="font-extrabold text-[#111827] text-[10px] sm:text-xs lg:text-xs xl:text-sm tracking-tight leading-tight group-hover:text-[#1E4D38] transition-colors whitespace-nowrap">
+            <div className="flex flex-col leading-tight pr-1 min-w-0 overflow-hidden">
+              <span className="font-extrabold text-[#111827] text-[9.5px] xs:text-[10.5px] sm:text-xs lg:text-xs xl:text-sm tracking-tight leading-tight group-hover:text-[#1E4D38] transition-colors truncate sm:whitespace-nowrap max-w-[180px] xs:max-w-[240px] sm:max-w-none">
                 RENEWED HOPE NATIONAL LIVESTOCK CARNIVAL 2026
               </span>
-              <span className="text-[#8D6B1B] text-[7.5px] sm:text-[9px] lg:text-[10px] font-bold tracking-[0.12em] sm:tracking-[0.16em] uppercase whitespace-nowrap">
+              <span className="text-[#8D6B1B] text-[7px] xs:text-[8px] sm:text-[9px] lg:text-[10px] font-bold tracking-[0.1em] sm:tracking-[0.16em] uppercase truncate sm:whitespace-nowrap max-w-[180px] xs:max-w-[240px] sm:max-w-none">
                 GOLDEN CAMEL &amp; COW CARNIVAL
               </span>
             </div>
           </Link>
 
-          {/* ── Desktop Nav Links ── */}
+          {/* ── Desktop Nav Links (Visible on 2XL / 1400px+) ── */}
           <nav className="hidden 2xl:flex items-center gap-4 2xl:gap-5 shrink-0">
             {navLinks.map((link) => (
               <Link
@@ -102,13 +102,13 @@ export default function Header() {
             </a>
           </div>
 
-          {/* ── Mobile & Tablet Toggle ── */}
+          {/* ── Mobile & Tablet Hamburger Toggle (Pushed right, shrink-0, z-30) ── */}
           <button
-            className="2xl:hidden text-[#111827] p-1.5 sm:p-2 focus:outline-none shrink-0 z-20 bg-gray-100/90 rounded-lg hover:bg-gray-200 active:scale-95 transition-all"
+            className="2xl:hidden text-[#111827] p-2 focus:outline-none shrink-0 z-30 bg-slate-100 hover:bg-[#D8EADF]/50 rounded-xl border border-slate-200 active:scale-95 transition-all ml-auto"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle Navigation Menu"
           >
-            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            {isMobileMenuOpen ? <X size={22} className="text-[#1E4D38]" /> : <Menu size={22} className="text-[#111827]" />}
           </button>
         </div>
       </div>
@@ -122,7 +122,7 @@ export default function Header() {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="2xl:hidden w-full bg-white/90 backdrop-blur-lg shadow-2xl border-b border-[#E5E7EB] flex flex-col p-6 max-h-[calc(100vh-80px)] overflow-y-auto"
+            className="2xl:hidden w-full bg-white/95 backdrop-blur-lg shadow-2xl border-b border-[#E5E7EB] flex flex-col p-6 max-h-[calc(100vh-80px)] overflow-y-auto"
           >
             <motion.nav
               variants={slideDownDrawer}
