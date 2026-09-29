@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import { Navigation, Compass, Layers } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { slidePanelRight, staggerParent, staggerChildItem } from '@/lib/motion';
 import 'leaflet/dist/leaflet.css';
 
@@ -91,94 +91,9 @@ export default function LeafletMap() {
   const [selectedZoneId, setSelectedZoneId] = useState<string>('zone-1');
 
   return (
-    <div className="flex flex-col lg:flex-row h-[calc(100vh-100px)] w-full overflow-hidden bg-[#FBFBFA]">
-      {/* Zone Navigator Side Panel with Entrance Animation */}
-      <motion.div
-        variants={slidePanelRight}
-        initial="initial"
-        animate="animate"
-        className="w-full lg:w-96 bg-white border-r border-[#E5E7EB] flex flex-col shrink-0 z-10 shadow-lg lg:h-full"
-      >
-        {/* Panel Header */}
-        <div className="p-6 border-b border-[#E5E7EB]">
-          <div className="flex items-center gap-2 mb-1">
-            <Layers className="w-4 h-4 text-[#1E4D38]" />
-            <span className="text-xs font-bold uppercase tracking-widest text-[#1E4D38]">
-              GIS Satellite Positioning
-            </span>
-          </div>
-          <h2 className="text-xl font-bold text-[#111827]">
-            Old Parade Ground Zones
-          </h2>
-          <p className="text-xs text-[#4B5563] mt-1">
-            Interactive satellite map of all operational festival sectors in Area 10, Garki, Abuja.
-          </p>
-        </div>
-
-        {/* Zones List with Staggered Entrance */}
-        <motion.div
-          variants={staggerParent}
-          initial="initial"
-          animate="animate"
-          className="flex-1 overflow-y-auto p-4 space-y-2.5"
-        >
-          {zones.map((zone) => {
-            const isSelected = selectedZoneId === zone.id;
-
-            return (
-              <motion.button
-                key={zone.id}
-                variants={staggerChildItem}
-                layout
-                onClick={() => {
-                  setSelectedCoords([zone.lat, zone.lng]);
-                  setSelectedZoneId(zone.id);
-                }}
-                className={`w-full text-left p-3.5 rounded-xl border transition-all flex items-start gap-3 ${
-                  isSelected
-                    ? 'border-[#1E4D38] bg-[#D8EADF]/30 shadow-sm'
-                    : 'border-[#E5E7EB] hover:border-[#B8D8C5] bg-white'
-                }`}
-              >
-                <div
-                  className="w-3.5 h-3.5 rounded-full mt-1 shrink-0 ring-2 ring-white"
-                  style={{ backgroundColor: zone.color }}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-1">
-                    <h3 className="font-bold text-xs text-[#111827] truncate">
-                      {zone.name.split(':')[0]}
-                    </h3>
-                    <span className="text-[10px] text-[#4B5563] uppercase tracking-wider font-semibold">
-                      {zone.region.split('(')[0]}
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#111827] font-medium mt-0.5">
-                    {zone.name.split(':')[1]}
-                  </p>
-                  <p className="text-[11px] text-[#4B5563] mt-1 line-clamp-2">
-                    {zone.desc}
-                  </p>
-                </div>
-              </motion.button>
-            );
-          })}
-        </motion.div>
-
-        {/* Panel Footer */}
-        <div className="p-4 bg-[#FEF3D6] border-t border-[#FCE6A8] text-[#8D6B1B]">
-          <div className="flex items-center gap-1.5 font-bold text-xs">
-            <Navigation className="w-3.5 h-3.5" />
-            <span>Venue Dispatch</span>
-          </div>
-          <p className="text-[11px] mt-1 text-[#8D6B1B]/90">
-            Pedestrian Gates 1 &amp; 2 open from 08:00 AM daily. Show accredited digital pass or VIP badge at perimeter checkpoint.
-          </p>
-        </div>
-      </motion.div>
-
-      {/* Satellite Map Container */}
-      <div className="flex-1 relative h-full min-h-[400px]">
+    <div className="flex flex-col lg:flex-row h-[calc(100dvh-70px)] sm:h-[calc(100vh-80px)] w-full overflow-hidden bg-[#FBFBFA]">
+      {/* Satellite Map Container - Top on Mobile, Right on Desktop */}
+      <div className="w-full lg:flex-1 h-[45dvh] lg:h-full relative min-h-[280px] order-1 lg:order-2 shrink-0 lg:shrink">
         <MapContainer
           center={[9.0428, 7.489]}
           zoom={17}
@@ -228,6 +143,91 @@ export default function LeafletMap() {
           ))}
         </MapContainer>
       </div>
+
+      {/* Zone Navigator Side Panel - Bottom on Mobile, Left on Desktop */}
+      <motion.div
+        variants={slidePanelRight}
+        initial="initial"
+        animate="animate"
+        className="w-full lg:w-96 h-[55dvh] lg:h-full bg-white border-t lg:border-t-0 lg:border-r border-[#E5E7EB] flex flex-col shrink-0 z-10 shadow-xl order-2 lg:order-1"
+      >
+        {/* Panel Header */}
+        <div className="p-4 sm:p-6 border-b border-[#E5E7EB] shrink-0">
+          <div className="flex items-center gap-2 mb-1">
+            <Layers className="w-4 h-4 text-[#1E4D38]" />
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#1E4D38]">
+              Interactive Spatial Zones
+            </span>
+          </div>
+          <h2 className="text-lg sm:text-xl font-bold text-[#111827]">
+            Old Parade Ground Sectors
+          </h2>
+          <p className="text-xs text-[#4B5563] mt-0.5 line-clamp-2">
+            Select a sector below to pinpoint GPS coordinates on the interactive satellite arena map.
+          </p>
+        </div>
+
+        {/* Zones List with Scroll Container */}
+        <motion.div
+          variants={staggerParent}
+          initial="initial"
+          animate="animate"
+          className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2"
+        >
+          {zones.map((zone) => {
+            const isSelected = selectedZoneId === zone.id;
+
+            return (
+              <motion.button
+                key={zone.id}
+                variants={staggerChildItem}
+                layout
+                onClick={() => {
+                  setSelectedCoords([zone.lat, zone.lng]);
+                  setSelectedZoneId(zone.id);
+                }}
+                className={`w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 ${
+                  isSelected
+                    ? 'border-[#1E4D38] bg-[#D8EADF]/30 shadow-sm'
+                    : 'border-[#E5E7EB] hover:border-[#B8D8C5] bg-white'
+                }`}
+              >
+                <div
+                  className="w-3.5 h-3.5 rounded-full mt-1 shrink-0 ring-2 ring-white"
+                  style={{ backgroundColor: zone.color }}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1">
+                    <h3 className="font-bold text-xs text-[#111827] truncate">
+                      {zone.name.split(':')[0]}
+                    </h3>
+                    <span className="text-[9.5px] sm:text-[10px] text-[#4B5563] uppercase tracking-wider font-semibold shrink-0">
+                      {zone.region.split('(')[0]}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#111827] font-medium mt-0.5">
+                    {zone.name.split(':')[1]}
+                  </p>
+                  <p className="text-[11px] text-[#4B5563] mt-1 line-clamp-2 leading-relaxed">
+                    {zone.desc}
+                  </p>
+                </div>
+              </motion.button>
+            );
+          })}
+        </motion.div>
+
+        {/* Panel Footer */}
+        <div className="p-3.5 sm:p-4 bg-[#FEF3D6] border-t border-[#FCE6A8] text-[#8D6B1B] shrink-0">
+          <div className="flex items-center gap-1.5 font-bold text-xs">
+            <Navigation className="w-3.5 h-3.5" />
+            <span>Perimeter Dispatch</span>
+          </div>
+          <p className="text-[10.5px] sm:text-[11px] mt-0.5 text-[#8D6B1B]/90 leading-tight">
+            Pedestrian Gates 1 &amp; 2 open from 08:00 AM daily. Show accredited digital pass or VIP badge at perimeter checkpoint.
+          </p>
+        </div>
+      </motion.div>
     </div>
   );
 }

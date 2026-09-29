@@ -127,6 +127,30 @@ export default function Home() {
 
       const isMobile = window.innerWidth < 768;
 
+      /* Helper function to get distinct directional starting position for each card */
+      const getInitialCardState = (index: number) => {
+        const mode = index % 5;
+        switch (mode) {
+          case 0:
+            // Rise from bottom
+            return { x: 0, y: '100vh', rotationX: isMobile ? -15 : -35, rotationY: 0, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
+          case 1:
+            // Pivot from left
+            return { x: isMobile ? '-85vw' : '-100vw', y: 0, rotationX: 0, rotationY: isMobile ? -20 : -50, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
+          case 2:
+            // Pivot from right
+            return { x: isMobile ? '85vw' : '100vw', y: 0, rotationX: 0, rotationY: isMobile ? 20 : 50, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
+          case 3:
+            // Slide from top
+            return { x: 0, y: '-100vh', rotationX: isMobile ? 15 : 35, rotationY: 0, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
+          case 4:
+            // Pivot from bottom-left diagonal
+            return { x: isMobile ? '-60vw' : '-80vw', y: '60vh', rotationX: 0, rotationY: isMobile ? -15 : -35, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
+          default:
+            return { x: 0, y: '100vh', rotationX: 0, rotationY: 0, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
+        }
+      };
+
       /* Use gsap.context scoped to outer container so all selectors are found */
       ctx = gsap.context(() => {
         const sceneEl = sceneRef.current;
@@ -135,26 +159,24 @@ export default function Home() {
         /* ── Center all scene elements ───────────────────────────────── */
         gsap.set('.scene-element', { xPercent: -50, yPercent: -50 });
 
-        const cardSelectors = cards.map((c) => `#${c.id}`).join(', ');
+        /* ── Initial states: Welcome Title is sticky at top; Cards start in distinct directional positions ── */
+        gsap.set('#welcome-title', { opacity: 1, scale: 1, x: 0, y: 0, z: 0, filter: 'none' });
 
-        /* ── Initial states: Welcome Title is visible at top; Cards are hidden at bottom ── */
-        gsap.set('#welcome-title', { opacity: 1, scale: 1, y: 0, z: 0, filter: 'none' });
-        gsap.set(cardSelectors, {
-          x: 0,
-          y: '100vh',
-          scale: 0.85,
-          opacity: 0,
-          z: isMobile ? 0 : -150,
-          filter: isMobile ? 'none' : 'blur(10px)',
-          pointerEvents: 'none',
+        cards.forEach((card, idx) => {
+          const initial = getInitialCardState(idx);
+          gsap.set(`#${card.id}`, {
+            ...initial,
+            z: isMobile ? 0 : -150,
+            filter: isMobile ? 'none' : 'blur(10px)',
+          });
         });
 
-        /* ── Slow, Smooth Master Scroll Timeline across all 10 highlight cards ────── */
+        /* ── Slow, Smooth Master Scroll Timeline ────── */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sceneEl,
             start: 'top top',
-            end: isMobile ? `+=${cards.length * 1400}` : `+=${cards.length * 1700}`,
+            end: isMobile ? `+=${cards.length * 1600}` : `+=${cards.length * 1900}`,
             scrub: 1.2,
             pin: true,
             anticipatePin: 1,
@@ -165,42 +187,47 @@ export default function Home() {
 
         const maxZoomScale = isMobile ? 3.2 : 32;
         const blurOut = isMobile ? 'none' : 'blur(32px)';
-        const blurTitleOut = isMobile ? 'none' : 'blur(16px)';
         const blurFocus = isMobile ? 'none' : 'blur(0px)';
 
-        /* Phase 1: Welcome title starts at 100% opacity on load and floats up as user scrolls down */
-        tl.fromTo(
-          '#welcome-title',
-          { opacity: 1, y: 0, scale: 1, filter: 'none' },
-          { y: '-45vh', opacity: 0, filter: blurTitleOut, duration: 2.5, ease: 'power2.inOut' },
-          0
-        );
+        /* ── WELCOME TITLE STICKY & COVER BEHAVIOR ──
+         * Welcome title stays sticky at top and slowly shifts up (y: -12vh).
+         * Card 1 rises from below to cover Welcome Title.
+         * Once Card 1 covers it, Welcome Title fades out behind Card 1.
+         */
+        tl.to('#welcome-title', { y: '-12vh', opacity: 0.85, duration: 2.2, ease: 'none' }, 0);
 
-        /* Phase 2: Sequence through each card with entry, focal reading hold, and zoom transition */
+        /* Card 1 rises from bottom to cover the Welcome Title */
+        tl.to('#card-1', {
+          x: 0,
+          y: 0,
+          rotationX: 0,
+          rotationY: 0,
+          scale: 0.98,
+          opacity: 1,
+          filter: blurFocus,
+          pointerEvents: 'auto',
+          duration: 2.2,
+          ease: 'power2.out',
+        }, 0.2);
+
+        /* As Card 1 settles in center, Welcome Title behind it finishes fading out */
+        tl.to('#welcome-title', { opacity: 0, duration: 1.0, ease: 'power2.in' }, 1.8);
+
+        /* Card 1 Focal Hold in center */
+        tl.to('#card-1', {
+          scale: 1.02,
+          z: isMobile ? 40 : 100,
+          duration: 2.5,
+          ease: 'none',
+        });
+
+        /* ── SEQUENCE ALL CARDS 1 TO 10 ── */
         cards.forEach((card, index) => {
           const cardId = `#${card.id}`;
-          const startTime = 0.8 + index * 4.8;
+          const isLast = index === cards.length - 1;
 
-          tl.to(
-            cardId,
-            {
-              y: 0,
-              scale: 0.98,
-              opacity: 1,
-              filter: blurFocus,
-              pointerEvents: 'auto',
-              duration: 2.5,
-              ease: 'power2.out',
-            },
-            startTime
-          ).to(cardId, {
-            scale: 1.02,
-            z: isMobile ? 40 : 100,
-            duration: 2.2,
-            ease: 'none',
-          });
-
-          if (index < cards.length - 1) {
+          if (index === 0) {
+            // Card 1 zooms in past camera
             tl.to(cardId, {
               scale: maxZoomScale,
               opacity: 0,
@@ -209,13 +236,67 @@ export default function Home() {
               duration: 2.2,
               ease: 'power3.in',
             });
-          } else {
+          } else if (!isLast) {
+            // Cards 2 through 9:
+            // 1. Enter from distinct direction
             tl.to(cardId, {
-              y: '-100vh',
+              x: 0,
+              y: 0,
+              rotationX: 0,
+              rotationY: 0,
+              scale: 0.98,
+              opacity: 1,
+              filter: blurFocus,
+              pointerEvents: 'auto',
+              duration: 2.5,
+              ease: 'power2.out',
+            })
+            // 2. Focal hold in center for reading
+            .to(cardId, {
+              scale: 1.02,
+              z: isMobile ? 40 : 100,
+              duration: 2.5,
+              ease: 'none',
+            })
+            // 3. Zoom in past camera & fade out BEFORE next card starts
+            .to(cardId, {
+              scale: maxZoomScale,
               opacity: 0,
-              filter: isMobile ? 'none' : 'blur(20px)',
+              filter: blurOut,
               pointerEvents: 'none',
               duration: 2.2,
+              ease: 'power3.in',
+            });
+          } else {
+            // Card 10 (THE LAST CARD):
+            // 1. Enters from distinct direction
+            tl.to(cardId, {
+              x: 0,
+              y: 0,
+              rotationX: 0,
+              rotationY: 0,
+              scale: 0.98,
+              opacity: 1,
+              filter: blurFocus,
+              pointerEvents: 'auto',
+              duration: 2.5,
+              ease: 'power2.out',
+            })
+            // 2. Focal hold in center
+            .to(cardId, {
+              scale: 1.02,
+              z: isMobile ? 40 : 100,
+              duration: 2.5,
+              ease: 'none',
+            })
+            // 3. DOES NOT ZOOM IN! Simply slides UP out of view as normal, revealing footer below!
+            .to(cardId, {
+              y: '-110vh',
+              opacity: 0,
+              scale: 1.02,
+              filter: isMobile ? 'none' : 'blur(12px)',
+              pointerEvents: 'none',
+              duration: 2.5,
               ease: 'power2.in',
             });
           }
@@ -261,7 +342,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(228,176,58,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
 
         {/* ── WELCOME TITLE ── */}
-        <div id="welcome-title" className="scene-element w-[92vw] max-w-4xl text-center z-10 px-3 sm:px-4">
+        <div id="welcome-title" className="scene-element -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-4xl text-center z-10 px-3 sm:px-4">
           {/* Logo */}
           <div className="relative w-28 h-16 sm:w-40 sm:h-24 md:w-48 md:h-28 mx-auto mb-2 sm:mb-4">
             <Image
