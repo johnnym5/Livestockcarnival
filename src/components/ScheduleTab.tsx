@@ -192,7 +192,7 @@ export default function ScheduleTab() {
                 </div>
               )}
 
-              {/* Sync .ICS Calendar Action */}
+              {/* Save to Calendar Action */}
               <div className="mt-5 pt-4 border-t border-slate-100 flex justify-end">
                 <button
                   onClick={() =>
@@ -207,8 +207,8 @@ export default function ScheduleTab() {
                   }
                   className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#FBFBFA] border border-slate-200 hover:border-[#B8D8C5] hover:bg-[#D8EADF]/30 text-[#1E4D38] text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm"
                 >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Sync .ICS Calendar</span>
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Save to Calendar</span>
                 </button>
               </div>
             </div>
