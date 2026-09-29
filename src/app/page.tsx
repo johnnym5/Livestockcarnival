@@ -104,6 +104,12 @@ export default function Home() {
   const sceneRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Force browser to load landing page at the very top (y = 0)
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
     let isCancelled = false;
     let ctx: { revert: () => void } | null = null;
 
@@ -120,6 +126,7 @@ export default function Home() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const lenisInstance = typeof window !== 'undefined' ? (window as any).__lenisInstance : null;
       if (lenisInstance) {
+        lenisInstance.scrollTo(0, { immediate: true });
         lenisInstance.on('scroll', ScrollTrigger.update);
       }
 
