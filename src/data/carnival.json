@@ -49,20 +49,19 @@
     {
       "id": "culture-fashion",
       "align": "left",
-      "kicker": "MUSIC, CONCERTS & CRAFTS",
-      "headline": "Live Performances, Fashion & Cultural Arts",
-      "body": "Immerse yourself in live music concerts, traditional masquerades including the monumental Ijele, contemporary African fashion showcases, and indigenous arts & crafts markets.",
-      "image": "/assets/home/story-ijele-masquerade.jpg",
+      "kicker": "WHERE AGRICULTURE MEETS FASHION",
+      "headline": "Livestock Cultural Fashion Parade & Heritage Arts",
+      "body": "Experience Nigeria's first-ever livestock fashion runway featuring prize Bunaji bulls, Sahelian camels, and champion rams adorned in Aso-Oke drapes, Akwete sashes, and royal leather regalia, alongside the monumental Ijele masquerade.",
+      "image": "/assets/fashion-parade/handler-walking-white-bull-runway.jpg",
       "images": [
+        "/assets/fashion-parade/handler-walking-white-bull-runway.jpg",
         "/assets/home/story-ijele-masquerade.jpg",
+        "/assets/fashion-parade/handler-leading-saddled-camel.jpg",
         "/assets/home/story-cultural-dancers.jpg",
-        "/assets/home/story-festival-celebration.jpg",
-        "/assets/home/story-live-concert-stage.jpg",
-        "/assets/home/story-night-dj-performance.jpg",
-        "/assets/home/story-traditional-fashion-crafts.jpg"
+        "/assets/home/story-live-concert-stage.jpg"
       ],
-      "imageAlt": "Cultural Arts and Ijele Masquerade in Abuja",
-      "cta": { "label": "Explore Cultural Arts", "href": "/attractions" }
+      "imageAlt": "Livestock Cultural Fashion Parade and Ijele Masquerade in Abuja",
+      "cta": { "label": "Explore Fashion Parade", "href": "/fashion-parade" }
     },
     {
       "id": "trade-tech",

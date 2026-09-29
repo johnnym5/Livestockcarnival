@@ -1,421 +1,350 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
-import { CheckCircle2, ArrowRight, Calendar, MapPin, Award } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, CheckCircle2, ArrowRight, Calendar, MapPin } from 'lucide-react';
 
-interface ExpectationCard {
+interface ExpectationItem {
   id: string;
+  tabLabel: string;
   eyebrow: string;
   title: string;
+  subtitle: string;
   summary: string;
   image: string;
-  tag: string;
+  location: string;
   dateBadge: string;
   ctaText: string;
   ctaLink: string;
-  highlights: string[];
+  activities: string[];
 }
 
-const CARNIVAL_EXPECTATIONS: ExpectationCard[] = [
+const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
   {
     id: 'durbar-cavalry',
+    tabLabel: '01. Royal Durbar',
     eyebrow: 'DAY 1 · ROYAL CAVALRY & HERITAGE',
     title: 'Royal Horse Cavalry & Durbar Parade',
-    summary: 'Witness over 200 ceremonial war stallions, royal Kano Durbar horsemen, adorned camels, and traditional cavalry fanfare in an awe-inspiring celebration of Nigeria’s centuries-old pastoral nobility.',
+    subtitle: 'Centuries of Northern Royalty, Pageantry & Desert Heritage',
+    summary: 'Witness over 200 ceremonial cavalry war stallions, traditional Northern horsemen, camel pageantry, and royal racing displays in a breathtaking celebration of national heritage.',
     image: '/assets/home/story-equestrian-durbar-parade.jpg',
-    tag: 'Royal Durbar',
-    dateBadge: 'Nov 21 · Main Arena',
-    ctaText: 'View Equestrian Schedule',
+    location: 'Zone 3: Central Track & Oval',
+    dateBadge: 'Friday, 21 Nov 2026',
+    ctaText: 'Explore Equestrian Schedule',
     ctaLink: '/schedule',
-    highlights: [
-      '200+ ceremonial cavalry war stallions & royal horsemen in full regalia',
-      'Grand opening salute to the Minister of Livestock Development',
-      'Parade of champion Bunaji bulls and decorated Sahelian camels',
-      'Kano Durbar ceremonial charge & traditional horn fanfare'
+    activities: [
+      'VIP Arrival, Red Carpet Reception & Security Sweep by Police, Military & Agro-Rangers',
+      'Ribbon Cutting & Official Opening by the Hon. Minister of Livestock Development',
+      'Grand Opening Parade of prize Bunaji bulls, Sahelian camels, and equines',
+      'Kano Durbar Horsemen ceremonial equestrian display & royal cavalry salutes',
+      'Midway Opening, live cultural troupes, animal costume parade floats, beer garden & karaoke'
     ]
   },
   {
     id: 'suya-village',
+    tabLabel: '02. Suya Village',
     eyebrow: 'GASTRONOMY & STREET FOOD CULTURE',
-    title: 'Open-Flame Suya Village & Night Roasting',
-    summary: "Indulge in Nigeria's largest outdoor open-flame grilling arena. Featuring master Suya chefs, artisanal Kilishi cutting demonstrations, organic spice markets, and evening dining under the stars.",
+    title: 'Open-Flame Suya Village & Artisanal Fest',
+    subtitle: 'Nigeria’s Largest Outdoor Grilling & Artisanal Smoked Meats Pavilion',
+    summary: "Indulge in Nigeria's largest outdoor open-flame grilling arena. Featuring master Suya chefs, artisanal Kilishi cutting demonstrations, organic spice markets, and family festival dining.",
     image: '/assets/home/story-suya-grill-fire.jpg',
-    tag: 'Artisanal Gastronomy',
-    dateBadge: 'Daily 12PM – 11PM · Food Pavilion',
-    ctaText: 'Explore Suya Village',
+    location: 'Zone 2: Culinary Village',
+    dateBadge: 'Daily 12:00 PM – 11:00 PM',
+    ctaText: 'Discover Culinary Village',
     ctaLink: '/attractions#suya-village',
-    highlights: [
+    activities: [
       'Master Suya Guild national championship & secret spice blend showcase',
-      'Live Kilishi sun-drying craft & vacuum-sealed export packaging',
-      'Certified veterinary cold-chain hygiene & temperature monitoring',
-      'Open-air garden acoustic rhythms & late-night artisanal roasting'
+      'Artisanal Kilishi craft demonstrations & vacuum-sealed export packaging',
+      'Live-weight meat processing, hygienic prep zones & continuous temperature control',
+      'Open-air garden acoustic music, evening karaoke & late-night artisanal roasting'
     ]
   },
   {
     id: 'culture-fashion',
-    eyebrow: 'SIGNATURE RUNWAY · WHERE AGRICULTURE MEETS FASHION',
-    title: 'Livestock Cultural Fashion Parade',
-    summary: 'Experience Nigeria’s first-ever livestock fashion runway. Prize Bunaji bulls, Sahelian camels, and champion rams adorned in hand-woven Aso-Oke drapes, Akwete sashes, and royal leather regalia.',
-    image: '/assets/fashion-parade/handler-walking-white-bull-runway.jpg',
-    tag: 'Fashion Runway',
-    dateBadge: 'Nov 22 · Red Carpet Oval',
-    ctaText: 'Explore Fashion Parade',
-    ctaLink: '/fashion-parade',
-    highlights: [
-      'Prize bulls & dromedary camels walked on the red carpet runway',
-      'Hand-loomed Aso-Oke, Isiagu motifs, and George silks styling',
-      'Ethical animal welfare guidelines verified by Federal Vet Officers',
-      'Traditional Kakaki trumpeters, Yoruba talking drums & Ogene rhythms'
+    tabLabel: '03. Fashion & Concerts',
+    eyebrow: 'SIGNATURE RUNWAY & LIVE MUSIC STAGE',
+    title: 'Livestock Cultural Fashion & Star Concerts',
+    subtitle: 'Where Agriculture Meets Fashion, Traditional Pageantry & Live Concerts',
+    summary: 'Experience Nigeria’s first-ever livestock fashion runway with prize cattle draped in Aso-Oke, alongside traditional dance troupes, Queen/King NLC Pageant, and headlining concerts with top Nigerian stars.',
+    image: '/assets/home/story-live-concert-stage.jpg',
+    location: 'Mainstage Arena & Fashion Runway',
+    dateBadge: 'Nightly 6:00 PM – 11:00 PM',
+    ctaText: 'View Concert Lineup',
+    ctaLink: '/schedule',
+    activities: [
+      'Queen and King of National Livestock Carnival (NLC) Pageant',
+      'Parade Floats showcase featuring welfare-conscious animal costume pageantry',
+      'Cultural dance troupes representing all 36 States and the FCT',
+      'Agritainment Concert Night 1 featuring Top Nigerian Artist #1',
+      'Grand Finale Concert featuring superstar Top Nigerian Artist #2 & Laser Light Show'
     ]
   },
   {
-    id: 'concerts-masquerades',
-    eyebrow: 'FESTIVAL MUSIC & ARTS CELEBRATION',
-    title: 'Live Concerts, Masquerades & Cultural Rhythms',
-    summary: 'Immerse in grand cultural spectacles featuring the monumental Ijele masquerade, traditional troupes representing all 36 States and the FCT, alongside headlining concerts with top Nigerian music stars.',
-    image: '/assets/home/story-ijele-masquerade.jpg',
-    tag: 'Concerts & Arts',
-    dateBadge: 'Nightly 6PM – 11PM · Grand Stage',
-    ctaText: 'View Concert Lineup',
-    ctaLink: '/schedule',
-    highlights: [
-      'Monumental Ijele Masquerade display & ceremonial processions',
-      'Traditional dance ensembles representing the 6 geopolitical zones',
-      'Agritainment Concert Night 1 featuring top national artists',
-      'Grand Finale Laser Show & Festival Champions Gala'
+    id: 'trade-tech',
+    tabLabel: '04. B2B & Agribusiness',
+    eyebrow: 'DAY 2 & 3 · TRADE, FINANCING & B2B MATCHMAKING',
+    title: 'Agribusiness, Tech & B2B Matchmaking Hub',
+    subtitle: 'Commercial Trade Agreements, RFID Auctions & Agropreneur Capital',
+    summary: 'Explore multi-sector commercial pavilions featuring high-tech agricultural machinery, digital livestock e-tagging platforms, direct B2B investor contract signings, and cold-chain export logistics.',
+    image: '/assets/home/story-carnival-entrance-gate.jpg',
+    location: 'Zone 4: B2B Marquee & Tech Hub',
+    dateBadge: 'Nov 22 – 23 · 9:00 AM – 5:00 PM',
+    ctaText: 'Visit Innovation Hub',
+    ctaLink: '/nhesics',
+    activities: [
+      'Agro-Investors Roundtable & Sovereign Capital Briefing',
+      'Agropreneur Financing Workshop with commercial banking partners',
+      'Live Commercial & Seedstock Auctions with RFID digital bidding',
+      'B2B Supplier Meet & direct trade agreements signing',
+      'National Pastoralist Forum: MACBAN & Kautal Hore dialogue & cooperative grants'
     ]
   },
   {
     id: 'championship-judging',
-    eyebrow: 'DAY 2 & 3 · LIVESTOCK CHAMPIONSHIP & TRADE',
-    title: 'Supreme Champion Breed Judging & Trade Expo',
-    summary: 'Watch supreme conformation judging across cattle, sheep, goats, and camels, alongside commercial RFID auctions, digital livestock e-tagging demonstrations, and B2B investor contract signings.',
-    image: '/assets/fashion-parade/exhibition-bull-and-horse-pens.jpg',
-    tag: 'Championship Ring',
-    dateBadge: 'Nov 22–23 · Judging Court',
+    tabLabel: '05. Breed Championships',
+    eyebrow: 'LIVESTOCK CHAMPIONSHIP & PET SHOWS',
+    title: 'Supreme Breed Judging & Pet Showmanship',
+    subtitle: 'Conformation Judging, Genetics Showcase & Pet Agility Contests',
+    summary: 'Watch supreme livestock judging competitions across cattle, sheep, goats, poultry, and camels alongside youth rabbit shows, dog showmanship, and cat competitions.',
+    image: '/assets/attractions/arena-breed-judging-court.jpg',
+    location: 'Zone 1: Beef Show Ring & Pet Arena',
+    dateBadge: 'Nov 22 – 23 · Judging Court',
     ctaText: 'View Championship Schedule',
     ctaLink: '/schedule',
-    highlights: [
-      'National Cattle Conformation Judging (White Fulani, Gudali, Bororo)',
-      'Supreme Sheep & Goat Competitions (Balami rams & Maradi goats)',
-      'Live commercial auctions with certified digital live-weight scales',
-      'Bank of Industry (BOI) agribusiness capital & trade briefings'
+    activities: [
+      'National Cattle Formation & Conformation Judging (Bunaji, Gudali, Bororo)',
+      'Sheep & Goat Breed Competitions (Balami, Uda, Yankasa, Maradi)',
+      'Dairy Goat Shows (Jr. & Sr. Does) & Goat Showmanship heats',
+      'Youth Rabbit Show Check-In & Youth Market Goat Championship',
+      'Dog Show & Agility Showmanship, Cat Show, and Children’s Agro-Education Workshop',
+      'Beef Show Ring Livestock Judging Awards & Breed Champions Trophy Presentation'
     ]
   }
 ];
 
-function FullScreen3DCard({
-  card,
-  index,
-  total,
-  scrollYProgress,
-}: {
-  card: ExpectationCard;
-  index: number;
-  total: number;
-  scrollYProgress: MotionValue<number>;
-}) {
-  const isFirst = index === 0;
-  const isLast = index === total - 1;
-
-  // Normalized scroll time slice per card
-  const step = 1 / total; // 0.20 per card
-  const start = index * step;
-  const peak = start + step * 0.30; // Card fully centered & locked
-  const hold = start + step * 0.70; // Card stays in focal view
-  const exit = (index + 1) * step; // Card zooms past or exits
-
-  // 1. VERTICAL POSITION (y)
-  // - First card: Scrolls UP from below screen (85vh -> 0vh), then LOCKS in center
-  // - Middle cards: FIXED AT EXACT SCREEN CENTER (0vh) throughout their entire lifecycle
-  // - Last card: Stays in center, then SCROLLS UP out of screen (0vh -> -90vh) to reveal footer
-  const y = useTransform(
-    scrollYProgress,
-    isFirst
-      ? [0, peak, exit]
-      : isLast
-      ? [start, peak, hold, 1]
-      : [start, peak, exit],
-    isFirst
-      ? ['85vh', '0vh', '0vh']
-      : isLast
-      ? ['0vh', '0vh', '0vh', '-90vh']
-      : ['0vh', '0vh', '0vh']
-  );
-
-  // 2. 3D ZOOM & SCALE (scale)
-  // - Pre-arrival (in depth): scale 0.82
-  // - Centered in focus: scale 1.0 (fills screen viewport)
-  // - Zooming into screen: scale 2.6 (zooms straight toward viewer camera!)
-  // - Last card: holds at 1.0, then scrolls up slightly scaling to 0.92
-  const scale = useTransform(
-    scrollYProgress,
-    isFirst
-      ? [0, peak, hold, exit]
-      : isLast
-      ? [Math.max(0, start - 0.08), start, peak, hold, 1]
-      : [Math.max(0, start - 0.08), start, peak, hold, exit],
-    isFirst
-      ? [0.90, 1.0, 1.0, 2.5]
-      : isLast
-      ? [0.80, 0.90, 1.0, 1.0, 0.92]
-      : [0.80, 0.90, 1.0, 1.0, 2.5]
-  );
-
-  // 3. 3D TRANSLATE-Z (depth)
-  const z = useTransform(
-    scrollYProgress,
-    isFirst
-      ? [0, peak, hold, exit]
-      : isLast
-      ? [Math.max(0, start - 0.08), start, peak, hold, 1]
-      : [Math.max(0, start - 0.08), start, peak, hold, exit],
-    isFirst
-      ? [-100, 0, 0, 600]
-      : isLast
-      ? [-450, -180, 0, 0, 0]
-      : [-450, -180, 0, 0, 600]
-  );
-
-  // 4. OPACITY (fading)
-  // - First card: fades in from bottom (0 -> 1), stays visible, dissolves as it zooms in
-  // - Middle cards: emerge from background depth (0 -> 1), hold, dissolve as they zoom forward
-  // - Last card: emerges from depth (0 -> 1), holds, then fades out as it scrolls up to footer
-  const opacity = useTransform(
-    scrollYProgress,
-    isFirst
-      ? [0, peak * 0.6, hold, exit]
-      : isLast
-      ? [Math.max(0, start - 0.06), start, peak, hold, 0.98, 1]
-      : [Math.max(0, start - 0.06), start, peak, hold, exit],
-    isFirst
-      ? [0, 1, 1, 0]
-      : isLast
-      ? [0, 0.5, 1, 1, 0.8, 0]
-      : [0, 0.5, 1, 1, 0]
-  );
-
-  // 5. CINEMATIC DEPTH BLUR
-  const filter = useTransform(
-    scrollYProgress,
-    isFirst
-      ? [0, peak, hold, exit]
-      : isLast
-      ? [Math.max(0, start - 0.08), peak, hold, 1]
-      : [Math.max(0, start - 0.08), peak, hold, exit],
-    isFirst
-      ? ['blur(4px)', 'blur(0px)', 'blur(0px)', 'blur(12px)']
-      : isLast
-      ? ['blur(8px)', 'blur(0px)', 'blur(0px)', 'blur(4px)']
-      : ['blur(8px)', 'blur(0px)', 'blur(0px)', 'blur(12px)']
-  );
-
-  // Pointer events: only clickable when this card is in active focal view
-  const pointerEvents = useTransform(scrollYProgress, (latest) => {
-    if (isFirst) {
-      return latest < exit ? 'auto' : 'none';
-    }
-    if (isLast) {
-      return latest >= start ? 'auto' : 'none';
-    }
-    return latest >= start && latest <= exit ? 'auto' : 'none';
-  });
-
-  return (
-    <motion.div
-      style={{
-        y,
-        scale,
-        z,
-        opacity,
-        filter,
-        pointerEvents,
-        transformStyle: 'preserve-3d',
-        zIndex: total - index,
-      }}
-      className="absolute inset-0 w-full h-full flex items-center justify-center p-3 sm:p-6 md:p-8"
-    >
-      {/* SCREEN-FILLING LUXURY EDITORIAL CARD */}
-      <div className="relative w-[94vw] max-w-6xl h-[82vh] min-h-[540px] max-h-[780px] bg-[#0A1A10] rounded-3xl border border-[#E4B03A]/30 overflow-hidden shadow-[0_32px_90px_-20px_rgba(0,0,0,0.8)] grid grid-cols-1 lg:grid-cols-12">
-
-        {/* Ambient Decorative Accents */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#E4B03A]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#1E4D38]/40 rounded-full blur-3xl pointer-events-none" />
-
-        {/* LEFT COLUMN: EDITORIAL CONTENT (48%) */}
-        <div className="lg:col-span-6 flex flex-col justify-between p-6 sm:p-8 lg:p-12 z-20 text-white overflow-y-auto">
-          <div>
-            {/* Top Badges Row */}
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span className="text-[10px] sm:text-[11px] font-black tracking-[0.24em] text-[#E4B03A] uppercase bg-[#E4B03A]/15 border border-[#E4B03A]/30 px-3 py-1 rounded-full">
-                {card.eyebrow}
-              </span>
-              <span className="text-[10px] font-semibold text-gray-300 bg-white/10 px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                <Calendar className="w-3 h-3 text-[#E4B03A]" />
-                {card.dateBadge}
-              </span>
-            </div>
-
-            {/* Main Headline */}
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white font-serif leading-[1.12] tracking-tight mb-4">
-              {card.title}
-            </h3>
-
-            {/* Description */}
-            <p className="text-xs sm:text-sm lg:text-base text-gray-300/90 leading-relaxed mb-6 font-normal">
-              {card.summary}
-            </p>
-
-            {/* Scheduled Activities Glass Box */}
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-md mb-6">
-              <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-[#E4B03A] mb-3 flex items-center gap-2">
-                <Award className="w-4 h-4 text-[#E4B03A]" /> Key Arena Highlights
-              </h4>
-              <ul className="space-y-2">
-                {card.highlights.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-gray-200 leading-snug">
-                    <CheckCircle2 className="w-4 h-4 text-[#E4B03A] shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Action Row */}
-          <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-4">
-            <span className="text-xs font-mono font-bold text-[#E4B03A] tracking-widest">
-              SHOWCASE 0{index + 1} / 0{total}
-            </span>
-
-            <Link
-              href={card.ctaLink}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#E4B03A] hover:bg-[#D4A030] text-[#0A1A10] text-xs font-black uppercase tracking-wider shadow-button transition-all hover:-translate-y-0.5"
-            >
-              <span>{card.ctaText}</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN: MASSIVE CINEMATIC PHOTOGRAPHY (52%) */}
-        <div className="lg:col-span-6 relative min-h-[280px] sm:min-h-[340px] lg:min-h-full overflow-hidden bg-black">
-          <Image
-            src={card.image}
-            alt={card.title}
-            fill
-            className="object-cover object-center scale-100 hover:scale-105 transition-transform duration-1000"
-            sizes="(max-width: 1024px) 100vw, 55vw"
-            priority={index < 2}
-          />
-          {/* Subtle Inner Gradients for Seamless Edge Integration */}
-          <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#0A1A10] via-transparent to-transparent pointer-events-none z-10" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 pointer-events-none z-10" />
-
-          {/* Floating Pill on Image */}
-          <div className="absolute top-5 right-5 z-20 bg-black/70 backdrop-blur-md border border-white/20 px-3.5 py-1.5 rounded-full text-xs font-extrabold text-[#E4B03A] uppercase tracking-wider shadow-lg">
-            {card.tag}
-          </div>
-
-          {/* Location Badge on Image */}
-          <div className="absolute bottom-5 right-5 z-20 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl text-[11px] font-semibold text-gray-200 flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-[#E4B03A]" />
-            <span>Old Parade Ground, Area 10, Abuja</span>
-          </div>
-        </div>
-
-      </div>
-    </motion.div>
-  );
-}
-
 export default function WhatToExpect() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [progress, setProgress] = useState(0);
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  });
+  const nextSlide = useCallback(() => {
+    setActiveIdx((prev) => (prev + 1) % CARNIVAL_EXPECTATIONS.length);
+    setProgress(0);
+  }, []);
 
+  const prevSlide = useCallback(() => {
+    setActiveIdx((prev) => (prev - 1 + CARNIVAL_EXPECTATIONS.length) % CARNIVAL_EXPECTATIONS.length);
+    setProgress(0);
+  }, []);
+
+  // 5-second auto rotation timer
   useEffect(() => {
-    const unsubscribe = scrollYProgress.on('change', (latest) => {
-      const cardCount = CARNIVAL_EXPECTATIONS.length;
-      const index = Math.min(
-        cardCount - 1,
-        Math.max(0, Math.floor(latest * cardCount))
-      );
-      setActiveCardIndex(index);
-    });
-    return () => unsubscribe();
-  }, [scrollYProgress]);
+    if (isPaused) return;
+
+    const intervalTime = 50;
+    const totalTime = 5000;
+    const step = (intervalTime / totalTime) * 100;
+
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          nextSlide();
+          return 0;
+        }
+        return prev + step;
+      });
+    }, intervalTime);
+
+    return () => clearInterval(timer);
+  }, [isPaused, nextSlide]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full bg-[#0A1A10]"
-      style={{
-        // 130vh per card allows comfortable, majestic pacing
-        height: `${CARNIVAL_EXPECTATIONS.length * 130}vh`,
-      }}
-    >
-      {/* Sticky Full Viewport 3D Theater */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-center items-center overflow-hidden [perspective:1400px]">
+    <section className="w-full py-16 sm:py-24 bg-[#FBFBFA] border-t border-slate-200/80">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Ambient Glows inside 3D Viewport */}
-        <div className="absolute top-1/4 left-1/4 w-[700px] h-[700px] bg-[#E4B03A]/8 rounded-full blur-[160px] pointer-events-none -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-1/4 right-1/4 w-[700px] h-[700px] bg-[#1E4D38]/30 rounded-full blur-[160px] pointer-events-none translate-x-1/2 translate-y-1/2" />
-
-        {/* Ambient Top HUD */}
-        <div className="absolute top-6 sm:top-8 z-40 text-center max-w-2xl px-4 pointer-events-none">
-          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#E4B03A]/20 border border-[#E4B03A]/40 text-[#E4B03A] text-[11px] font-black uppercase tracking-[0.24em] mb-2 shadow-sm">
-            <span>SIGNATURE FESTIVAL ARENAS</span>
+        {/* Section Title Header */}
+        <div className="text-center mb-10 sm:mb-12">
+          <div className="inline-block bg-[#D8EADF] text-[#1E4D38] px-5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-widest mb-3.5 shadow-sm">
+            WHAT TO EXPECT
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-white font-serif tracking-tight">
-            Explore the 2026 Carnival Program
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] tracking-tight mb-3">
+            Explore the Carnival Program &amp; Attractions
           </h2>
-          <p className="text-xs text-gray-400 mt-1 hidden sm:block">
-            Scroll down to zoom into each arena &bull; Scroll up to zoom back out
+          <p className="text-sm sm:text-base text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
+            A synchronized 3-day experience marrying royal equestrian pageantry, artisanal gastronomy, live auctions, B2B matchmaking, and star-studded concerts.
           </p>
+          <div className="w-16 h-0.5 bg-[#E4B03A] mx-auto mt-5" />
         </div>
 
-        {/* Pinned 3D Card Deck Viewport */}
-        <div className="relative w-full h-full flex items-center justify-center [transform-style:preserve-3d]">
-          {CARNIVAL_EXPECTATIONS.map((card, index) => (
-            <FullScreen3DCard
-              key={card.id}
-              card={card}
-              index={index}
-              total={CARNIVAL_EXPECTATIONS.length}
-              scrollYProgress={scrollYProgress}
-            />
-          ))}
-        </div>
-
-        {/* Bottom Floating Navigation HUD */}
-        <div className="absolute bottom-6 z-40 flex items-center justify-center gap-3 bg-black/60 backdrop-blur-xl px-6 py-2.5 rounded-full border border-white/15 shadow-2xl">
-          <div className="flex items-center gap-2">
-            {CARNIVAL_EXPECTATIONS.map((card, idx) => (
-              <div
-                key={card.id}
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  activeCardIndex === idx
-                    ? 'w-8 bg-[#E4B03A]'
-                    : 'w-2 bg-white/30'
+        {/* Tab Selector Buttons */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-10">
+          {CARNIVAL_EXPECTATIONS.map((item, idx) => {
+            const isActive = activeIdx === idx;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveIdx(idx);
+                  setProgress(0);
+                }}
+                className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-[#1E4D38] text-white shadow-card scale-105'
+                    : 'bg-white border border-slate-200 text-[#4B5563] hover:border-[#B8D8C5] hover:text-[#111827]'
                 }`}
-              />
-            ))}
+              >
+                {item.tabLabel}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Card Stack Deck Container */}
+        <div
+          className="relative w-full max-w-6xl mx-auto min-h-[520px] sm:min-h-[500px]"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {/* 5-Second Progress Line */}
+          <div className="w-full h-1.5 bg-slate-100 rounded-t-3xl overflow-hidden z-40 relative">
+            <div
+              className="h-full bg-[#1E4D38] transition-all duration-75 ease-linear"
+              style={{ width: `${progress}%` }}
+            />
           </div>
 
-          <span className="text-xs font-mono font-bold text-[#E4B03A] border-l border-white/20 pl-3">
-            0{activeCardIndex + 1} / 0{CARNIVAL_EXPECTATIONS.length}
+          {/* Layered Card Stack Deck */}
+          <div className="relative w-full min-h-[520px] sm:min-h-[500px]">
+            {CARNIVAL_EXPECTATIONS.map((item, index) => {
+              const total = CARNIVAL_EXPECTATIONS.length;
+              const offset = (index - activeIdx + total) % total;
+
+              // Display top 3 cards in depth stack
+              if (offset > 2) return null;
+
+              const scale = 1 - offset * 0.04;
+              const translateY = offset * 18;
+              const zIndex = 30 - offset * 10;
+              const opacity = offset === 0 ? 1 : offset === 1 ? 0.85 : 0.6;
+
+              return (
+                <motion.div
+                  key={item.id}
+                  style={{ zIndex }}
+                  animate={{
+                    scale,
+                    y: translateY,
+                    opacity,
+                  }}
+                  transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                  className="absolute inset-0 w-full bg-white border border-slate-200/90 rounded-b-3xl overflow-hidden shadow-card hover:shadow-card-hover"
+                >
+                  <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
+                    {/* LEFT COLUMN: EDITORIAL DETAILS */}
+                    <div className="lg:col-span-6 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-white z-20">
+                      <div>
+                        {/* Eyebrow & Date */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <span className="text-[11px] sm:text-xs font-extrabold tracking-[0.22em] text-[#8D6B1B] uppercase">
+                            {item.eyebrow}
+                          </span>
+                          <span className="text-[11px] font-bold text-[#1E4D38] bg-[#D8EADF]/60 px-3 py-1 rounded-full flex items-center gap-1">
+                            <Calendar className="w-3 h-3 text-[#1E4D38]" />
+                            {item.dateBadge}
+                          </span>
+                        </div>
+
+                        {/* Title & Subtitle */}
+                        <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#111827] leading-[1.15] tracking-tight mb-2">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm font-semibold text-[#8D6B1B] mb-4">
+                          {item.subtitle}
+                        </p>
+
+                        {/* Summary */}
+                        <p className="text-xs sm:text-sm text-[#4B5563] leading-relaxed mb-6">
+                          {item.summary}
+                        </p>
+
+                        {/* Scheduled Ground Activities List */}
+                        <div className="bg-[#F8FAF9] border border-slate-200/80 rounded-2xl p-4 sm:p-5 space-y-2 mb-6 max-h-[190px] overflow-y-auto">
+                          <h4 className="text-[11px] font-bold text-[#111827] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-[#1E4D38]" /> Scheduled Activities:
+                          </h4>
+                          <ul className="space-y-2">
+                            {item.activities.map((act, i) => (
+                              <li key={i} className="flex items-start gap-2.5 text-xs text-[#374151] leading-snug">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#1E4D38] shrink-0 mt-1.5" />
+                                <span>{act}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Bottom Action Row */}
+                      <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-[#1E4D38]">
+                          <MapPin className="w-4 h-4 text-[#1E4D38]" />
+                          <span>{item.location}</span>
+                        </div>
+
+                        <Link
+                          href={item.ctaLink}
+                          className="inline-flex items-center gap-2 text-xs sm:text-sm font-extrabold tracking-[0.14em] uppercase text-[#1E4D38] hover:text-[#111827] group transition-colors"
+                        >
+                          <span>{item.ctaText}</span>
+                          <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform" />
+                        </Link>
+                      </div>
+                    </div>
+
+                    {/* RIGHT COLUMN: HIGH-RES CINEMATIC IMAGE */}
+                    <div className="lg:col-span-6 relative min-h-[300px] sm:min-h-[360px] lg:min-h-full overflow-hidden bg-slate-900">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover object-center scale-100 hover:scale-105 transition-transform duration-700"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        priority={offset === 0}
+                      />
+                      <div className="absolute inset-0 pointer-events-none hidden lg:block z-20 bg-gradient-to-r from-white via-white/20 to-transparent" />
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Left & Right Switch Controls */}
+          <button
+            onClick={prevSlide}
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-white/95 border border-slate-200 text-[#111827] flex items-center justify-center shadow-md hover:bg-[#1E4D38] hover:text-white transition-all active:scale-95"
+            aria-label="Previous Highlight"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-white/95 border border-slate-200 text-[#111827] flex items-center justify-center shadow-md hover:bg-[#1E4D38] hover:text-white transition-all active:scale-95"
+            aria-label="Next Highlight"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Index Counter */}
+        <div className="flex items-center justify-center gap-2 mt-8">
+          <span className="text-xs font-bold text-[#6B7280]">
+            Highlight 0{activeIdx + 1} of 0{CARNIVAL_EXPECTATIONS.length}
           </span>
         </div>
 
       </div>
-    </div>
+    </section>
   );
 }
