@@ -24,8 +24,11 @@ export default function Header() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
+    { name: 'NHESICS', href: '/nhesics' },
+    { name: 'Fashion Parade', href: '/fashion-parade' },
     { name: 'Attractions', href: '/attractions' },
     { name: 'Schedule', href: '/schedule' },
+    { name: 'Livestock', href: '/livestock' },
     { name: 'Media', href: '/media' },
     { name: 'Venue Map', href: '/venue-map' },
     { name: 'Contact', href: '/contact' },
@@ -42,18 +45,16 @@ export default function Header() {
       >
         <div className="w-full max-w-[1536px] mx-auto px-3 sm:px-6 lg:px-8 flex justify-between items-center gap-2 lg:gap-4">
 
-          {/* ── Logo: FGN Coat of Arms + Event Title - borderless, no box ── */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 group shrink-0">
-            {/* Coat of Arms - clean image from assets */}
+          {/* ── App Logo: Livestock Carnival Emblem ── */}
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
             <Image
-              src="/assets/coat_of_arms.png"
-              alt="Federal Republic of Nigeria Coat of Arms"
-              width={32}
-              height={36}
-              className="shrink-0 object-contain w-6 h-7 sm:w-8 sm:h-9 lg:w-9 lg:h-10 transition-opacity group-hover:opacity-80"
+              src="/assets/logo_transparent.png"
+              alt="Livestock Carnival Official Logo"
+              width={56}
+              height={42}
+              className="shrink-0 object-contain w-auto h-7 sm:h-8 lg:h-9 transition-transform group-hover:scale-105"
               priority
             />
-            {/* Event Typography */}
             <div className="flex flex-col leading-tight pr-1">
               <span className="font-extrabold text-[#111827] text-[10px] sm:text-xs lg:text-xs xl:text-sm tracking-tight leading-tight group-hover:text-[#1E4D38] transition-colors whitespace-nowrap">
                 RENEWED HOPE NATIONAL LIVESTOCK CARNIVAL 2026
@@ -64,7 +65,7 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* ── Desktop Nav Links (Visible on 2XL / 1400px+) ── */}
+          {/* ── Desktop Nav Links ── */}
           <nav className="hidden 2xl:flex items-center gap-4 2xl:gap-5 shrink-0">
             {navLinks.map((link) => (
               <Link
@@ -84,7 +85,7 @@ export default function Header() {
           {/* ── Desktop CTAs ── */}
           <div className="hidden sm:flex items-center gap-2 lg:gap-3 shrink-0">
             <a
-              href="https://nlf-vendors.web.app/"
+              href="https://vendors.livestockcarnival.ng"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-[#1E4D38] border border-[#B8D8C5] hover:border-[#1E4D38] px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl hover:bg-[#D8EADF]/40 transition-all whitespace-nowrap"
@@ -92,7 +93,7 @@ export default function Header() {
               Exhibitor Booths
             </a>
             <a
-              href="https://gcc-carnival.web.app/ticket"
+              href="https://pass.livestockcarnival.ng"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#D4AF37] hover:bg-[#C49F27] text-[#111827] px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[10px] sm:text-[11px] font-bold uppercase tracking-wider transition-all shadow-button hover:shadow-lg whitespace-nowrap"
@@ -101,7 +102,7 @@ export default function Header() {
             </a>
           </div>
 
-          {/* ── Mobile & Tablet Toggle (Visible below 2XL / 1400px) ── */}
+          {/* ── Mobile & Tablet Toggle ── */}
           <button
             className="2xl:hidden text-[#111827] p-1.5 sm:p-2 focus:outline-none shrink-0 z-20 bg-gray-100/90 rounded-lg hover:bg-gray-200 active:scale-95 transition-all"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -112,7 +113,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ── Mobile & Tablet Navigation Drawer with AnimatePresence ── */}
+      {/* ── Mobile & Tablet Navigation Drawer ── */}
       <AnimatePresence mode="wait">
         {isMobileMenuOpen && (
           <motion.div
@@ -145,7 +146,7 @@ export default function Header() {
             </motion.nav>
             <div className="flex flex-col gap-3 pt-2 sm:hidden">
               <a
-                href="https://nlf-vendors.web.app/"
+                href="https://vendors.livestockcarnival.ng"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-center text-xs font-bold uppercase tracking-wider text-[#1E4D38] border border-[#B8D8C5] py-3 rounded-xl hover:bg-[#D8EADF]/30"
@@ -154,7 +155,7 @@ export default function Header() {
                 Exhibitor Booths
               </a>
               <a
-                href="https://gcc-carnival.web.app/ticket"
+                href="https://pass.livestockcarnival.ng"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-center bg-[#D4AF37] hover:bg-[#C49F27] text-[#111827] py-3 rounded-xl text-xs font-bold uppercase tracking-wider"

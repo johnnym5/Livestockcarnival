@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>National Livestock Carnival 2026 | Livestock Cultural Fashion Parade</title>
+  
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="National Livestock Carnival 2026 | Livestock Cultural Fashion Parade" />
+  <meta name="description" content="Where Agriculture Meets Fashion. Official portal for the National Livestock Carnival at Abuja National Grounds, November 21–23, 2026." />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Tailwind Configuration with Custom Pastel Palette Tokens -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            canvas: '#FBFBFA',
+            forest: {
+              DEFAULT: '#0F4A2F',
+              deep: '#0A3421',
+              light: '#1B6543',
+            },
+            gold: {
+              DEFAULT: '#E4B03A',
+              light: '#F5D076',
+              deep: '#9E7519',
+            },
+            pastel: {
+              sage: '#D8EADF',
+              champagne: '#FEF3D6',
+            },
+            slate: {
+              contrast: '#1F2937',
+              subtle: '#4B5563',
+              muted: '#6B7280',
+            }
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+            serif: ['Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+          },
+          boxShadow: {
+            card: '0 10px 30px -5px rgba(15, 74, 47, 0.06), 0 8px 15px -6px rgba(15, 74, 47, 0.04)',
+            'card-hover': '0 20px 35px -5px rgba(15, 74, 47, 0.12), 0 10px 20px -6px rgba(15, 74, 47, 0.08)',
+            button: '0 8px 20px -4px rgba(228, 176, 58, 0.38)',
+          },
+          transitionTimingFunction: {
+            editorial: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Editorial baseline styles */
+    body {
+      background-color: #FBFBFA;
+      color: #1F2937;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Subtle 500ms opacity fades */
+    .fade-in-entry {
+      animation: fadeIn 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Custom Hide Scrollbar for Horizontal Scrollers */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-canvas text-slate-contrast antialiased selection:bg-gold/30 selection:text-forest">
+
+  <!-- =========================================================================
+       A. NAVIGATION & HERO
+  ========================================================================= -->
+  <header class="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-forest/10 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Sovereign Seal Lockup -->
+        <a href="#hero" class="flex items-center gap-3 sm:gap-4 group shrink-0">
+          <div class="w-11 h-11 rounded-xl bg-forest flex items-center justify-center text-gold shadow-sm shrink-0 border border-gold/30">
+            <i data-lucide="shield" class="w-6 h-6 stroke-[2.2]"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-xs sm:text-sm font-extrabold text-forest tracking-tight leading-tight uppercase">
+              National Livestock Carnival 2026
+            </span>
+            <span class="text-[10px] font-bold text-gold-deep tracking-wider uppercase">
+              Federal Government of Nigeria · GCC Staging
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Anchors -->
+        <nav class="hidden lg:flex items-center gap-6 xl:gap-8 text-xs font-bold uppercase tracking-wider text-slate-subtle">
+          <a href="#pillars" class="hover:text-forest transition-colors">Strategic Pillars</a>
+          <a href="#lineup" class="hover:text-forest transition-colors">The Line-Up</a>
+          <a href="#regions" class="hover:text-forest transition-colors">One Nigeria</a>
+          <a href="#fashion" class="hover:text-forest transition-colors">Fashion Meets Agro</a>
+          <a href="#village" class="hover:text-forest transition-colors">Welfare &amp; Village</a>
+          <a href="#directory" class="hover:text-forest transition-colors">Breed Search</a>
+        </nav>
+
+        <!-- CTA Buttons -->
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <a href="#directory" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-forest/20 text-forest text-xs font-bold uppercase tracking-wider hover:bg-pastel-sage/50 transition-all">
+            <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+            <span>Exhibitor Stalls</span>
+          </a>
+          <a href="#pass" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gold hover:bg-gold-light text-slate-contrast text-xs font-black uppercase tracking-wider shadow-button hover:-translate-y-0.5 transition-all">
+            <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
+            <span>Claim Free Pass</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section id="hero" class="relative w-full overflow-hidden bg-gradient-to-b from-[#FEF3D6]/35 via-canvas to-canvas border-b border-forest/10 py-16 sm:py-24 lg:py-28">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-4xl mx-auto flex flex-col items-center">
+        
+        <!-- Sovereign Endorsement Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pastel-sage border border-forest/20 text-forest text-xs font-bold tracking-widest uppercase mb-6 shadow-xs">
+          <i data-lucide="award" class="w-4 h-4 text-forest"></i>
+          <span>Office of the Vice President · Golden Camel &amp; Cow</span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-forest tracking-tight leading-[1.1] mb-6 font-serif">
+          National Livestock Carnival: <br class="hidden sm:inline" />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-forest via-[#1B6543] to-forest">
+            Livestock Cultural Fashion Parade
+          </span>
+        </h1>
+
+        <!-- Subtitle & Motto -->
+        <p class="text-lg sm:text-xl md:text-2xl font-semibold text-slate-contrast leading-snug mb-3">
+          &ldquo;Where Agriculture Meets Fashion&rdquo;
+        </p>
+        <p class="text-sm sm:text-base md:text-lg text-slate-subtle max-w-2xl leading-relaxed mb-8">
+          Celebrating Nigeria&apos;s breeds and cultural heritage as a symbol of national renewal.
+          Our Livestock. Our Culture. Our Heritage.
+        </p>
+
+        <!-- Meta Badges Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-2xl mb-10 text-left">
+          <div class="p-3.5 rounded-2xl bg-white border border-forest/15 shadow-card flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-pastel-champagne flex items-center justify-center text-forest shrink-0">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-muted">Festival Dates</p>
+              <p class="text-xs sm:text-sm font-black text-forest">21 – 23 Nov 2026</p>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-white border border-forest/15 shadow-card flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-pastel-sage flex items-center justify-center text-forest shrink-0">
+              <i data-lucide="map-pin" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-muted">Venue Ground</p>
+              <p class="text-xs sm:text-sm font-black text-forest">Abuja National Grounds</p>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-white border border-forest/15 shadow-card flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-pastel-champagne flex items-center justify-center text-forest shrink-0">
+              <i data-lucide="ticket-check" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-muted">Public Access</p>
+              <p class="text-xs sm:text-sm font-black text-forest">Free Public Admission</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Actions -->
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <a href="#lineup" class="px-7 py-3.5 rounded-xl bg-forest hover:bg-forest-light text-white text-xs font-black uppercase tracking-wider shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
+            <span>Explore Exhibits</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+          <a href="#pass" class="px-7 py-3.5 rounded-xl bg-gold hover:bg-gold-light text-slate-contrast text-xs font-black uppercase tracking-wider shadow-button hover:-translate-y-0.5 transition-all flex items-center gap-2">
+            <span>Get Entry Pass</span>
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       B. THE 4 STRATEGIC PILLARS
+  ========================================================================= -->
+  <section id="pillars" class="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-champagne border border-gold/30 text-gold-deep text-xs font-bold uppercase tracking-widest mb-3">
+        <i data-lucide="target" class="w-3.5 h-3.5"></i>
+        <span>National Development Framework</span>
+      </div>
+      <h2 class="text-2xl sm:text-4xl font-black text-forest tracking-tight font-serif mb-3">
+        The Four Strategic Pillars
+      </h2>
+      <p class="text-sm sm:text-base text-slate-subtle">
+        Aligning ancestral pastoral excellence with modern socioeconomic growth under the Renewed Hope Agenda.
+      </p>
+    </div>
+
+    <!-- 4 Cards using Pastel Sage Surfaces -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      
+      <!-- Pillar 1: Renewal -->
+      <div class="rounded-2xl bg-pastel-sage border border-forest/20 p-7 shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-forest mb-5 shadow-xs border border-forest/15">
+            <i data-lucide="sprout" class="w-6 h-6"></i>
+          </div>
+          <span class="text-[11px] font-black uppercase tracking-widest text-forest/70 block mb-1">Pillar 01</span>
+          <h3 class="text-xl font-bold text-forest mb-3 font-serif">Renewal</h3>
+          <p class="text-sm text-slate-contrast/90 leading-relaxed font-normal">
+            Agriculture resilience and productivity renewal through upgraded genetics, sustainable pastures, and commercial value addition.
+          </p>
+        </div>
+        <div class="pt-5 mt-5 border-t border-forest/15 flex items-center gap-1.5 text-xs font-bold text-forest">
+          <i data-lucide="trending-up" class="w-4 h-4"></i>
+          <span>Productivity &amp; Feed Security</span>
+        </div>
+      </div>
+
+      <!-- Pillar 2: Unity -->
+      <div class="rounded-2xl bg-pastel-sage border border-forest/20 p-7 shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-forest mb-5 shadow-xs border border-forest/15">
+            <i data-lucide="users" class="w-6 h-6"></i>
+          </div>
+          <span class="text-[11px] font-black uppercase tracking-widest text-forest/70 block mb-1">Pillar 02</span>
+          <h3 class="text-xl font-bold text-forest mb-3 font-serif">Unity</h3>
+          <p class="text-sm text-slate-contrast/90 leading-relaxed font-normal">
+            Uniting regional livestock traditions, pastoral communities, and commercial ranchers on one cohesive national ceremonial stage.
+          </p>
+        </div>
+        <div class="pt-5 mt-5 border-t border-forest/15 flex items-center gap-1.5 text-xs font-bold text-forest">
+          <i data-lucide="flag" class="w-4 h-4"></i>
+          <span>One National Platform</span>
+        </div>
+      </div>
+
+      <!-- Pillar 3: Culture -->
+      <div class="rounded-2xl bg-pastel-sage border border-forest/20 p-7 shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-forest mb-5 shadow-xs border border-forest/15">
+            <i data-lucide="sparkle" class="w-6 h-6 text-gold-deep"></i>
+          </div>
+          <span class="text-[11px] font-black uppercase tracking-widest text-forest/70 block mb-1">Pillar 03</span>
+          <h3 class="text-xl font-bold text-forest mb-3 font-serif">Culture</h3>
+          <p class="text-sm text-slate-contrast/90 leading-relaxed font-normal">
+            Celebrating regional fabrics, traditional textiles, beadwork, and ceremonial handler attire honoring Nigeria&apos;s living heritage.
+          </p>
+        </div>
+        <div class="pt-5 mt-5 border-t border-forest/15 flex items-center gap-1.5 text-xs font-bold text-forest">
+          <i data-lucide="feather" class="w-4 h-4"></i>
+          <span>Ancestral Textile Arts</span>
+        </div>
+      </div>
+
+      <!-- Pillar 4: Opportunity -->
+      <div class="rounded-2xl bg-pastel-sage border border-forest/20 p-7 shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-forest mb-5 shadow-xs border border-forest/15">
+            <i data-lucide="briefcase" class="w-6 h-6"></i>
+          </div>
+          <span class="text-[11px] font-black uppercase tracking-widest text-forest/70 block mb-1">Pillar 04</span>
+          <h3 class="text-xl font-bold text-forest mb-3 font-serif">Opportunity</h3>
+          <p class="text-sm text-slate-contrast/90 leading-relaxed font-normal">
+            Unlocking agro-education, youth apprenticeship, cultural tourism, and high-value enterprise partnerships across the meat and leather chains.
+          </p>
+        </div>
+        <div class="pt-5 mt-5 border-t border-forest/15 flex items-center gap-1.5 text-xs font-bold text-forest">
+          <i data-lucide="handshake" class="w-4 h-4"></i>
+          <span>Enterprise &amp; Tourism</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       C. THE LINE-UP: 7 EXHIBITION CATEGORIES
+  ========================================================================= -->
+  <section id="lineup" class="w-full py-20 bg-white border-y border-forest/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-sage text-forest text-xs font-bold uppercase tracking-widest mb-3">
+            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+            <span>The Exhibition Spectrum</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-black text-forest tracking-tight font-serif">
+            The Line-Up: 7 Exhibition Categories
+          </h2>
+          <p class="text-sm sm:text-base text-slate-subtle max-w-2xl mt-1">
+            Browse the full spectrum of Nigeria&apos;s indigenous breeds and managed micro-livestock on display.
+          </p>
+        </div>
+
+        <div class="text-xs font-bold text-slate-muted flex items-center gap-2">
+          <i data-lucide="arrow-left-right" class="w-4 h-4 text-forest"></i>
+          <span>Swipe or scroll horizontally on mobile</span>
+        </div>
+      </div>
+
+      <!-- 7 Category Horizontal Track (Switching to 7-card responsive grid) -->
+      <div class="flex lg:grid lg:grid-cols-7 gap-4 overflow-x-auto pb-6 lg:pb-0 no-scrollbar snap-x snap-mandatory">
+        
+        <!-- 1. Camels -->
+        <div class="w-[280px] sm:w-[320px] lg:w-auto shrink-0 snap-center rounded-2xl bg-canvas border border-forest/15 p-5 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-pastel-champagne flex items-center justify-center text-forest mb-4 border border-gold/30">
+              <i data-lucide="sun" class="w-5 h-5 text-gold-deep"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gold-deep block mb-1">Class 01</span>
+            <h3 class="text-base font-bold text-forest mb-2 font-serif">Camels</h3>
+            <p class="text-xs text-slate-subtle leading-relaxed mb-4">
+              Dromedary &amp; desert caravans, renowned for endurance, milk yield, and royal desert pageantry.
+            </p>
+          </div>
+          <div class="pt-3 border-t border-forest/10">
+            <span class="text-[11px] font-semibold text-forest bg-pastel-sage/70 px-2 py-0.5 rounded-md inline-block">
+              Sahelian &amp; Desert Ecotypes
+            </span>
+          </div>
+        </div>
+
+        <!-- 2. Cattle & Equines -->
+        <div class="w-[280px] sm:w-[320px] lg:w-auto shrink-0 snap-center rounded-2xl bg-canvas border border-forest/15 p-5 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-pastel-sage flex items-center justify-center text-forest mb-4 border border-forest/20">
+              <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-forest block mb-1">Class 02</span>
+            <h3 class="text-base font-bold text-forest mb-2 font-serif">Cattle &amp; Equines</h3>
+            <p class="text-xs text-slate-subtle leading-relaxed mb-4">
+              White Fulani (Bunaji), Sokoto Gudali, Muturu, Arewa horses, and sturdy Bornu donkeys.
+            </p>
+          </div>
+          <div class="pt-3 border-t border-forest/10">
+            <span class="text-[11px] font-semibold text-forest bg-pastel-sage/70 px-2 py-0.5 rounded-md inline-block">
+              Large Livestock
+            </span>
+          </div>
+        </div>
+
+        <!-- 3. Small Ruminants -->
+        <div class="w-[280px] sm:w-[320px] lg:w-auto shrink-0 snap-center rounded-2xl bg-canvas border border-forest/15 p-5 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-pastel-champagne flex items-center justify-center text-forest mb-4 border border-gold/30">
+              <i data-lucide="tag" class="w-5 h-5 text-gold-deep"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gold-deep block mb-1">Class 03</span>
+            <h3 class="text-base font-bold text-forest mb-2 font-serif">Small Ruminants</h3>
+            <p class="text-xs text-slate-subtle leading-relaxed mb-4">
+              Goats (West African Dwarf, Maradi Red) and Sheep (Balami, Uda, Yankasa rams).
+            </p>
+          </div>
+          <div class="pt-3 border-t border-forest/10">
+            <span class="text-[11px] font-semibold text-forest bg-pastel-sage/70 px-2 py-0.5 rounded-md inline-block">
+              Goats &amp; Sheep
+            </span>
+          </div>
+        </div>
+
+        <!-- 4. Small Animals -->
+        <div class="w-[280px] sm:w-[320px] lg:w-auto shrink-0 snap-center rounded-2xl bg-canvas border border-forest/15 p-5 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-pastel-sage flex items-center justify-center text-forest mb-4 border border-forest/20">
+              <i data-lucide="heart" class="w-5 h-5"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-forest block mb-1">Class 04</span>
+            <h3 class="text-base font-bold text-forest mb-2 font-serif">Small Animals</h3>
+            <p class="text-xs text-slate-subtle leading-relaxed mb-4">
+              Commercial rabbits, ornamental peacocks, and domesticated guinea pigs.
+            </p>
+          </div>
+          <div class="pt-3 border-t border-forest/10">
+            <span class="text-[11px] font-semibold text-forest bg-pastel-sage/70 px-2 py-0.5 rounded-md inline-block">
+              Hutch &amp; Aviary
+            </span>
+          </div>
+        </div>
+
+        <!-- 5. Poultry -->
+        <div class="w-[280px] sm:w-[320px] lg:w-auto shrink-0 snap-center rounded-2xl bg-canvas border border-forest/15 p-5 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-pastel-champagne flex items-center justify-center text-forest mb-4 border border-gold/30">
+              <i data-lucide="feather" class="w-5 h-5 text-gold-deep"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gold-deep block mb-1">Class 05</span>
+            <h3 class="text-base font-bold text-forest mb-2 font-serif">Poultry</h3>
+            <p class="text-xs text-slate-subtle leading-relaxed mb-4">
+              Indigenous ecotypes, heritage turkeys, domestic geese, and helmeted guinea fowl.
+            </p>
+          </div>
+          <div class="pt-3 border-t border-forest/10">
+            <span class="text-[11px] font-semibold text-forest bg-pastel-sage/70 px-2 py-0.5 rounded-md inline-block">
+              Aviculture
+            </span>
+          </div>
+        </div>
+
+        <!-- 6. Exotic Displays -->
+        <div class="w-[280px] sm:w-[320px] lg:w-auto shrink-0 snap-center rounded-2xl bg-canvas border border-forest/15 p-5 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-pastel-sage flex items-center justify-center text-forest mb-4 border border-forest/20">
+              <i data-lucide="compass" class="w-5 h-5"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-forest block mb-1">Class 06</span>
+            <h3 class="text-base font-bold text-forest mb-2 font-serif">Exotic Displays</h3>
+            <p class="text-xs text-slate-subtle leading-relaxed mb-4">
+              Sahelian ostriches and vetted regional conservation displays with certified wild ecotypes.
+            </p>
+          </div>
+          <div class="pt-3 border-t border-forest/10">
+            <span class="text-[11px] font-semibold text-forest bg-pastel-sage/70 px-2 py-0.5 rounded-md inline-block">
+              Conservation
+            </span>
+          </div>
+        </div>
+
+        <!-- 7. Micro-Livestock -->
+        <div class="w-[280px] sm:w-[320px] lg:w-auto shrink-0 snap-center rounded-2xl bg-canvas border border-forest/15 p-5 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-pastel-champagne flex items-center justify-center text-forest mb-4 border border-gold/30">
+              <i data-lucide="waves" class="w-5 h-5 text-gold-deep"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-gold-deep block mb-1">Class 07</span>
+            <h3 class="text-base font-bold text-forest mb-2 font-serif">Micro-Livestock</h3>
+            <p class="text-xs text-slate-subtle leading-relaxed mb-4">
+              Heliculture (Giant African snails) and aquaculture (African catfish &amp; tilapia displays).
+            </p>
+          </div>
+          <div class="pt-3 border-t border-forest/10">
+            <span class="text-[11px] font-semibold text-forest bg-pastel-sage/70 px-2 py-0.5 rounded-md inline-block">
+              Snails &amp; Fish
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       D. CULTURAL REPRESENTATION BY REGION ("ONE NIGERIA")
+  ========================================================================= -->
+  <section id="regions" class="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <div class="text-center max-w-3xl mx-auto mb-14">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-sage text-forest text-xs font-bold uppercase tracking-widest mb-3">
+        <i data-lucide="map" class="w-3.5 h-3.5"></i>
+        <span>National Diversity</span>
+      </div>
+      <h2 class="text-2xl sm:text-4xl font-black text-forest tracking-tight font-serif mb-2">
+        Cultural Representation by Region
+      </h2>
+      <p class="text-sm sm:text-base text-slate-subtle">
+        Ancestral textile artistry and livestock styling across Nigeria&apos;s four primary corridors.
+      </p>
+    </div>
+
+    <!-- 4-Quadrant Regional Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      
+      <!-- Northern Corridor -->
+      <div class="rounded-2xl bg-white border border-forest/15 p-8 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-black uppercase tracking-wider text-forest px-3 py-1 rounded-full bg-pastel-sage">
+              Northern Corridor
+            </span>
+            <span class="text-xs font-semibold text-slate-muted">Sahel &amp; Savannas</span>
+          </div>
+          <h3 class="text-xl font-bold text-forest mb-2 font-serif">Kano &amp; Bornu Pastoral Splendor</h3>
+          <p class="text-sm text-slate-subtle leading-relaxed mb-5">
+            Dromedary camels and royal Durbar steeds styled with Northern hand-woven textiles, indigo dye fabrics, leather-tooled ceremonial saddle pads, and brass tassels.
+          </p>
+          <div class="p-4 rounded-xl bg-pastel-champagne/60 border border-gold/20 mb-4">
+            <p class="text-xs font-bold text-forest uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-gold-deep"></i>
+              <span>Handler Attire</span>
+            </p>
+            <p class="text-xs text-slate-contrast font-medium">
+              Flowing Babban Riga robes, layered traditional turbans, and handmade leather riding boots.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-forest">
+          <i data-lucide="check" class="w-4 h-4 text-forest"></i>
+          <span>Key Breeds: Sahelian Camels, Arewa Stallions, Balami Rams</span>
+        </div>
+      </div>
+
+      <!-- Western Corridor -->
+      <div class="rounded-2xl bg-white border border-forest/15 p-8 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-black uppercase tracking-wider text-forest px-3 py-1 rounded-full bg-pastel-sage">
+              Western Corridor
+            </span>
+            <span class="text-xs font-semibold text-slate-muted">South-West Rainforest &amp; Grasslands</span>
+          </div>
+          <h3 class="text-xl font-bold text-forest mb-2 font-serif">Aso-Oke Royal Adornment</h3>
+          <p class="text-sm text-slate-subtle leading-relaxed mb-5">
+            Prized Bunaji cattle and horses draped in hand-loomed Aso-Oke back blankets (Alaari, Sanyan, Etu), accented with cowrie-shell beadwork and equestrian tassels.
+          </p>
+          <div class="p-4 rounded-xl bg-pastel-champagne/60 border border-gold/20 mb-4">
+            <p class="text-xs font-bold text-forest uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-gold-deep"></i>
+              <span>Handler Attire</span>
+            </p>
+            <p class="text-xs text-slate-contrast font-medium">
+              Bespoke Aso-Oke Agbada with matching Fila cap and ceremonial horse-tail fly-whisk (Irukere).
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-forest">
+          <i data-lucide="check" class="w-4 h-4 text-forest"></i>
+          <span>Key Breeds: White Fulani (Bunaji), Muturu Cattle, Yoruba Ponies</span>
+        </div>
+      </div>
+
+      <!-- Eastern Corridor -->
+      <div class="rounded-2xl bg-white border border-forest/15 p-8 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-black uppercase tracking-wider text-forest px-3 py-1 rounded-full bg-pastel-sage">
+              Eastern Corridor
+            </span>
+            <span class="text-xs font-semibold text-slate-muted">South-East Agro Belt</span>
+          </div>
+          <h3 class="text-xl font-bold text-forest mb-2 font-serif">Akwete Weaving &amp; Isiagu Motifs</h3>
+          <p class="text-sm text-slate-subtle leading-relaxed mb-5">
+            Native goats and championship rams presented with geometric Akwete woven chest collars, symbolic Isiagu lion-crest banners, and braided natural raffia garlands.
+          </p>
+          <div class="p-4 rounded-xl bg-pastel-champagne/60 border border-gold/20 mb-4">
+            <p class="text-xs font-bold text-forest uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-gold-deep"></i>
+              <span>Handler Attire</span>
+            </p>
+            <p class="text-xs text-slate-contrast font-medium">
+              Traditional Isiagu tunic, red Okpu Agu cap, and ceremonial hand-woven fan.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-forest">
+          <i data-lucide="check" class="w-4 h-4 text-forest"></i>
+          <span>Key Breeds: West African Dwarf Goats, Dwarf Sheep, Local Heifers</span>
+        </div>
+      </div>
+
+      <!-- Southern / Niger Delta -->
+      <div class="rounded-2xl bg-white border border-forest/15 p-8 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xs font-black uppercase tracking-wider text-forest px-3 py-1 rounded-full bg-pastel-sage">
+              Southern / Niger Delta
+            </span>
+            <span class="text-xs font-semibold text-slate-muted">Coastal Wetlands &amp; Creeks</span>
+          </div>
+          <h3 class="text-xl font-bold text-forest mb-2 font-serif">Riverine George Silks &amp; Aquatic Displays</h3>
+          <p class="text-sm text-slate-subtle leading-relaxed mb-5">
+            Specialized riverine livestock and snail terrariums styled with vibrant George wrapper textiles, multi-strand coral bead ropes, and mangrove timber staging.
+          </p>
+          <div class="p-4 rounded-xl bg-pastel-champagne/60 border border-gold/20 mb-4">
+            <p class="text-xs font-bold text-forest uppercase tracking-wider mb-1 flex items-center gap-1.5">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-gold-deep"></i>
+              <span>Handler Attire</span>
+            </p>
+            <p class="text-xs text-slate-contrast font-medium">
+              Traditional Etibo shirt, flowing George wrapper, coral necklace, and brass-tipped walking stick.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-forest">
+          <i data-lucide="check" class="w-4 h-4 text-forest"></i>
+          <span>Key Breeds: Giant African Snails, African Catfish, Coastal Ruminants</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Motto Banner -->
+    <div class="w-full rounded-2xl bg-forest text-white p-6 sm:p-8 text-center shadow-md border border-forest-light">
+      <p class="text-base sm:text-xl font-bold tracking-wide uppercase text-pastel-champagne">
+        &ldquo;Different cultures. Different traditions. One Nigeria.&rdquo;
+      </p>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       E. THE MAIN ATTRACTION: FASHION MEETS AGRICULTURE
+  ========================================================================= -->
+  <section id="fashion" class="w-full py-20 bg-canvas border-t border-forest/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pastel-champagne text-gold-deep text-xs font-bold uppercase tracking-widest mb-3 border border-gold/30">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>The Red Carpet Oval</span>
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-forest tracking-tight font-serif mb-3">
+          The Main Attraction: Fashion Meets Agriculture
+        </h2>
+        <p class="text-sm sm:text-base text-slate-subtle">
+          A high-visibility national runway pairing livestock conformation with ethical, ancestral textile styling.
+        </p>
+      </div>
+
+      <!-- Split-Screen Visual Storytelling Module -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Livestock Dressing Concept -->
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-forest/15 p-8 shadow-card space-y-6">
+          <div class="flex items-center gap-3 pb-4 border-b border-forest/10">
+            <div class="w-10 h-10 rounded-xl bg-pastel-sage flex items-center justify-center text-forest shrink-0">
+              <i data-lucide="palette" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-forest font-serif">Livestock Dressing Concept</h3>
+              <p class="text-xs text-slate-muted">Ethical, non-restrictive cultural embellishment guidelines</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="p-4 rounded-xl bg-canvas border border-forest/10">
+              <h4 class="text-sm font-bold text-forest mb-1">Camels &amp; Horses</h4>
+              <p class="text-xs text-slate-subtle leading-relaxed">
+                Traditional quilted saddle cloths, braided mane ribbons, soft leather pommels, and handlers in matching regional robes.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-canvas border border-forest/10">
+              <h4 class="text-sm font-bold text-forest mb-1">Cattle (Bulls &amp; Heifers)</h4>
+              <p class="text-xs text-slate-subtle leading-relaxed">
+                Aso-Oke back drapes, hand-braided organic cotton neck garlands, and polished horn cuffs with zero adhesive or chemical treatment.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-canvas border border-forest/10">
+              <h4 class="text-sm font-bold text-forest mb-1">Small Ruminants (Goats &amp; Sheep)</h4>
+              <p class="text-xs text-slate-subtle leading-relaxed">
+                Loose textile neckbands, patterned cotton halters, and natural raffia side bands tailored for complete respiratory freedom.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-canvas border border-forest/10">
+              <h4 class="text-sm font-bold text-forest mb-1">Poultry &amp; Small Animals</h4>
+              <p class="text-xs text-slate-subtle leading-relaxed">
+                Decorated Ankara hutches, bamboo aviary floats, and botanical shaded perches — strictly nothing tied or worn directly on birds or rabbits.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Parade Highlights & Spectator Experience -->
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-forest/15 p-8 shadow-card space-y-6">
+          <div class="flex items-center gap-3 pb-4 border-b border-forest/10">
+            <div class="w-10 h-10 rounded-xl bg-pastel-champagne flex items-center justify-center text-forest shrink-0 border border-gold/30">
+              <i data-lucide="megaphone" class="w-5 h-5 text-gold-deep"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-forest font-serif">Parade Highlights</h3>
+              <p class="text-xs text-slate-muted">What visitors experience on the ceremonial runway</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-pastel-sage/30 border border-forest/10">
+              <i data-lucide="radio" class="w-5 h-5 text-forest shrink-0 mt-0.5"></i>
+              <div>
+                <h4 class="text-sm font-bold text-forest">Live Editorial Commentary</h4>
+                <p class="text-xs text-slate-subtle">Bilingual commentary detailing breed genetics, regional textile provenance, and handler bloodlines.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-pastel-sage/30 border border-forest/10">
+              <i data-lucide="music" class="w-5 h-5 text-forest shrink-0 mt-0.5"></i>
+              <div>
+                <h4 class="text-sm font-bold text-forest">Traditional Drummers &amp; Pageantry</h4>
+                <p class="text-xs text-slate-subtle">Kano Kakaki trumpeters, Yoruba talking drummers, and Eastern Ogene percussionists accompanying entry classes.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-pastel-sage/30 border border-forest/10">
+              <i data-lucide="graduation-cap" class="w-5 h-5 text-forest shrink-0 mt-0.5"></i>
+              <div>
+                <h4 class="text-sm font-bold text-forest">Live Breed Education</h4>
+                <p class="text-xs text-slate-subtle">Interactive judge explanations on conformation scorecards, milk/meat yields, and heat-tolerance traits.</p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3.5 p-3.5 rounded-xl bg-pastel-sage/30 border border-forest/10">
+              <i data-lucide="camera" class="w-5 h-5 text-forest shrink-0 mt-0.5"></i>
+              <div>
+                <h4 class="text-sm font-bold text-forest">Dedicated Public Photo Zones</h4>
+                <p class="text-xs text-slate-subtle">Specially staged, barrier-protected photo platforms allowing families and photographers close-up souvenir portraits.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       F. LIVESTOCK VILLAGE & ANIMAL WELFARE
+  ========================================================================= -->
+  <section id="village" class="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    
+    <!-- Welfare Anchor Banner -->
+    <div class="rounded-2xl bg-forest text-white p-6 sm:p-10 mb-14 text-center shadow-md relative overflow-hidden">
+      <div class="relative z-10 max-w-3xl mx-auto">
+        <span class="text-xs font-extrabold uppercase tracking-widest text-gold block mb-2">
+          Ethical Charter
+        </span>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-black font-serif mb-3 text-pastel-champagne">
+          &ldquo;Beautiful for the audience. Comfortable for the animals.&rdquo;
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-300">
+          Our cardinal welfare pledge. Every presentation, housing stall, and runway lap strictly adheres to certified veterinary standards.
+        </p>
+      </div>
+    </div>
+
+    <!-- Two-Column Operational Architecture Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Left Column: Village Infrastructure -->
+      <div class="lg:col-span-6 bg-white rounded-2xl border border-forest/15 p-8 shadow-card space-y-6">
+        <div class="flex items-center gap-3 pb-4 border-b border-forest/10">
+          <div class="w-10 h-10 rounded-xl bg-pastel-sage flex items-center justify-center text-forest shrink-0">
+            <i data-lucide="home" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-forest font-serif">Village Infrastructure</h3>
+            <p class="text-xs text-slate-muted">Purpose-built temporary habitat at Abuja National Grounds</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl bg-canvas border border-forest/10 flex items-start gap-3.5">
+            <i data-lucide="sun-medium" class="w-5 h-5 text-forest shrink-0 mt-0.5"></i>
+            <div>
+              <h4 class="text-sm font-bold text-forest">Shaded Cross-Ventilated Pens</h4>
+              <p class="text-xs text-slate-subtle mt-0.5">High-roof pavilions with natural thatch membranes providing a 5°C ambient temperature reduction.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-canvas border border-forest/10 flex items-start gap-3.5">
+            <i data-lucide="droplet" class="w-5 h-5 text-forest shrink-0 mt-0.5"></i>
+            <div>
+              <h4 class="text-sm font-bold text-forest">Clean Continuous Water Troughs</h4>
+              <p class="text-xs text-slate-subtle mt-0.5">Automated freshwater stations and electrolyte hydration docks monitored hourly by site stewards.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-canvas border border-forest/10 flex items-start gap-3.5">
+            <i data-lucide="activity" class="w-5 h-5 text-forest shrink-0 mt-0.5"></i>
+            <div>
+              <h4 class="text-sm font-bold text-forest">Dedicated Veterinary Inspection Corridors</h4>
+              <p class="text-xs text-slate-subtle mt-0.5">Direct, non-crowded medical transit routes connecting all stables to the on-site clinic.</p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-canvas border border-forest/10 flex items-start gap-3.5">
+            <i data-lucide="recycle" class="w-5 h-5 text-forest shrink-0 mt-0.5"></i>
+            <div>
+              <h4 class="text-sm font-bold text-forest">Sanitary Waste Management</h4>
+              <p class="text-xs text-slate-subtle mt-0.5">Continuous bio-compost bagging, deodorizing wood shavings, and zero-runoff drainage systems.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: 10 Welfare Commitments -->
+      <div class="lg:col-span-6 bg-white rounded-2xl border border-forest/15 p-8 shadow-card space-y-6">
+        <div class="flex items-center gap-3 pb-4 border-b border-forest/10">
+          <div class="w-10 h-10 rounded-xl bg-pastel-champagne flex items-center justify-center text-forest shrink-0 border border-gold/30">
+            <i data-lucide="shield-check" class="w-5 h-5 text-gold-deep"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-forest font-serif">10 Welfare Commitments</h3>
+            <p class="text-xs text-slate-muted">Mandatory operational standards enforced system-wide</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-contrast font-medium">
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Certified Animal Handlers Only</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Non-Restrictive Breathable Drapes</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>24/7 On-Site Veterinary Care</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Visitor Separation Barriers</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Zero Adhesives &amp; Zero Body Paints</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Mandatory Pre-Runway Health Check</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Cooling Misting Zones at Stalls</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Noise Capping near Animal Resting Dens</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Natural Perch Structures for Birds</span>
+          </div>
+          <div class="p-3 rounded-lg bg-pastel-sage/40 flex items-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-forest shrink-0"></i>
+            <span>Rapid Response Medical Evacuation</span>
+          </div>
+        </div>
+
+        <div class="pt-2 text-center">
+          <span class="text-[11px] font-semibold text-slate-muted">
+            Audited independently by Federal Veterinary Officers.
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       G. INTERACTIVE EDUCATION & BREED SEARCH
+  ========================================================================= -->
+  <section id="directory" class="w-full py-20 bg-white border-y border-forest/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Visitor Journey Banner: SEE -> LEARN -> EXPERIENCE -> CONNECT -->
+      <div class="rounded-2xl bg-canvas border border-forest/15 p-6 sm:p-8 mb-16 shadow-card">
+        <p class="text-xs font-extrabold uppercase tracking-widest text-gold-deep text-center mb-4">
+          Visitor Learning Pathway
+        </p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div class="p-3 rounded-xl bg-white border border-forest/10 shadow-xs">
+            <span class="text-xs font-black text-forest block mb-1">01. SEE</span>
+            <span class="text-xs text-slate-subtle">Spectacular pageantry on the runway</span>
+          </div>
+          <div class="p-3 rounded-xl bg-white border border-forest/10 shadow-xs">
+            <span class="text-xs font-black text-forest block mb-1">02. LEARN</span>
+            <span class="text-xs text-slate-subtle">Scientific breed conformation signage</span>
+          </div>
+          <div class="p-3 rounded-xl bg-white border border-forest/10 shadow-xs">
+            <span class="text-xs font-black text-forest block mb-1">03. EXPERIENCE</span>
+            <span class="text-xs text-slate-subtle">Guided village walks and photo zones</span>
+          </div>
+          <div class="p-3 rounded-xl bg-white border border-forest/10 shadow-xs">
+            <span class="text-xs font-black text-forest block mb-1">04. CONNECT</span>
+            <span class="text-xs text-slate-subtle">Direct linkages with breeder cooperatives</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Searchable Breed Directory Title -->
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <h2 class="text-2xl sm:text-4xl font-black text-forest tracking-tight font-serif mb-2">
+          Searchable Breed Directory
+        </h2>
+        <p class="text-sm text-slate-subtle">
+          Filter by geographic origin and production purpose. Click any entry to inspect its Animal Shed Signage Board.
+        </p>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="flex flex-wrap items-center justify-center gap-3 mb-10">
+        <!-- Origin Filters -->
+        <div class="inline-flex rounded-xl bg-canvas p-1 border border-forest/15 text-xs font-bold">
+          <button onclick="setOriginFilter('all')" class="origin-btn px-3 py-1.5 rounded-lg bg-forest text-white transition-all" data-origin="all">All Origins</button>
+          <button onclick="setOriginFilter('Local/Nigerian')" class="origin-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all" data-origin="Local/Nigerian">Local Nigerian</button>
+          <button onclick="setOriginFilter('West African')" class="origin-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all" data-origin="West African">West African</button>
+          <button onclick="setOriginFilter('Exotic')" class="origin-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all" data-origin="Exotic">Exotic</button>
+        </div>
+
+        <!-- Purpose Filters -->
+        <div class="inline-flex rounded-xl bg-canvas p-1 border border-forest/15 text-xs font-bold">
+          <button onclick="setPurposeFilter('all')" class="purpose-btn px-3 py-1.5 rounded-lg bg-gold text-slate-contrast transition-all" data-purpose="all">All Purposes</button>
+          <button onclick="setPurposeFilter('Dairy')" class="purpose-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all" data-purpose="Dairy">Dairy</button>
+          <button onclick="setPurposeFilter('Meat')" class="purpose-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all" data-purpose="Meat">Meat</button>
+          <button onclick="setPurposeFilter('Traction')" class="purpose-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all" data-purpose="Traction">Traction</button>
+          <button onclick="setPurposeFilter('Exhibition')" class="purpose-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all" data-purpose="Exhibition">Exhibition</button>
+        </div>
+      </div>
+
+      <!-- Main Directory Layout: Breed List (Left) + Interactive Signage Preview (Right) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left: Breed Cards Grid -->
+        <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4" id="breedCardsContainer">
+          <!-- Dynamically Rendered via JS -->
+        </div>
+
+        <!-- Right: Info Board Template (Interactive Preview of Animal Shed Signage) -->
+        <div class="lg:col-span-5 sticky top-28">
+          <div class="rounded-2xl bg-canvas border-2 border-forest/20 p-6 sm:p-8 shadow-card-hover relative overflow-hidden" id="infoBoardPreview">
+            <!-- Signage Header Strip -->
+            <div class="flex items-center justify-between pb-4 border-b border-forest/15 mb-6">
+              <div class="flex items-center gap-2">
+                <i data-lucide="tag" class="w-4 h-4 text-gold-deep"></i>
+                <span class="text-[11px] font-black tracking-widest uppercase text-forest">Animal Shed Signage Board</span>
+              </div>
+              <span class="text-[10px] font-bold text-slate-muted bg-white border border-forest/10 px-2 py-0.5 rounded">
+                Official Pavilion Placard
+              </span>
+            </div>
+
+            <!-- Signage Content -->
+            <div class="space-y-4">
+              <div>
+                <span class="text-xs font-bold text-gold-deep uppercase tracking-wider block mb-1" id="boardCategory">
+                  Cattle &amp; Large Ruminants
+                </span>
+                <h3 class="text-2xl font-black text-forest font-serif" id="boardName">
+                  White Fulani (Bunaji)
+                </h3>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="p-3 rounded-xl bg-white border border-forest/10">
+                  <span class="text-[10px] font-bold text-slate-muted uppercase block">Origin</span>
+                  <span class="font-bold text-forest" id="boardOrigin">Northern Nigeria (Local)</span>
+                </div>
+                <div class="p-3 rounded-xl bg-white border border-forest/10">
+                  <span class="text-[10px] font-bold text-slate-muted uppercase block">Production Focus</span>
+                  <span class="font-bold text-forest" id="boardPurpose">Dual (Dairy &amp; Meat)</span>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-white border border-forest/10">
+                <span class="text-[10px] font-bold text-slate-muted uppercase block mb-1">Key Conformation &amp; Adaptive Traits</span>
+                <p class="text-xs text-slate-contrast leading-relaxed" id="boardTraits">
+                  Distinctive lyre-shaped horns, pure white to speckled coat providing natural solar reflectance, and high resistance to endemic trypanosomiasis.
+                </p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-white border border-forest/10">
+                <span class="text-[10px] font-bold text-slate-muted uppercase block mb-1">National Economic Value</span>
+                <p class="text-xs text-slate-contrast leading-relaxed" id="boardEconomic">
+                  Constitutes approximately 37% of Nigeria's national cattle herd. Primary supplier of domestic fresh milk, premium beef cuts, and artisanal leather.
+                </p>
+              </div>
+
+              <!-- QR Code & Verification Lockup -->
+              <div class="pt-4 border-t border-forest/15 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 rounded-lg bg-forest text-gold flex items-center justify-center font-mono text-xs font-bold">
+                    <i data-lucide="qr-code" class="w-5 h-5"></i>
+                  </div>
+                  <div class="text-[10px]">
+                    <p class="font-bold text-forest">Digital Studbook ID</p>
+                    <p class="text-slate-muted">Scan at stall for pedigree registry</p>
+                  </div>
+                </div>
+                <span class="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full">
+                  Vet Certified
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       ENTRY PASS & REGISTRATION MODAL ANCHOR
+  ========================================================================= -->
+  <section id="pass" class="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+    <div class="rounded-3xl bg-forest text-white p-8 sm:p-14 lg:p-16 shadow-2xl relative overflow-hidden border border-gold/30 text-center flex flex-col items-center">
+      <div class="relative z-10 max-w-2xl flex flex-col items-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-gold text-xs font-bold uppercase tracking-widest mb-4 border border-white/15">
+          <i data-lucide="ticket" class="w-3.5 h-3.5"></i>
+          <span>Public Accreditation</span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black font-serif mb-4 text-pastel-champagne">
+          Claim Your Free Entry Pass
+        </h2>
+        <p class="text-sm sm:text-base text-slate-200 leading-relaxed mb-8 max-w-xl">
+          Complimentary public admission for families, agribusiness investors, students, and culture enthusiasts at Abuja National Grounds, November 21–23, 2026.
+        </p>
+
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <a href="https://pass.livestockcarnival.ng" target="_blank" rel="noopener noreferrer" class="px-8 py-4 rounded-xl bg-gold hover:bg-gold-light text-slate-contrast font-black text-sm uppercase tracking-wider shadow-button hover:-translate-y-0.5 transition-all flex items-center gap-2">
+            <span>Register for Free Gate Pass</span>
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+          </a>
+          <a href="#hero" class="px-8 py-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm uppercase tracking-wider border border-white/20 transition-all">
+            Back to Overview
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       H. GLOBAL FOOTER
+  ========================================================================= -->
+  <footer class="w-full bg-[#111827] text-white border-t border-forest/20 pt-16 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Top Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+        
+        <!-- Col 1: Sovereign Seal & Endorsement -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-forest flex items-center justify-center text-gold border border-gold/30">
+              <i data-lucide="shield" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <span class="text-sm font-extrabold text-white uppercase block leading-tight">
+                National Livestock Carnival
+              </span>
+              <span class="text-[10px] font-bold text-gold uppercase tracking-wider">
+                The Golden Camel &amp; Cow Carnival
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Backed by the Federal Government of Nigeria (Office of the Vice President) in collaboration with Golden Camel and Cow (GCC).
+          </p>
+          <div class="pt-2 text-[11px] font-bold text-gold flex items-center gap-1.5">
+            <i data-lucide="landmark" class="w-3.5 h-3.5"></i>
+            <span>Sovereign Federal Initiative</span>
+          </div>
+        </div>
+
+        <!-- Col 2: Event Anchors -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gold">Carnival Navigation</h4>
+          <ul class="space-y-2 text-xs text-slate-400">
+            <li><a href="#hero" class="hover:text-white transition-colors">Cultural Fashion Parade</a></li>
+            <li><a href="#pillars" class="hover:text-white transition-colors">Four Strategic Pillars</a></li>
+            <li><a href="#lineup" class="hover:text-white transition-colors">Exhibition Line-Up</a></li>
+            <li><a href="#regions" class="hover:text-white transition-colors">One Nigeria Motifs</a></li>
+            <li><a href="#fashion" class="hover:text-white transition-colors">Fashion Meets Agriculture</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Operations & Welfare -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gold">Governance &amp; Welfare</h4>
+          <ul class="space-y-2 text-xs text-slate-400">
+            <li><a href="#village" class="hover:text-white transition-colors">Livestock Village Architecture</a></li>
+            <li><a href="#village" class="hover:text-white transition-colors">10 Animal Welfare Commitments</a></li>
+            <li><a href="#directory" class="hover:text-white transition-colors">Breed Standards &amp; Conformation</a></li>
+            <li><a href="#pass" class="hover:text-white transition-colors">Public Accreditation</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Venue Map Anchor & Contact -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-gold">Carnival Venue Ground</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Abuja National Carnival Grounds (Old Parade Ground, Area 10, Garki), Federal Capital Territory, Nigeria.
+          </p>
+          <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 flex items-center gap-2">
+            <i data-lucide="map-pin" class="w-4 h-4 text-gold shrink-0"></i>
+            <span>Gates Open Daily: 08:00 AM – 18:00 PM</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <p>
+          &copy; 2026 National Livestock Carnival. Official Federal Republic of Nigeria Staging.
+        </p>
+        <p class="font-medium text-slate-400">
+          Our Livestock. Our Culture. Our Heritage.
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       INTERACTIVE DATA ENGINE & BREED FILTER SCRIPT
+  ========================================================================= -->
+  <script>
+    // Breed Database
+    const breedData = [
+      {
+        id: 'bunaji',
+        name: 'White Fulani (Bunaji)',
+        category: 'Cattle & Equines',
+        origin: 'Local/Nigerian',
+        purpose: 'Dairy',
+        traits: 'Lyre-shaped horns, white coat for solar reflectance, high heat tolerance, and trypanosomiasis resilience.',
+        economic: 'Represents 37% of Nigerian cattle. Flagship producer of domestic dairy, beef, and artisanal leather goods.'
+      },
+      {
+        id: 'gudali',
+        name: 'Sokoto Gudali',
+        category: 'Cattle & Equines',
+        origin: 'Local/Nigerian',
+        purpose: 'Meat',
+        traits: 'Short-horned or polled, deep-bodied conformation with gentle temperament and rapid pasture weight gain.',
+        economic: 'Premier beef breed of the North-Western savanna, anchoring commercial live-weight livestock auctions.'
+      },
+      {
+        id: 'dromedary',
+        name: 'Sahelian Dromedary',
+        category: 'Camels',
+        origin: 'Local/Nigerian',
+        purpose: 'Traction',
+        traits: 'Single-hump arid desert conformation, wide padded feet for sand movement, and specialized water conservation physiology.',
+        economic: 'Vital for Northern trans-Sahel trade corridors, pageantry racing, and nutrient-dense camel milk production.'
+      },
+      {
+        id: 'wad-goat',
+        name: 'West African Dwarf Goat',
+        category: 'Small Ruminants',
+        origin: 'Local/Nigerian',
+        purpose: 'Meat',
+        traits: 'Compact stature (30–50cm), high prolificacy (frequent twins/triplets), and total resistance to tsetse-fly sleeping sickness.',
+        economic: 'The cornerstone smallholder livestock of southern Nigeria, driving rural household savings and ceremonial wealth.'
+      },
+      {
+        id: 'balami-sheep',
+        name: 'Balami Giant Ram',
+        category: 'Small Ruminants',
+        origin: 'West African',
+        purpose: 'Exhibition',
+        traits: 'Prominent convex roman nose, white fleece, tall stature reaching over 100kg live weight, and magnificent horn curvature.',
+        economic: 'The sovereign champion of ceremonial ram markets, prized for premier festival exhibitions and stud breeding.'
+      },
+      {
+        id: 'moorbeta-chicken',
+        name: 'MoorBeta Indigenous Chicken',
+        category: 'Poultry',
+        origin: 'Local/Nigerian',
+        purpose: 'Meat',
+        traits: 'Hardy local dual-purpose scavenger ecotype, vibrant multicolored plumage, high immunity to Newcastle disease.',
+        economic: 'Core of free-range village poultry systems, providing organic eggs and flavorful native poultry meat.'
+      },
+      {
+        id: 'giant-snail',
+        name: 'Giant African Snail (Archachatina)',
+        category: 'Micro-Livestock',
+        origin: 'Local/Nigerian',
+        purpose: 'Meat',
+        traits: 'Massive helical shell, high feed-to-protein conversion, zero noise, and thrives in high-humidity vegetative biomes.',
+        economic: 'High-margin micro-livestock enterprise with booming export demand for high-protein meat and cosmetic mucin.'
+      },
+      {
+        id: 'ostrich',
+        name: 'Sahelian Red-Neck Ostrich',
+        category: 'Exotic Displays',
+        origin: 'Exotic',
+        purpose: 'Exhibition',
+        traits: 'World\'s largest flightless avian, rapid running speeds up to 70 km/h, and thick protective plumage.',
+        economic: 'High-value conservation genetics, eco-tourism attraction, and sustainable feather/leather harvesting.'
+      }
+    ];
+
+    let currentOrigin = 'all';
+    let currentPurpose = 'all';
+
+    function renderBreedCards() {
+      const container = document.getElementById('breedCardsContainer');
+      container.innerHTML = '';
+
+      const filtered = breedData.filter(b => {
+        const matchesOrigin = (currentOrigin === 'all') || (b.origin === currentOrigin);
+        const matchesPurpose = (currentPurpose === 'all') || (b.purpose === currentPurpose);
+        return matchesOrigin && matchesPurpose;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-2 p-8 text-center bg-canvas rounded-2xl border border-forest/10">
+            <p class="text-sm font-bold text-forest">No breeds found matching the selected filter combination.</p>
+            <p class="text-xs text-slate-subtle mt-1">Try resetting the origin or purpose filters above.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach((b) => {
+        const card = document.createElement('div');
+        card.className = 'p-5 rounded-2xl bg-canvas border border-forest/15 shadow-card hover:shadow-card-hover transition-all cursor-pointer flex flex-col justify-between group';
+        card.onclick = () => updateInfoBoard(b);
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-bold text-forest uppercase tracking-wider px-2 py-0.5 rounded bg-pastel-sage">
+                ${b.origin}
+              </span>
+              <span class="text-[10px] font-bold text-gold-deep uppercase">
+                ${b.purpose}
+              </span>
+            </div>
+            <h4 class="text-base font-bold text-forest group-hover:text-forest-light transition-colors font-serif mb-1">
+              ${b.name}
+            </h4>
+            <p class="text-xs text-slate-subtle line-clamp-2 leading-relaxed mb-4">
+              ${b.traits}
+            </p>
+          </div>
+          <div class="pt-3 border-t border-forest/10 flex items-center justify-between text-[11px] font-bold text-forest">
+            <span>Inspect Placard</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Refresh Lucide icons on newly injected elements
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    function updateInfoBoard(breed) {
+      document.getElementById('boardCategory').innerText = breed.category;
+      document.getElementById('boardName').innerText = breed.name;
+      document.getElementById('boardOrigin').innerText = breed.origin;
+      document.getElementById('boardPurpose').innerText = breed.purpose;
+      document.getElementById('boardTraits').innerText = breed.traits;
+      document.getElementById('boardEconomic').innerText = breed.economic;
+
+      // Subtle pulse to indicate active update
+      const board = document.getElementById('infoBoardPreview');
+      board.classList.remove('fade-in-entry');
+      void board.offsetWidth; // trigger reflow
+      board.classList.add('fade-in-entry');
+    }
+
+    function setOriginFilter(origin) {
+      currentOrigin = origin;
+      document.querySelectorAll('.origin-btn').forEach(btn => {
+        if (btn.getAttribute('data-origin') === origin) {
+          btn.className = 'origin-btn px-3 py-1.5 rounded-lg bg-forest text-white transition-all';
+        } else {
+          btn.className = 'origin-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all';
+        }
+      });
+      renderBreedCards();
+    }
+
+    function setPurposeFilter(purpose) {
+      currentPurpose = purpose;
+      document.querySelectorAll('.purpose-btn').forEach(btn => {
+        if (btn.getAttribute('data-purpose') === purpose) {
+          btn.className = 'purpose-btn px-3 py-1.5 rounded-lg bg-gold text-slate-contrast transition-all';
+        } else {
+          btn.className = 'purpose-btn px-3 py-1.5 rounded-lg text-slate-subtle hover:text-forest transition-all';
+        }
+      });
+      renderBreedCards();
+    }
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      renderBreedCards();
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+</html>

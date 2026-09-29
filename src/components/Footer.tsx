@@ -9,14 +9,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand Column */}
           <div className="flex flex-col gap-4">
-            {/* FGN Coat of Arms */}
+            {/* LSC Logo */}
             <div className="flex items-center gap-3">
               <Image
-                src="/assets/coat_of_arms.png"
-                alt="Federal Republic of Nigeria Coat of Arms"
-                width={40}
-                height={46}
-                className="shrink-0 object-contain"
+                src="/assets/logo_transparent.png"
+                alt="Livestock Carnival Emblem"
+                width={56}
+                height={42}
+                className="shrink-0 object-contain w-12 h-10"
               />
               <div className="flex flex-col">
                 <span className="font-extrabold text-white text-base tracking-tight leading-snug">
@@ -40,6 +40,10 @@ export default function Footer() {
           <div className="flex flex-col gap-4">
             <h4 className="font-bold text-sm uppercase tracking-wider text-white">Festival Hubs</h4>
             <nav className="flex flex-col gap-2.5">
+              <Link href="/fashion-parade" className="text-[#D4AF37] hover:text-white text-sm font-semibold transition-colors flex items-center gap-1.5">
+                <span>Cultural Fashion Parade</span>
+                <span className="text-[9px] bg-[#D4AF37]/20 text-[#D4AF37] px-1.5 py-0.5 rounded font-bold">EDITORIAL</span>
+              </Link>
               <Link href="/attractions#durbar" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
                 Royal Durbar Pageantry
               </Link>
@@ -65,6 +69,10 @@ export default function Footer() {
               <Link href="/about" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
                 Presidential Mandate
               </Link>
+              <Link href="/nhesics" className="text-[#D4AF37] hover:text-white text-sm font-semibold transition-colors flex items-center gap-1.5">
+                <span>NHESICS Secretariat</span>
+                <span className="text-[9px] bg-[#D4AF37]/20 text-[#D4AF37] px-1.5 py-0.5 rounded font-bold">MANDATE</span>
+              </Link>
               <Link href="/about#financing" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
                 Agro-Industrial Financing Window
               </Link>
@@ -85,7 +93,7 @@ export default function Footer() {
             <h4 className="font-bold text-sm uppercase tracking-wider text-white">External Portals &amp; Venue</h4>
             <nav className="flex flex-col gap-2.5 mb-2">
               <a
-                href="https://gcc-carnival.web.app/ticket"
+                href="https://pass.livestockcarnival.ng"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#D4AF37] hover:underline text-sm font-semibold transition-colors"
@@ -93,7 +101,7 @@ export default function Footer() {
                 Claim Free Gate Pass →
               </a>
               <a
-                href="https://nlf-vendors.web.app/"
+                href="https://vendors.livestockcarnival.ng"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-white text-sm font-semibold transition-colors"

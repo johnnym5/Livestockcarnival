@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { Shield, Sparkles, Filter, Info, X, ImageOff } from 'lucide-react';
+import { Shield, Tag, Filter, Info, X, ImageOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export interface LivestockItem {
@@ -160,7 +160,7 @@ export default function LivestockGrid() {
 
                   {/* Category Badge */}
                   <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5">
-                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <Tag className="w-3 h-3 text-amber-400" />
                     {item.category}
                   </div>
 

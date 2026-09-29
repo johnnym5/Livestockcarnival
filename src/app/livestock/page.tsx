@@ -1,7 +1,7 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LivestockGrid from '@/components/LivestockGrid';
-import { Sparkles, Shield, Compass } from 'lucide-react';
+import { Crown, Shield, Compass } from 'lucide-react';
 
 export const metadata = {
   title: 'Golden Camel & Champion Livestock Catalog | Livestock Carnival',
@@ -20,7 +20,7 @@ export default function LivestockPage() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 blur-3xl rounded-full pointer-events-none" />
 
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-extrabold uppercase tracking-widest">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <Crown className="w-3.5 h-3.5 text-amber-400" />
             Golden Camel & Livestock Registry
           </div>
 

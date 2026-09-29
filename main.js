@@ -86,8 +86,8 @@ function renderGlobalNav(activePage = '') {
           </ul>
 
           <div class="nav-actions">
-            <a href="https://nlf-vendors.web.app/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Vendor Portal</a>
-            <a href="https://gcc-carnival.web.app/ticket" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Free Gate Pass</a>
+            <a href="https://vendors.livestockcarnival.ng" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">Vendor Portal</a>
+            <a href="https://pass.livestockcarnival.ng" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Free Gate Pass</a>
             <button class="mobile-toggle" id="mobile-toggle-btn" aria-label="Toggle navigation menu">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
@@ -97,8 +97,8 @@ function renderGlobalNav(activePage = '') {
         <div class="mobile-menu-drawer" id="mobile-menu-drawer">
           ${mobileItemsHTML}
           <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
-            <a href="https://nlf-vendors.web.app/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width: 100%;">Vendor Portal</a>
-            <a href="https://gcc-carnival.web.app/ticket" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%;">Free Gate Pass</a>
+            <a href="https://vendors.livestockcarnival.ng" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="width: 100%;">Vendor Portal</a>
+            <a href="https://pass.livestockcarnival.ng" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width: 100%;">Free Gate Pass</a>
           </div>
         </div>
       </nav>
