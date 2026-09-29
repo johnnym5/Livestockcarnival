@@ -127,28 +127,19 @@ export default function Home() {
 
       const isMobile = window.innerWidth < 768;
 
-      /* Helper function to get distinct directional starting position for each card */
-      const getInitialCardState = (index: number) => {
-        const mode = index % 5;
-        switch (mode) {
-          case 0:
-            // Rise from bottom
-            return { x: 0, y: '100vh', rotationX: isMobile ? -15 : -35, rotationY: 0, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
-          case 1:
-            // Pivot from left
-            return { x: isMobile ? '-85vw' : '-100vw', y: 0, rotationX: 0, rotationY: isMobile ? -20 : -50, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
-          case 2:
-            // Pivot from right
-            return { x: isMobile ? '85vw' : '100vw', y: 0, rotationX: 0, rotationY: isMobile ? 20 : 50, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
-          case 3:
-            // Slide from top
-            return { x: 0, y: '-100vh', rotationX: isMobile ? 15 : 35, rotationY: 0, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
-          case 4:
-            // Pivot from bottom-left diagonal
-            return { x: isMobile ? '-60vw' : '-80vw', y: '60vh', rotationX: 0, rotationY: isMobile ? -15 : -35, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
-          default:
-            return { x: 0, y: '100vh', rotationX: 0, rotationY: 0, scale: 0.85, opacity: 0, pointerEvents: 'none' as const };
-        }
+      /* Helper function for deep 3D initial card state in distance */
+      const getInitialCardState = () => {
+        return {
+          x: 0,
+          y: '12vh',
+          z: isMobile ? -300 : -1000,
+          scale: 0.35,
+          rotationX: 0,
+          rotationY: 0,
+          opacity: 0,
+          filter: isMobile ? 'none' : 'blur(12px)',
+          pointerEvents: 'none' as const,
+        };
       };
 
       /* Use gsap.context scoped to outer container so all selectors are found */
@@ -159,16 +150,12 @@ export default function Home() {
         /* ── Center all scene elements ───────────────────────────────── */
         gsap.set('.scene-element', { xPercent: -50, yPercent: -50 });
 
-        /* ── Initial states: Welcome Title is sticky at top; Cards start in distinct directional positions ── */
+        /* ── Initial states: Welcome Title is sticky at top; Cards start small & deep in distance ── */
         gsap.set('#welcome-title', { opacity: 1, scale: 1, x: 0, y: 0, z: 0, filter: 'none' });
 
-        cards.forEach((card, idx) => {
-          const initial = getInitialCardState(idx);
-          gsap.set(`#${card.id}`, {
-            ...initial,
-            z: isMobile ? 0 : -150,
-            filter: isMobile ? 'none' : 'blur(10px)',
-          });
+        cards.forEach((card) => {
+          const initial = getInitialCardState();
+          gsap.set(`#${card.id}`, { ...initial });
         });
 
         /* ── Slow, Smooth Master Scroll Timeline ────── */
@@ -185,112 +172,106 @@ export default function Home() {
           },
         });
 
-        const maxZoomScale = isMobile ? 3.2 : 32;
-        const blurOut = isMobile ? 'none' : 'blur(32px)';
+        const maxZoomScale = isMobile ? 3.2 : 28;
+        const blurOut = isMobile ? 'none' : 'blur(28px)';
         const blurFocus = isMobile ? 'none' : 'blur(0px)';
 
-        /* ── WELCOME TITLE STICKY & COVER BEHAVIOR ──
-         * Welcome title stays sticky at top and slowly shifts up (y: -12vh).
-         * Card 1 rises from below to cover Welcome Title.
-         * Once Card 1 covers it, Welcome Title fades out behind Card 1.
-         */
-        tl.to('#welcome-title', { y: '-12vh', opacity: 0.85, duration: 2.2, ease: 'none' }, 0);
-
-        /* Card 1 rises from bottom to cover the Welcome Title */
+        /* ── STEP 1: Card 1 emerges from small distance to focal size (scale 0.35 -> 0.98) ── */
         tl.to('#card-1', {
           x: 0,
           y: 0,
+          z: 0,
           rotationX: 0,
           rotationY: 0,
           scale: 0.98,
           opacity: 1,
           filter: blurFocus,
           pointerEvents: 'auto',
-          duration: 2.2,
+          duration: 2.5,
           ease: 'power2.out',
-        }, 0.2);
+        }, 0);
 
-        /* As Card 1 settles in center, Welcome Title behind it finishes fading out */
-        tl.to('#welcome-title', { opacity: 0, duration: 1.0, ease: 'power2.in' }, 1.8);
+        /* #welcome-title remains 100% OPAQUE (opacity: 1, filter: blur 0px)
+         * during Card 1's entrance AND Card 1's focal hold!
+         */
+        tl.to('#welcome-title', {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: 'blur(0px)',
+          duration: 4.8,
+          ease: 'none',
+        }, 0);
 
         /* Card 1 Focal Hold in center */
         tl.to('#card-1', {
           scale: 1.02,
-          z: isMobile ? 40 : 100,
-          duration: 2.5,
+          z: isMobile ? 30 : 80,
+          duration: 2.3,
           ease: 'none',
         });
 
-        /* ── SEQUENCE ALL CARDS 1 TO 10 ── */
+        /* Fade in top HUD indicator when Card 1 covers welcome title */
+        tl.to('#scene-hud', { opacity: 1, duration: 0.8 }, 2.0);
+
+        /* ── STEP 2: Card 1 starts ZOOMING IN past camera ──
+         * ONLY NOW does #welcome-title behind it blur and fade out!
+         */
+        tl.to('#welcome-title', {
+          opacity: 0,
+          filter: isMobile ? 'none' : 'blur(20px)',
+          duration: 2.0,
+          ease: 'power2.in',
+        }, '>');
+
+        /* ── STEP 3: DEEP DIVE EXPANSION ACROSS ALL 10 CARDS ── */
         cards.forEach((card, index) => {
           const cardId = `#${card.id}`;
           const isLast = index === cards.length - 1;
 
-          if (index === 0) {
-            // Card 1 zooms in past camera
+          if (!isLast) {
+            const nextCardId = `#${cards[index + 1].id}`;
+
+            // 1. Current card expands / zooms forward past camera into foreground with blur
             tl.to(cardId, {
               scale: maxZoomScale,
+              z: isMobile ? 150 : 400,
               opacity: 0,
               filter: blurOut,
               pointerEvents: 'none',
               duration: 2.2,
               ease: 'power3.in',
             });
-          } else if (!isLast) {
-            // Cards 2 through 9:
-            // 1. Enter from distinct direction
-            tl.to(cardId, {
-              x: 0,
-              y: 0,
-              rotationX: 0,
-              rotationY: 0,
-              scale: 0.98,
-              opacity: 1,
-              filter: blurFocus,
-              pointerEvents: 'auto',
-              duration: 2.5,
-              ease: 'power2.out',
-            })
-            // 2. Focal hold in center for reading
-            .to(cardId, {
+
+            // 2. Next card emerges SMALL (scale 0.35) from deep distance and expands to focal size!
+            tl.to(
+              nextCardId,
+              {
+                x: 0,
+                y: 0,
+                z: 0,
+                rotationX: 0,
+                rotationY: 0,
+                scale: 0.98,
+                opacity: 1,
+                filter: blurFocus,
+                pointerEvents: 'auto',
+                duration: 2.2,
+                ease: 'power2.out',
+              },
+              '<0.3' // Starts expanding while current card zooms past camera!
+            )
+            // 3. Next card focal hold in center for reading
+            .to(nextCardId, {
               scale: 1.02,
-              z: isMobile ? 40 : 100,
+              z: isMobile ? 30 : 80,
               duration: 2.5,
               ease: 'none',
-            })
-            // 3. Zoom in past camera & fade out BEFORE next card starts
-            .to(cardId, {
-              scale: maxZoomScale,
-              opacity: 0,
-              filter: blurOut,
-              pointerEvents: 'none',
-              duration: 2.2,
-              ease: 'power3.in',
             });
           } else {
             // Card 10 (THE LAST CARD):
-            // 1. Enters from distinct direction
+            // Does NOT zoom in! Slides UP out of view as normal, smoothly revealing footer!
             tl.to(cardId, {
-              x: 0,
-              y: 0,
-              rotationX: 0,
-              rotationY: 0,
-              scale: 0.98,
-              opacity: 1,
-              filter: blurFocus,
-              pointerEvents: 'auto',
-              duration: 2.5,
-              ease: 'power2.out',
-            })
-            // 2. Focal hold in center
-            .to(cardId, {
-              scale: 1.02,
-              z: isMobile ? 40 : 100,
-              duration: 2.5,
-              ease: 'none',
-            })
-            // 3. DOES NOT ZOOM IN! Simply slides UP out of view as normal, revealing footer below!
-            .to(cardId, {
               y: '-110vh',
               opacity: 0,
               scale: 1.02,
@@ -299,6 +280,7 @@ export default function Home() {
               duration: 2.5,
               ease: 'power2.in',
             });
+            tl.to('#scene-hud', { opacity: 0, duration: 1.0 }, '<0.5');
           }
         });
 
@@ -340,6 +322,8 @@ export default function Home() {
 
         {/* Radial ambient glow */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(228,176,58,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
+
+
 
         {/* ── WELCOME TITLE ── */}
         <div id="welcome-title" className="scene-element -translate-x-1/2 -translate-y-1/2 w-[92vw] max-w-4xl text-center z-10 px-3 sm:px-4">
