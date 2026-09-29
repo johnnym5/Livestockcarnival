@@ -12,7 +12,7 @@ export default function Footer() {
             {/* LSC Logo */}
             <div className="flex items-center gap-3">
               <Image
-                src="/assets/logo_transparent.png"
+                src="/assets/branding/carnival-logo-transparent.png"
                 alt="Livestock Carnival Emblem"
                 width={56}
                 height={42}

@@ -48,7 +48,7 @@ export default function Header() {
           {/* ── App Logo: Livestock Carnival Emblem ── */}
           <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
             <Image
-              src="/assets/logo_transparent.png"
+              src="/assets/branding/carnival-logo-transparent.png"
               alt="Livestock Carnival Official Logo"
               width={56}
               height={42}

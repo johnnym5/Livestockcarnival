@@ -17,7 +17,7 @@ const livestockList = [
     name: 'Bulls & Cattle',
     species: 'White Fulani · Sokoto Gudali · Bunaji',
     description: 'Prized genetics, conformation judging, and live-weight precision trading.',
-    image: '/assets/livestock_bull_cow.jpg',
+    image: '/assets/livestock/breed-bull-cattle.jpg',
     tag: 'Elite Genetics',
   },
   {
@@ -25,7 +25,7 @@ const livestockList = [
     name: 'Golden Camels',
     species: 'Sahelian Dromedary · Royal Caravans',
     description: 'Centuries of desert heritage, pageantry racing, and milk/meat exhibition.',
-    image: '/assets/livestock_camel.jpg',
+    image: '/assets/livestock/breed-golden-camel.jpg',
     tag: 'Royal Heritage',
   },
   {
@@ -33,7 +33,7 @@ const livestockList = [
     name: 'Goats & Sheep',
     species: 'Red Sokoto · Yankasa · West African Dwarf',
     description: 'Premier small ruminant auctions, artisanal leather, and breeding studbooks.',
-    image: '/assets/livestock_goat_sheep.jpg',
+    image: '/assets/livestock/breed-goat-sheep.jpg',
     tag: 'Small Ruminants',
   },
   {
@@ -41,7 +41,7 @@ const livestockList = [
     name: 'Poultry & Birds',
     species: 'Indigenous Chickens · Ducks · Broilers',
     description: 'Commercial aviculture incubation, free-range feed systems, and farm-gate supply.',
-    image: '/assets/livestock_poultry.jpg',
+    image: '/assets/livestock/breed-poultry-birds.jpg',
     tag: 'Commercial Aviculture',
   },
   {
@@ -49,7 +49,7 @@ const livestockList = [
     name: 'Fish & Aquaculture',
     species: 'African Catfish · Tilapia · Aqua-culture',
     description: 'High-density tank systems, fingerling hatcheries, and maritime cold-chain export.',
-    image: '/assets/livestock_aquaculture.jpg',
+    image: '/assets/livestock/breed-fish-aquaculture.jpg',
     tag: 'Blue Economy',
   },
 ];

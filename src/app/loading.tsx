@@ -7,7 +7,7 @@ export default function Loading() {
         {/* Logo with Green Background preserved */}
         <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden shadow-2xl border border-white/10 animate-pulse">
           <Image
-            src="/assets/logo.jpeg"
+            src="/assets/branding/carnival-logo-solid.jpeg"
             alt="Livestock Carnival Loading"
             fill
             priority

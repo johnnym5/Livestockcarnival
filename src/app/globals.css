@@ -1,6 +1,8 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme inline {
+:root {
   /* Canvas */
   --color-canvas: #FBFBFA;
   --color-surface: #FFFFFF;

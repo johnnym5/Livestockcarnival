@@ -23,9 +23,9 @@ export const metadata: Metadata = {
     "agri-export",
   ],
   icons: {
-    icon: "/assets/logo.jpeg",
-    shortcut: "/assets/logo.jpeg",
-    apple: "/assets/logo.jpeg",
+    icon: "/assets/branding/carnival-logo-solid.jpeg",
+    shortcut: "/assets/branding/carnival-logo-solid.jpeg",
+    apple: "/assets/branding/carnival-logo-solid.jpeg",
   },
 };
 
