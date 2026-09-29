@@ -186,16 +186,7 @@ export default function FashionParadePage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="flex flex-col items-start text-left">
-              {/* Sovereign Endorsement Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={editorialTransition}
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D8EADF] border border-[#0F4A2F]/20 text-[#0F4A2F] text-xs font-bold tracking-widest uppercase mb-6 shadow-xs"
-              >
-                <Award className="w-4 h-4 text-[#0F4A2F]" />
-                <span>Office of the Vice President · Golden Camel &amp; Cow</span>
-              </motion.div>
+
 
               {/* Headline */}
               <motion.h1

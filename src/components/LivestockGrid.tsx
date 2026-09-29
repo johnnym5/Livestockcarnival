@@ -15,9 +15,22 @@ export interface LivestockItem {
   exhibitor: string | null;
   description: string | null;
   image_url: string;
+  fallback_url?: string;
   is_featured: boolean;
   created_at?: string;
 }
+
+const LOCAL_FALLBACK_MAP: Record<string, string> = {
+  'Rajputana Gold': '/assets/livestock_camel.jpg',
+  'Cheetak Lineage': '/assets/durbar_horse_rider.jpg',
+  'Nandi Crest': '/assets/livestock_bull_cow.jpg',
+  'Sultan of Pushkar': '/assets/fashion-parade/dromedary-camels-carnival-ground.jpg',
+  'Sokoto Gudali Prime': '/assets/fashion-parade/handler-beside-sokoto-gudali.jpg',
+  'Balami Red Ram': '/assets/fashion-parade/balami-ram-and-goat-shed.jpg',
+  'West African Dwarf Goat': '/assets/fashion-parade/goat-handler-traditional-attire.jpg',
+  'Arewa Aviculture Flock': '/assets/fashion-parade/guinea-fowl-chickens-aviary.jpg',
+  'Benue Catfish Showcase': '/assets/fashion-parade/catfish-and-snails-display.jpg',
+};
 
 const CATEGORIES = [
   { id: 'all', label: 'All Livestock' },
@@ -31,33 +44,43 @@ export default function LivestockGrid() {
   const [items, setItems] = useState<LivestockItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
-  const [fetchError, setFieldError] = useState<string | null>(null);
   const [activeModalItem, setActiveModalItem] = useState<LivestockItem | null>(null);
-  const [imageErrorMap, setImageErrorMap] = useState<Record<string, boolean>>({});
+  const [activeImageSrcs, setActiveImageSrcs] = useState<Record<string, string>>({});
+  const [imageFailed, setImageFailed] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     async function fetchLivestock() {
       setLoading(true);
-      setFieldError(null);
 
       try {
         const { data, error } = await supabase
           .from('livestock')
           .select('*')
-          .order('is_featured', { ascending: false })
-          .order('created_at', { ascending: false });
+          .order('is_featured', { ascending: false });
 
-        if (error) {
-          console.warn('[Supabase Livestock Fetch Note]:', error.message);
-          // Fallback static dataset for initial load if DB table empty or disconnected
+        if (error || !data || data.length === 0) {
           setItems(getFallbackItems());
-        } else if (data && data.length > 0) {
-          setItems(data as LivestockItem[]);
         } else {
-          setItems(getFallbackItems());
+          // Process records and assign local fallback images
+          const processed = (data as LivestockItem[]).map((record) => {
+            const fallback =
+              LOCAL_FALLBACK_MAP[record.name] ||
+              record.fallback_url ||
+              '/assets/livestock_spectrum_hero.jpg';
+
+            return {
+              ...record,
+              fallback_url: fallback,
+              // Use local path directly if image_url is missing or unseeded remote url
+              image_url: record.image_url && record.image_url.startsWith('/assets')
+                ? record.image_url
+                : fallback,
+            };
+          });
+          setItems(processed);
         }
       } catch (err) {
-        console.error('Error querying Supabase livestock table:', err);
+        console.warn('Using local fallback dataset for livestock grid:', err);
         setItems(getFallbackItems());
       } finally {
         setLoading(false);
@@ -67,8 +90,20 @@ export default function LivestockGrid() {
     fetchLivestock();
   }, []);
 
-  const handleImageError = (id: string) => {
-    setImageErrorMap((prev) => ({ ...prev, [id]: true }));
+  const getImageSrc = (item: LivestockItem) => {
+    if (activeImageSrcs[item.id]) {
+      return activeImageSrcs[item.id];
+    }
+    return item.image_url || item.fallback_url || LOCAL_FALLBACK_MAP[item.name] || '/assets/livestock_camel.jpg';
+  };
+
+  const handleImageError = (item: LivestockItem) => {
+    const fallback = item.fallback_url || LOCAL_FALLBACK_MAP[item.name] || '/assets/livestock_camel.jpg';
+    if (activeImageSrcs[item.id] !== fallback) {
+      setActiveImageSrcs((prev) => ({ ...prev, [item.id]: fallback }));
+    } else {
+      setImageFailed((prev) => ({ ...prev, [item.id]: true }));
+    }
   };
 
   const filteredItems = items.filter((item) =>
@@ -86,7 +121,7 @@ export default function LivestockGrid() {
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 border ${
+            className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-200 border cursor-pointer ${
               selectedCategory === cat.id
                 ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-500 shadow-lg shadow-amber-950/40 scale-105'
                 : 'bg-slate-900/80 text-slate-300 border-slate-800 hover:border-amber-700/50 hover:text-amber-200'
@@ -111,11 +146,6 @@ export default function LivestockGrid() {
             </div>
           ))}
         </div>
-      ) : fetchError ? (
-        <div className="p-8 text-center bg-amber-950/20 border border-amber-900/40 rounded-2xl text-amber-200 space-y-2">
-          <Info className="w-8 h-8 text-amber-500 mx-auto" />
-          <p className="text-sm font-semibold">{fetchError}</p>
-        </div>
       ) : filteredItems.length === 0 ? (
         <div className="p-12 text-center bg-slate-900/50 border border-slate-800 rounded-2xl text-slate-400">
           <p className="text-sm uppercase font-bold tracking-wider">
@@ -128,7 +158,8 @@ export default function LivestockGrid() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {filteredItems.map((item) => {
-            const hasError = imageErrorMap[item.id];
+            const isFailed = imageFailed[item.id];
+            const imageSrc = getImageSrc(item);
 
             return (
               <ThreeDCard
@@ -141,31 +172,28 @@ export default function LivestockGrid() {
                 className="border-amber-900/40 hover:border-amber-500/60"
               >
                 <div className="flex flex-col h-full [transform-style:preserve-3d]">
-                  {/* Image Container with Fallback (3D elevation 20px) */}
+                  {/* Image Container */}
                   <div
                     style={{ transform: 'translateZ(20px)' }}
                     className="relative h-60 w-full overflow-hidden bg-slate-950 rounded-t-2xl"
                   >
-                    {hasError ? (
+                    {isFailed ? (
                       <div className="w-full h-full flex flex-col items-center justify-center p-6 text-slate-500 bg-slate-950 border-b border-amber-900/20">
                         <ImageOff className="w-10 h-10 mb-2 text-amber-600/50" />
                         <span className="text-xs uppercase font-bold tracking-wider text-amber-500/70">
                           {item.name}
                         </span>
-                        <span className="text-[10px] text-slate-600 mt-1">
-                          Image Preview Unavailable
-                        </span>
                       </div>
                     ) : (
                       <img
-                        src={item.image_url}
+                        src={imageSrc}
                         alt={item.name}
-                        onError={() => handleImageError(item.id)}
+                        onError={() => handleImageError(item)}
                         className="w-full h-full object-cover transition-transform duration-700 hover:scale-108"
                       />
                     )}
 
-                    {/* Category Badge (Floating 3D depth 40px) */}
+                    {/* Category Badge */}
                     <div
                       style={{ transform: 'translateZ(40px)' }}
                       className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-md border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg"
@@ -174,7 +202,7 @@ export default function LivestockGrid() {
                       {item.category}
                     </div>
 
-                    {/* Featured Badge (Floating 3D depth 40px) */}
+                    {/* Featured Badge */}
                     {item.is_featured && (
                       <div
                         style={{ transform: 'translateZ(40px)' }}
@@ -185,7 +213,7 @@ export default function LivestockGrid() {
                     )}
                   </div>
 
-                  {/* Content Details (3D elevation 25px) */}
+                  {/* Content Details */}
                   <div
                     style={{ transform: 'translateZ(25px)' }}
                     className="p-6 flex-1 flex flex-col justify-between space-y-4"
@@ -215,13 +243,13 @@ export default function LivestockGrid() {
 
                     {/* Footer & Exhibitor info */}
                     <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                      <span className="text-[11px] text-slate-400 font-medium">
+                      <span className="text-[11px] text-slate-400 font-medium truncate max-w-[170px]">
                         Exhibitor: <strong className="text-slate-200">{item.exhibitor || 'Heritage Stock'}</strong>
                       </span>
                       <button
                         onClick={() => setActiveModalItem(item)}
                         style={{ transform: 'translateZ(35px)' }}
-                        className="text-xs font-bold text-amber-400 hover:text-amber-300 uppercase tracking-wider flex items-center gap-1 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-500/20 hover:border-amber-400 transition-all hover:scale-105"
+                        className="text-xs font-bold text-amber-400 hover:text-amber-300 uppercase tracking-wider flex items-center gap-1 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-500/20 hover:border-amber-400 transition-all hover:scale-105 cursor-pointer shrink-0"
                       >
                         Dossier <Info className="w-3.5 h-3.5" />
                       </button>
@@ -253,14 +281,14 @@ export default function LivestockGrid() {
             >
               <button
                 onClick={() => setActiveModalItem(null)}
-                className="absolute top-4 right-4 p-2 bg-slate-800/80 text-slate-300 hover:text-white rounded-full transition-colors"
+                className="absolute top-4 right-4 p-2 bg-slate-800/80 text-slate-300 hover:text-white rounded-full transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="relative h-64 w-full rounded-2xl overflow-hidden bg-slate-950">
                 <img
-                  src={activeModalItem.image_url}
+                  src={getImageSrc(activeModalItem)}
                   alt={activeModalItem.name}
                   className="w-full h-full object-cover"
                 />
@@ -292,7 +320,7 @@ export default function LivestockGrid() {
               <div className="pt-4 flex justify-end">
                 <button
                   onClick={() => setActiveModalItem(null)}
-                  className="px-6 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity"
+                  className="px-6 py-2.5 bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:opacity-90 transition-opacity cursor-pointer"
                 >
                   Close Dossier
                 </button>
@@ -315,7 +343,8 @@ function getFallbackItems(): LivestockItem[] {
       age: '5 Years',
       exhibitor: 'Golden Camel Estate',
       description: 'Championship breeding dromedary known for high endurance, distinctive golden coat, and grand ceremonial posture.',
-      image_url: 'https://bqwohpjschaditdkrdra.supabase.co/storage/v1/object/public/livestock-images/livestock_camel.jpg',
+      image_url: '/assets/livestock_camel.jpg',
+      fallback_url: '/assets/livestock_camel.jpg',
       is_featured: true,
     },
     {
@@ -326,7 +355,8 @@ function getFallbackItems(): LivestockItem[] {
       age: '4 Years',
       exhibitor: 'Kano Durbar Cavalry',
       description: 'Famous inward-turning ears, athletic build, and heritage lineage trained for ceremonial Durbar parades.',
-      image_url: 'https://bqwohpjschaditdkrdra.supabase.co/storage/v1/object/public/livestock-images/durbar_horse_rider.jpg',
+      image_url: '/assets/durbar_horse_rider.jpg',
+      fallback_url: '/assets/durbar_horse_rider.jpg',
       is_featured: true,
     },
     {
@@ -337,7 +367,8 @@ function getFallbackItems(): LivestockItem[] {
       age: '6 Years',
       exhibitor: 'National Livestock Ranch',
       description: 'Prize-winning indigenous Zebu bull with iconic lyre-shaped horns, robust heat tolerance, and premium genetics.',
-      image_url: 'https://bqwohpjschaditdkrdra.supabase.co/storage/v1/object/public/livestock-images/livestock_bull_cow.jpg',
+      image_url: '/assets/livestock_bull_cow.jpg',
+      fallback_url: '/assets/livestock_bull_cow.jpg',
       is_featured: true,
     },
     {
@@ -348,7 +379,8 @@ function getFallbackItems(): LivestockItem[] {
       age: '7 Years',
       exhibitor: 'Desert Crown Stud',
       description: 'Celebrated desert racing and parade camel featuring exceptional speed, tall stature, and royal saddle dress.',
-      image_url: 'https://bqwohpjschaditdkrdra.supabase.co/storage/v1/object/public/livestock-images/livestock_camel.jpg',
+      image_url: '/assets/fashion-parade/dromedary-camels-carnival-ground.jpg',
+      fallback_url: '/assets/fashion-parade/dromedary-camels-carnival-ground.jpg',
       is_featured: false,
     },
     {
@@ -359,7 +391,32 @@ function getFallbackItems(): LivestockItem[] {
       age: '5 Years',
       exhibitor: 'Northwest Cattle Alliance',
       description: 'Deep-bodied beef bull with smooth white coat, well-developed dewlap, and high live-weight yield certification.',
-      image_url: 'https://bqwohpjschaditdkrdra.supabase.co/storage/v1/object/public/livestock-images/livestock_spectrum_hero.jpg',
+      image_url: '/assets/fashion-parade/handler-beside-sokoto-gudali.jpg',
+      fallback_url: '/assets/fashion-parade/handler-beside-sokoto-gudali.jpg',
+      is_featured: false,
+    },
+    {
+      id: 'f6',
+      name: 'Balami Red Ram',
+      breed: 'Balami Red Sheep',
+      category: 'small-ruminants',
+      age: '3 Years',
+      exhibitor: 'Sahel Livestock Co-op',
+      description: 'Large-framed desert sheep with long pendulous ears, prized for breeding quality and heavy mutton output.',
+      image_url: '/assets/fashion-parade/balami-ram-and-goat-shed.jpg',
+      fallback_url: '/assets/fashion-parade/balami-ram-and-goat-shed.jpg',
+      is_featured: false,
+    },
+    {
+      id: 'f7',
+      name: 'West African Dwarf Goat',
+      breed: 'WAD Buck',
+      category: 'small-ruminants',
+      age: '2 Years',
+      exhibitor: 'Humane Herd Breeders',
+      description: 'Hardy indigenous dwarf goat breed renowned for trypanotolerance and exceptional prolificacy.',
+      image_url: '/assets/fashion-parade/goat-handler-traditional-attire.jpg',
+      fallback_url: '/assets/fashion-parade/goat-handler-traditional-attire.jpg',
       is_featured: false,
     },
   ];

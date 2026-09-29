@@ -57,7 +57,7 @@ const cards = [
     eyebrow: 'NAVIGATION · ABUJA NATIONAL GROUNDS',
     title: 'Interactive 3D Venue Map & Zone Guide',
     body: 'Navigate Old Parade Ground, Abuja: Equestrian Durbar Fields, Suya Village, Live Auction Arenas, Exhibition Pavilions, VIP Lounges, and Parking Hubs.',
-    image: '/assets/venue-map/old-parade-ground-map-annotated.jpg',
+    image: '/assets/venue-map/old-parade-ground-map-clean.jpg',
     link: '/venue-map',
     cta: 'Open Interactive Venue Map',
   },
@@ -127,19 +127,146 @@ export default function Home() {
 
       const isMobile = window.innerWidth < 768;
 
-      /* Helper function for deep 3D initial card state in distance */
-      const getInitialCardState = () => {
-        return {
-          x: 0,
-          y: '12vh',
-          z: isMobile ? -300 : -1000,
-          scale: 0.35,
-          rotationX: 0,
-          rotationY: 0,
-          opacity: 0,
-          filter: isMobile ? 'none' : 'blur(12px)',
-          pointerEvents: 'none' as const,
-        };
+      /* Helper function to generate distinct 3D tilt directional states for card entrances */
+      const getTiltEntranceState = (index: number) => {
+        const mode = index % 4;
+        switch (mode) {
+          case 0:
+            // Tilts in from left-bottom
+            return {
+              x: isMobile ? '-70vw' : '-85vw',
+              y: '30vh',
+              rotationY: isMobile ? -25 : -55,
+              rotationX: isMobile ? 15 : 30,
+              rotationZ: isMobile ? -8 : -18,
+              scale: 0.85,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(12px)',
+              pointerEvents: 'none' as const,
+            };
+          case 1:
+            // Tilts in from right-top
+            return {
+              x: isMobile ? '70vw' : '85vw',
+              y: '-30vh',
+              rotationY: isMobile ? 25 : 55,
+              rotationX: isMobile ? -15 : -30,
+              rotationZ: isMobile ? 8 : 18,
+              scale: 0.85,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(12px)',
+              pointerEvents: 'none' as const,
+            };
+          case 2:
+            // Tilts in from right-bottom
+            return {
+              x: isMobile ? '70vw' : '85vw',
+              y: '30vh',
+              rotationY: isMobile ? 25 : 55,
+              rotationX: isMobile ? 15 : 30,
+              rotationZ: isMobile ? -8 : -18,
+              scale: 0.85,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(12px)',
+              pointerEvents: 'none' as const,
+            };
+          case 3:
+            // Tilts in from left-top
+            return {
+              x: isMobile ? '-70vw' : '-85vw',
+              y: '-30vh',
+              rotationY: isMobile ? -25 : -55,
+              rotationX: isMobile ? -15 : -30,
+              rotationZ: isMobile ? 8 : 18,
+              scale: 0.85,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(12px)',
+              pointerEvents: 'none' as const,
+            };
+          default:
+            return {
+              x: isMobile ? '-70vw' : '-85vw',
+              y: '30vh',
+              rotationY: -45,
+              rotationX: 20,
+              rotationZ: -12,
+              scale: 0.85,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(12px)',
+              pointerEvents: 'none' as const,
+            };
+        }
+      };
+
+      /* Helper function to generate distinct 3D tilt exit directions */
+      const getTiltExitState = (index: number, isMobile: boolean) => {
+        const mode = (index + 1) % 4;
+        switch (mode) {
+          case 0:
+            // Tilts out to right-top
+            return {
+              x: isMobile ? '80vw' : '95vw',
+              y: '-35vh',
+              rotationY: isMobile ? 30 : 60,
+              rotationX: isMobile ? -20 : -40,
+              rotationZ: isMobile ? 12 : 24,
+              scale: 0.82,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(16px)',
+              pointerEvents: 'none' as const,
+            };
+          case 1:
+            // Tilts out to left-bottom
+            return {
+              x: isMobile ? '-80vw' : '-95vw',
+              y: '35vh',
+              rotationY: isMobile ? -30 : -60,
+              rotationX: isMobile ? 20 : 40,
+              rotationZ: isMobile ? -12 : -24,
+              scale: 0.82,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(16px)',
+              pointerEvents: 'none' as const,
+            };
+          case 2:
+            // Tilts out to left-top
+            return {
+              x: isMobile ? '-80vw' : '-95vw',
+              y: '-35vh',
+              rotationY: isMobile ? -30 : -60,
+              rotationX: isMobile ? -20 : -40,
+              rotationZ: isMobile ? 12 : 24,
+              scale: 0.82,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(16px)',
+              pointerEvents: 'none' as const,
+            };
+          case 3:
+            // Tilts out to right-bottom
+            return {
+              x: isMobile ? '80vw' : '95vw',
+              y: '35vh',
+              rotationY: isMobile ? 30 : 60,
+              rotationX: isMobile ? 20 : 40,
+              rotationZ: isMobile ? -12 : -24,
+              scale: 0.82,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(16px)',
+              pointerEvents: 'none' as const,
+            };
+          default:
+            return {
+              x: isMobile ? '80vw' : '95vw',
+              y: '-35vh',
+              rotationY: 55,
+              rotationX: -35,
+              rotationZ: 20,
+              scale: 0.82,
+              opacity: 0,
+              filter: isMobile ? 'none' : 'blur(16px)',
+              pointerEvents: 'none' as const,
+            };
+        }
       };
 
       /* Use gsap.context scoped to outer container so all selectors are found */
@@ -150,12 +277,25 @@ export default function Home() {
         /* ── Center all scene elements ───────────────────────────────── */
         gsap.set('.scene-element', { xPercent: -50, yPercent: -50 });
 
-        /* ── Initial states: Welcome Title is sticky at top; Cards start small & deep in distance ── */
+        /* ── Initial states: Welcome Title is sticky at top ── */
         gsap.set('#welcome-title', { opacity: 1, scale: 1, x: 0, y: 0, z: 0, filter: 'none' });
 
-        cards.forEach((card) => {
-          const initial = getInitialCardState();
-          gsap.set(`#${card.id}`, { ...initial });
+        // Card 1 starts at bottom (opening animation - no tilt)
+        gsap.set('#card-1', {
+          x: 0,
+          y: '100vh',
+          scale: 0.88,
+          rotationX: 0,
+          rotationY: 0,
+          rotationZ: 0,
+          opacity: 0,
+          pointerEvents: 'none',
+        });
+
+        // Cards 2 through 10 start in their 3D tilt entrance states
+        cards.slice(1).forEach((card, idx) => {
+          const entrance = getTiltEntranceState(idx + 1);
+          gsap.set(`#${card.id}`, { ...entrance });
         });
 
         /* ── Slow, Smooth Master Scroll Timeline ────── */
@@ -172,18 +312,16 @@ export default function Home() {
           },
         });
 
-        const maxZoomScale = isMobile ? 3.2 : 28;
-        const blurOut = isMobile ? 'none' : 'blur(28px)';
         const blurFocus = isMobile ? 'none' : 'blur(0px)';
 
-        /* ── STEP 1: Card 1 emerges from small distance to focal size (scale 0.35 -> 0.98) ── */
+        /* ── STEP 1: Card 1 (Opening) rises straight from bottom and covers Welcome Title ── */
         tl.to('#card-1', {
           x: 0,
           y: 0,
-          z: 0,
           rotationX: 0,
           rotationY: 0,
-          scale: 0.98,
+          rotationZ: 0,
+          scale: isMobile ? 1.0 : 1.05,
           opacity: 1,
           filter: blurFocus,
           pointerEvents: 'auto',
@@ -191,9 +329,7 @@ export default function Home() {
           ease: 'power2.out',
         }, 0);
 
-        /* #welcome-title remains 100% OPAQUE (opacity: 1, filter: blur 0px)
-         * during Card 1's entrance AND Card 1's focal hold!
-         */
+        /* #welcome-title remains 100% OPAQUE (opacity: 1) as Card 1 covers it! */
         tl.to('#welcome-title', {
           opacity: 1,
           y: 0,
@@ -205,45 +341,40 @@ export default function Home() {
 
         /* Card 1 Focal Hold in center */
         tl.to('#card-1', {
-          scale: 1.02,
-          z: isMobile ? 30 : 80,
+          scale: isMobile ? 1.12 : 1.25,
+          z: isMobile ? 50 : 150,
           duration: 2.3,
-          ease: 'none',
+          ease: 'power1.out',
         });
 
-        /* Fade in top HUD indicator when Card 1 covers welcome title */
+        /* Fade in top HUD indicator */
         tl.to('#scene-hud', { opacity: 1, duration: 0.8 }, 2.0);
 
-        /* ── STEP 2: Card 1 starts ZOOMING IN past camera ──
-         * ONLY NOW does #welcome-title behind it blur and fade out!
-         */
+        /* Fade out #welcome-title behind Card 1 */
         tl.to('#welcome-title', {
           opacity: 0,
           filter: isMobile ? 'none' : 'blur(20px)',
-          duration: 2.0,
+          duration: 1.0,
           ease: 'power2.in',
-        }, '>');
+        }, 3.8);
 
-        /* ── STEP 3: DEEP DIVE EXPANSION ACROSS ALL 10 CARDS ── */
+        /* ── STEP 2: SEQUENTIAL CARD TILT TRANSITION ACROSS ALL 10 CARDS ── */
         cards.forEach((card, index) => {
           const cardId = `#${card.id}`;
           const isLast = index === cards.length - 1;
 
           if (!isLast) {
             const nextCardId = `#${cards[index + 1].id}`;
+            const exitState = getTiltExitState(index, isMobile);
 
-            // 1. Current card expands / zooms forward past camera into foreground with blur
+            // 1. Current card TILTS OUT of the screen (3D rotation + shift + blur)
             tl.to(cardId, {
-              scale: maxZoomScale,
-              z: isMobile ? 150 : 400,
-              opacity: 0,
-              filter: blurOut,
-              pointerEvents: 'none',
+              ...exitState,
               duration: 2.2,
-              ease: 'power3.in',
+              ease: 'power2.in',
             });
 
-            // 2. Next card emerges SMALL (scale 0.35) from deep distance and expands to focal size!
+            // 2. Next card TILTS INTO the screen AFTER current card has tilted away & reached opacity 0!
             tl.to(
               nextCardId,
               {
@@ -252,29 +383,31 @@ export default function Home() {
                 z: 0,
                 rotationX: 0,
                 rotationY: 0,
-                scale: 0.98,
+                rotationZ: 0,
+                scale: isMobile ? 1.0 : 1.05,
                 opacity: 1,
                 filter: blurFocus,
                 pointerEvents: 'auto',
                 duration: 2.2,
                 ease: 'power2.out',
               },
-              '<0.3' // Starts expanding while current card zooms past camera!
+              '>' // Starts sequentially ONLY after previous card finishes tilting away!
             )
-            // 3. Next card focal hold in center for reading
+            // 3. Next card focal hold in center
             .to(nextCardId, {
-              scale: 1.02,
-              z: isMobile ? 30 : 80,
+              scale: isMobile ? 1.12 : 1.25,
+              z: isMobile ? 50 : 150,
               duration: 2.5,
-              ease: 'none',
+              ease: 'power1.out',
             });
           } else {
-            // Card 10 (THE LAST CARD):
-            // Does NOT zoom in! Slides UP out of view as normal, smoothly revealing footer!
+            // Card 10 (THE LAST CARD - Closing):
+            // DOES NOT TILT OUT & DOES NOT ZOOM IN!
+            // Simply slides straight UP out of view as normal, smoothly revealing footer!
             tl.to(cardId, {
               y: '-110vh',
               opacity: 0,
-              scale: 1.02,
+              scale: isMobile ? 1.12 : 1.25,
               filter: isMobile ? 'none' : 'blur(12px)',
               pointerEvents: 'none',
               duration: 2.5,
@@ -408,7 +541,7 @@ export default function Home() {
           <div
             key={card.id}
             id={card.id}
-            className="scene-element z-20 w-[90vw] max-w-2xl opacity-0 pointer-events-none"
+            className="scene-element z-20 w-[94vw] sm:w-[90vw] max-w-[1300px] opacity-0 pointer-events-none"
           >
             <GlassCard card={card} />
           </div>
@@ -485,39 +618,43 @@ interface CardData {
 
 function GlassCard({ card }: { card: CardData }) {
   return (
-    <div className="glass-card overflow-hidden w-full max-w-xl md:max-w-2xl mx-auto shadow-2xl">
-      {/* Image */}
-      <div className="relative w-full h-36 sm:h-52 md:h-60 overflow-hidden rounded-t-[1.5rem]">
+    <div className="glass-card overflow-hidden w-full max-w-sm sm:max-w-2xl md:max-w-4xl lg:max-w-[1300px] mx-auto shadow-[0_35px_90px_-15px_rgba(0,0,0,0.88),0_0_40px_0_rgba(228,176,58,0.20)] aspect-[9/16] sm:aspect-auto flex flex-col justify-between">
+      {/* Image Section: 46% height on mobile (9:16 aspect ratio), fixed responsive height on desktop */}
+      <div className="relative w-full h-[46%] sm:h-64 md:h-80 lg:h-[420px] overflow-hidden rounded-t-[1.5rem] shrink-0">
         <Image
           src={card.image}
           alt={card.title}
           fill
           className="object-cover object-center"
-          sizes="(max-width: 768px) 90vw, 700px"
+          sizes="(max-width: 640px) 90vw, (max-width: 1024px) 900px, 1300px"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1A10] via-[#0A1A10]/40 to-transparent" />
-        <div className="absolute bottom-2.5 sm:bottom-3 left-3 sm:left-4 right-3 sm:right-4">
-          <span className="text-[9px] sm:text-xs font-extrabold uppercase tracking-[0.18em] sm:tracking-[0.22em] text-[#E4B03A] bg-[#0A1A10]/85 backdrop-blur-md px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-[#E4B03A]/25">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A1A10] via-[#0A1A10]/25 to-transparent" />
+        <div className="absolute bottom-3 sm:bottom-4 left-3.5 sm:left-6 right-3.5 sm:right-6">
+          <span className="text-[9px] sm:text-xs font-extrabold uppercase tracking-[0.18em] sm:tracking-[0.22em] text-[#E4B03A] bg-[#0A1A10]/90 backdrop-blur-md px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full border border-[#E4B03A]/30 shadow-md">
             {card.eyebrow}
           </span>
         </div>
       </div>
 
-      {/* Text content */}
-      <div className="p-4 sm:p-7 md:p-8 bg-[#0A1A10]/85">
-        <h3 className="text-base sm:text-2xl md:text-3xl font-extrabold text-white leading-tight tracking-tight mb-2 sm:mb-2.5">
-          {card.title}
-        </h3>
-        <p className="text-[11px] sm:text-sm md:text-base text-gray-300/90 leading-normal sm:leading-relaxed mb-3 sm:mb-5">
-          {card.body}
-        </p>
-        <Link
-          href={card.link}
-          className="inline-flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-extrabold uppercase tracking-[0.12em] sm:tracking-[0.14em] text-[#E4B03A] hover:text-white group transition-colors"
-        >
-          <span>{card.cta}</span>
-          <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transform group-hover:translate-x-1.5 transition-transform" />
-        </Link>
+      {/* Text Content Section: 54% height on mobile, auto flex-1 on desktop */}
+      <div className="p-4 sm:p-7 md:p-10 bg-[#0A1A10]/92 flex-1 flex flex-col justify-between overflow-y-auto">
+        <div>
+          <h3 className="text-base sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white leading-tight tracking-tight mb-2 sm:mb-4">
+            {card.title}
+          </h3>
+          <p className="text-[11px] sm:text-sm md:text-base lg:text-lg text-gray-300/90 leading-normal sm:leading-relaxed mb-3 sm:mb-6">
+            {card.body}
+          </p>
+        </div>
+        <div className="pt-2 sm:pt-0">
+          <Link
+            href={card.link}
+            className="inline-flex items-center gap-2 px-4 sm:px-7 py-2 sm:py-3.5 rounded-xl bg-[#E4B03A] hover:bg-[#D4A030] text-[#0A1A10] text-[11px] sm:text-sm font-extrabold uppercase tracking-[0.12em] sm:tracking-[0.16em] shadow-button transition-all hover:-translate-y-0.5 group"
+          >
+            <span>{card.cta}</span>
+            <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transform group-hover:translate-x-1.5 transition-transform" />
+          </Link>
+        </div>
       </div>
     </div>
   );
