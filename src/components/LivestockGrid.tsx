@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { Shield, Tag, Filter, Info, X, ImageOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ThreeDCard from '@/components/motion/ThreeDCard';
 
 export interface LivestockItem {
   id: string;
@@ -130,87 +131,104 @@ export default function LivestockGrid() {
             const hasError = imageErrorMap[item.id];
 
             return (
-              <motion.div
+              <ThreeDCard
                 key={item.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="group bg-slate-900/90 border border-amber-900/30 hover:border-amber-500/60 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-amber-950/30 transition-all duration-300 flex flex-col"
+                variant="glass"
+                glowColor="rgba(245, 158, 11, 0.3)"
+                maxTilt={12}
+                scaleOnHover={1.03}
+                depth={28}
+                className="border-amber-900/40 hover:border-amber-500/60"
               >
-                {/* Image Container with Fallback */}
-                <div className="relative h-60 w-full overflow-hidden bg-slate-950">
-                  {hasError ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-slate-500 bg-slate-950 border-b border-amber-900/20">
-                      <ImageOff className="w-10 h-10 mb-2 text-amber-600/50" />
-                      <span className="text-xs uppercase font-bold tracking-wider text-amber-500/70">
-                        {item.name}
-                      </span>
-                      <span className="text-[10px] text-slate-600 mt-1">
-                        Image Preview Unavailable
-                      </span>
-                    </div>
-                  ) : (
-                    <img
-                      src={item.image_url}
-                      alt={item.name}
-                      onError={() => handleImageError(item.id)}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  )}
+                <div className="flex flex-col h-full [transform-style:preserve-3d]">
+                  {/* Image Container with Fallback (3D elevation 20px) */}
+                  <div
+                    style={{ transform: 'translateZ(20px)' }}
+                    className="relative h-60 w-full overflow-hidden bg-slate-950 rounded-t-2xl"
+                  >
+                    {hasError ? (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-slate-500 bg-slate-950 border-b border-amber-900/20">
+                        <ImageOff className="w-10 h-10 mb-2 text-amber-600/50" />
+                        <span className="text-xs uppercase font-bold tracking-wider text-amber-500/70">
+                          {item.name}
+                        </span>
+                        <span className="text-[10px] text-slate-600 mt-1">
+                          Image Preview Unavailable
+                        </span>
+                      </div>
+                    ) : (
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        onError={() => handleImageError(item.id)}
+                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-108"
+                      />
+                    )}
 
-                  {/* Category Badge */}
-                  <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5">
-                    <Tag className="w-3 h-3 text-amber-400" />
-                    {item.category}
+                    {/* Category Badge (Floating 3D depth 40px) */}
+                    <div
+                      style={{ transform: 'translateZ(40px)' }}
+                      className="absolute top-3 left-3 bg-slate-950/85 backdrop-blur-md border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg"
+                    >
+                      <Tag className="w-3 h-3 text-amber-400" />
+                      {item.category}
+                    </div>
+
+                    {/* Featured Badge (Floating 3D depth 40px) */}
+                    {item.is_featured && (
+                      <div
+                        style={{ transform: 'translateZ(40px)' }}
+                        className="absolute top-3 right-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg flex items-center gap-1 border border-amber-400/40"
+                      >
+                        <Shield className="w-3 h-3 text-amber-200" /> Grand Champion
+                      </div>
+                    )}
                   </div>
 
-                  {/* Featured Badge */}
-                  {item.is_featured && (
-                    <div className="absolute top-3 right-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-                      <Shield className="w-3 h-3 text-amber-200" /> Grand Champion
-                    </div>
-                  )}
-                </div>
-
-                {/* Content Details */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                  <div>
-                    <div className="flex items-baseline justify-between gap-2 mb-1">
-                      <h3 className="text-lg font-bold text-amber-100 group-hover:text-amber-400 transition-colors">
-                        {item.name}
-                      </h3>
-                      {item.age && (
-                        <span className="text-xs text-amber-400/80 font-mono">
-                          {item.age}
-                        </span>
+                  {/* Content Details (3D elevation 25px) */}
+                  <div
+                    style={{ transform: 'translateZ(25px)' }}
+                    className="p-6 flex-1 flex flex-col justify-between space-y-4"
+                  >
+                    <div>
+                      <div className="flex items-baseline justify-between gap-2 mb-1">
+                        <h3 className="text-lg font-bold text-amber-100 group-hover:text-amber-400 transition-colors">
+                          {item.name}
+                        </h3>
+                        {item.age && (
+                          <span className="text-xs text-amber-400/80 font-mono">
+                            {item.age}
+                          </span>
+                        )}
+                      </div>
+                      {item.breed && (
+                        <p className="text-xs text-amber-300/80 font-medium tracking-wide mb-2">
+                          Breed: {item.breed}
+                        </p>
+                      )}
+                      {item.description && (
+                        <p className="text-xs text-slate-300/80 line-clamp-2 leading-relaxed">
+                          {item.description}
+                        </p>
                       )}
                     </div>
-                    {item.breed && (
-                      <p className="text-xs text-amber-300/80 font-medium tracking-wide mb-2">
-                        Breed: {item.breed}
-                      </p>
-                    )}
-                    {item.description && (
-                      <p className="text-xs text-slate-300/80 line-clamp-2 leading-relaxed">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
 
-                  {/* Footer & Exhibitor info */}
-                  <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400 font-medium">
-                      Exhibitor: <strong className="text-slate-200">{item.exhibitor || 'Heritage Stock'}</strong>
-                    </span>
-                    <button
-                      onClick={() => setActiveModalItem(item)}
-                      className="text-xs font-bold text-amber-400 hover:text-amber-300 uppercase tracking-wider flex items-center gap-1 hover:underline"
-                    >
-                      Dossier <Info className="w-3.5 h-3.5" />
-                    </button>
+                    {/* Footer & Exhibitor info */}
+                    <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                      <span className="text-[11px] text-slate-400 font-medium">
+                        Exhibitor: <strong className="text-slate-200">{item.exhibitor || 'Heritage Stock'}</strong>
+                      </span>
+                      <button
+                        onClick={() => setActiveModalItem(item)}
+                        style={{ transform: 'translateZ(35px)' }}
+                        className="text-xs font-bold text-amber-400 hover:text-amber-300 uppercase tracking-wider flex items-center gap-1 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-500/20 hover:border-amber-400 transition-all hover:scale-105"
+                      >
+                        Dossier <Info className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </motion.div>
+              </ThreeDCard>
             );
           })}
         </div>

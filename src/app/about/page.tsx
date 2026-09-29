@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Activity, ShieldCheck, Wifi, MapPin, ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import ThreeDCard from "@/components/motion/ThreeDCard";
 
 export const metadata: Metadata = {
   title: "About & Mandate | Renewed Hope National Livestock Carnival 2026",
@@ -81,13 +82,20 @@ export default function About() {
               },
             ].map((pillar, idx) => (
               <ScrollReveal key={idx} direction="up" delay={idx * 0.15} duration={0.9}>
-                <div className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-card card-lift h-full">
-                  <div className={`w-12 h-12 rounded-2xl ${pillar.color} ${pillar.iconColor} flex items-center justify-center mb-6 shadow-sm`}>
-                    <pillar.icon className="w-6 h-6" />
+                <ThreeDCard variant="light" maxTilt={12} depth={26} className="h-full">
+                  <div className="p-8 h-full flex flex-col [transform-style:preserve-3d]">
+                    <div
+                      style={{ transform: 'translateZ(35px)' }}
+                      className={`w-12 h-12 rounded-2xl ${pillar.color} ${pillar.iconColor} flex items-center justify-center mb-6 shadow-sm`}
+                    >
+                      <pillar.icon className="w-6 h-6" />
+                    </div>
+                    <div style={{ transform: 'translateZ(20px)' }}>
+                      <h3 className="text-xl font-bold text-[#111827] mb-3">{pillar.title}</h3>
+                      <p className="text-sm text-[#4B5563] leading-relaxed">{pillar.desc}</p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold text-[#111827] mb-3">{pillar.title}</h3>
-                  <p className="text-sm text-[#4B5563] leading-relaxed">{pillar.desc}</p>
-                </div>
+                </ThreeDCard>
               </ScrollReveal>
             ))}
           </div>
@@ -123,29 +131,38 @@ export default function About() {
             </ScrollReveal>
 
             <ScrollReveal direction="left" duration={1.0} delay={0.1}>
-              <div className="bg-white p-8 md:p-10 rounded-2xl border border-slate-200/80 shadow-card relative overflow-hidden">
-                {/* Gold shimmer accent */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#E4B03A] to-transparent" />
-                <h3 className="text-xl font-extrabold text-[#111827] mb-6 pb-4 border-b border-gray-100">
-                  Corporate Sponsorship &amp; Partner Benefits
-                </h3>
-                <ul className="space-y-5">
-                  {[
-                    { color: 'text-[#8D6B1B]', title: 'Agro-Industrial Asset Financing', desc: 'Concessional equipment leasing for commercial feedlots, mobile abattoirs, and cold chain logistics.' },
-                    { color: 'text-[#1E4D38]', title: 'Concessionary Credit Terms', desc: 'Subsidized borrowing structure and priority access for certified pastoral and processing operators.' },
-                    { color: 'text-[#8D6B1B]', title: 'Flexible Repayment Tenor', desc: 'Structured repayment holidays tailored specifically to livestock breeding and fattening cycles.' },
-                    { color: 'text-[#1E4D38]', title: 'Brand Exposure', desc: 'VIP arena branding, ministerial trade briefings, and national media coverage across all festival zones.' },
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start space-x-3.5">
-                      <CheckCircle className={`w-5 h-5 ${item.color} shrink-0 mt-0.5`} />
-                      <div>
-                        <h4 className="text-sm font-bold text-[#111827]">{item.title}</h4>
-                        <p className="text-xs text-[#4B5563] mt-0.5">{item.desc}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ThreeDCard variant="light" maxTilt={8} depth={20} className="relative overflow-hidden">
+                <div className="p-8 md:p-10 [transform-style:preserve-3d]">
+                  {/* Gold shimmer accent */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#E4B03A] to-transparent" />
+                  <h3
+                    style={{ transform: 'translateZ(30px)' }}
+                    className="text-xl font-extrabold text-[#111827] mb-6 pb-4 border-b border-gray-100"
+                  >
+                    Corporate Sponsorship &amp; Partner Benefits
+                  </h3>
+                  <ul className="space-y-5">
+                    {[
+                      { color: 'text-[#8D6B1B]', title: 'Agro-Industrial Asset Financing', desc: 'Concessional equipment leasing for commercial feedlots, mobile abattoirs, and cold chain logistics.' },
+                      { color: 'text-[#1E4D38]', title: 'Concessionary Credit Terms', desc: 'Subsidized borrowing structure and priority access for certified pastoral and processing operators.' },
+                      { color: 'text-[#8D6B1B]', title: 'Flexible Repayment Tenor', desc: 'Structured repayment holidays tailored specifically to livestock breeding and fattening cycles.' },
+                      { color: 'text-[#1E4D38]', title: 'Brand Exposure', desc: 'VIP arena branding, ministerial trade briefings, and national media coverage across all festival zones.' },
+                    ].map((item, i) => (
+                      <li
+                        key={i}
+                        style={{ transform: `translateZ(${15 + i * 4}px)` }}
+                        className="flex items-start space-x-3.5"
+                      >
+                        <CheckCircle className={`w-5 h-5 ${item.color} shrink-0 mt-0.5`} />
+                        <div>
+                          <h4 className="text-sm font-bold text-[#111827]">{item.title}</h4>
+                          <p className="text-xs text-[#4B5563] mt-0.5">{item.desc}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </ThreeDCard>
             </ScrollReveal>
           </div>
         </div>
@@ -179,16 +196,21 @@ export default function About() {
               { zone: "South-South", state: "Delta Hub", desc: "Maritime deep-sea cold reefer terminals & direct Middle Eastern export berths." },
             ].map((item, idx) => (
               <ScrollReveal key={idx} direction="up" delay={idx * 0.1} duration={0.85}>
-                <div className="border border-slate-200/80 rounded-2xl bg-white p-6 shadow-card card-lift flex items-start space-x-4 h-full">
-                  <div className="bg-[#D8EADF] p-3.5 rounded-2xl shadow-sm shrink-0 flex items-center justify-center text-[#1E4D38]">
-                    <MapPin className="w-5 h-5" />
+                <ThreeDCard variant="light" maxTilt={10} depth={20} className="h-full">
+                  <div className="p-6 flex items-start space-x-4 h-full [transform-style:preserve-3d]">
+                    <div
+                      style={{ transform: 'translateZ(30px)' }}
+                      className="bg-[#D8EADF] p-3.5 rounded-2xl shadow-sm shrink-0 flex items-center justify-center text-[#1E4D38]"
+                    >
+                      <MapPin className="w-5 h-5" />
+                    </div>
+                    <div style={{ transform: 'translateZ(20px)' }}>
+                      <span className="text-[11px] font-bold text-[#8D6B1B] uppercase tracking-wider block mb-1">{item.zone}</span>
+                      <h4 className="text-lg font-bold text-[#111827] mb-1.5">{item.state}</h4>
+                      <p className="text-xs text-[#4B5563] leading-relaxed">{item.desc}</p>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[11px] font-bold text-[#8D6B1B] uppercase tracking-wider block mb-1">{item.zone}</span>
-                    <h4 className="text-lg font-bold text-[#111827] mb-1.5">{item.state}</h4>
-                    <p className="text-xs text-[#4B5563] leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
+                </ThreeDCard>
               </ScrollReveal>
             ))}
           </div>

@@ -13,6 +13,8 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       smoothWheel: true,
     });
     lenisRef.current = lenis;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).__lenisInstance = lenis;
 
     function raf(time: number) {
       lenis.raf(time);
@@ -20,7 +22,11 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     }
     requestAnimationFrame(raf);
 
-    return () => lenis.destroy();
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).__lenisInstance;
+      lenis.destroy();
+    };
   }, []);
 
   return <>{children}</>;

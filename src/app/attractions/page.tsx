@@ -4,6 +4,8 @@ import { Check, MapPin, ArrowRight, ShieldCheck } from "lucide-react";
 import attractions from "@/data/attractions.json";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Metadata } from "next";
+import ThreeDCard from "@/components/motion/ThreeDCard";
+import ThreeDImage from "@/components/motion/ThreeDImage";
 
 export const metadata: Metadata = {
   title: "Festival Attractions & Arenas | Renewed Hope National Livestock Carnival 2026",
@@ -94,17 +96,14 @@ export default function AttractionsPage() {
                 className="bg-white rounded-2xl border border-slate-200/80 p-8 sm:p-10 lg:p-12 shadow-card hover:shadow-card-hover transition-all duration-500"
               >
                 <div className={`grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center`}>
-                  {/* Image Column */}
+                  {/* Image Column with 3D perspective and depth */}
                   <div className={`lg:col-span-6 ${index % 2 === 1 ? 'lg:order-2' : 'lg:order-1'}`}>
-                    <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-[#D8EADF] shadow-md border border-slate-200/60 img-reveal">
-                      <Image
-                        src={attraction.image || '/assets/placeholder.jpg'}
-                        alt={attraction.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                      />
-                    </div>
+                    <ThreeDImage
+                      src={attraction.image || '/assets/placeholder.jpg'}
+                      alt={attraction.title}
+                      badge={attraction.zone}
+                      containerClassName="aspect-[4/3] w-full"
+                    />
                   </div>
 
                   {/* Content Column */}
@@ -174,20 +173,34 @@ export default function AttractionsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {livestockList.map((animal, idx) => (
               <ScrollReveal key={animal.id} direction="up" delay={idx * 0.1} duration={0.85}>
-                <div className="bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-card card-lift flex flex-col group h-full">
-                  <div className="relative w-full h-64 overflow-hidden bg-slate-100 img-reveal">
+                <ThreeDCard
+                  variant="light"
+                  maxTilt={12}
+                  depth={24}
+                  className="flex flex-col group h-full [transform-style:preserve-3d]"
+                >
+                  <div
+                    style={{ transform: 'translateZ(15px)' }}
+                    className="relative w-full h-64 overflow-hidden rounded-t-2xl bg-slate-100"
+                  >
                     <Image
                       src={animal.image}
                       alt={animal.name}
                       fill
-                      className="object-cover"
+                      className="object-cover transition-transform duration-700 group-hover:scale-108"
                     />
-                    <div className="absolute top-4 right-4 bg-[#111827]/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">
+                    <div
+                      style={{ transform: 'translateZ(35px)' }}
+                      className="absolute top-4 right-4 bg-[#111827]/85 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider shadow-md"
+                    >
                       {animal.tag}
                     </div>
                   </div>
 
-                  <div className="p-6 sm:p-7 flex flex-col flex-grow justify-between">
+                  <div
+                    style={{ transform: 'translateZ(25px)' }}
+                    className="p-6 sm:p-7 flex flex-col flex-grow justify-between [transform-style:preserve-3d]"
+                  >
                     <div>
                       <h3 className="text-xl font-bold text-[#111827] mb-1.5 group-hover:text-[#1E4D38] transition-colors">{animal.name}</h3>
                       <div className="text-xs font-semibold text-[#8D6B1B] uppercase tracking-wider mb-3">{animal.species}</div>
@@ -208,7 +221,7 @@ export default function AttractionsPage() {
                       </Link>
                     </div>
                   </div>
-                </div>
+                </ThreeDCard>
               </ScrollReveal>
             ))}
           </div>

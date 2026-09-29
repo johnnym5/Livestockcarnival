@@ -226,3 +226,52 @@ html.lenis, html.lenis body {
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.6);
 }
+
+/* ── 3D Scene Container ──────────────────────────────────────────────── */
+
+#scene-container {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  background-color: #0A1A10;
+}
+
+.pin-spacer {
+  background-color: #0A1A10 !important;
+}
+
+.scene-element {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, opacity, filter;
+}
+
+/* ── Glassmorphism Card ──────────────────────────────────────────────── */
+
+.glass-card {
+  background: rgba(10, 26, 16, 0.55);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(228, 176, 58, 0.18);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 32px 64px -16px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ── Hide Scrollbar Utility ──────────────────────────────────────────── */
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
