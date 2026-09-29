@@ -37,9 +37,9 @@ export default function Header() {
   return (
     <header className="w-full flex flex-col z-50 fixed top-0 left-0 right-0">
 
-      {/* ── Main Navigation Bar ── */}
+      {/* ── Main Navigation Bar (90% opaque white background with backdrop blur) ── */}
       <div
-        className={`w-full bg-white/97 backdrop-blur-md border-b border-[#E5E7EB] transition-all duration-300 ${
+        className={`w-full bg-white/90 backdrop-blur-lg border-b border-[#E5E7EB] transition-all duration-300 ${
           isScrolled ? 'shadow-md py-2' : 'py-2.5 sm:py-3'
         }`}
       >
@@ -73,7 +73,7 @@ export default function Header() {
                 href={link.href}
                 className={`text-[11px] font-semibold uppercase tracking-wider transition-colors hover:text-[#1E4D38] whitespace-nowrap ${
                   pathname === link.href
-                    ? 'text-[#1E4D38] border-b-2 border-[#1E4D38] pb-0.5'
+                    ? 'text-[#1E4D38] border-b-2 border-[#1E4D38] pb-0.5 font-bold'
                     : 'text-[#4B5563]'
                 }`}
               >
@@ -113,7 +113,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ── Mobile & Tablet Navigation Drawer ── */}
+      {/* ── Mobile & Tablet Navigation Drawer (90% opaque white background) ── */}
       <AnimatePresence mode="wait">
         {isMobileMenuOpen && (
           <motion.div
@@ -122,7 +122,7 @@ export default function Header() {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="2xl:hidden w-full bg-white/98 shadow-xl border-b border-[#E5E7EB] flex flex-col p-6 max-h-[calc(100vh-100px)] overflow-y-auto"
+            className="2xl:hidden w-full bg-white/90 backdrop-blur-lg shadow-2xl border-b border-[#E5E7EB] flex flex-col p-6 max-h-[calc(100vh-80px)] overflow-y-auto"
           >
             <motion.nav
               variants={slideDownDrawer}
@@ -135,8 +135,8 @@ export default function Header() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-sm font-semibold uppercase tracking-wider py-2 border-b border-gray-100 ${
-                    pathname === link.href ? 'text-[#1E4D38]' : 'text-[#4B5563]'
+                  className={`text-sm font-semibold uppercase tracking-wider py-2.5 border-b border-slate-100 ${
+                    pathname === link.href ? 'text-[#1E4D38] font-bold' : 'text-[#111827] hover:text-[#1E4D38]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

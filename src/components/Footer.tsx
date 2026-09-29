@@ -57,7 +57,7 @@ export default function Footer() {
                 Livestock Breed Judging
               </Link>
               <Link href="/venue-map" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
-                GIS Satellite Venue Map
+                Interactive Venue Map
               </Link>
             </nav>
           </div>

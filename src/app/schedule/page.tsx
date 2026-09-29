@@ -1,12 +1,11 @@
-import scheduleData from '@/data/schedule.json';
 import ScheduleTab from '@/components/ScheduleTab';
 import ScrollReveal from '@/components/ScrollReveal';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Festival Schedule & Timetable | National Livestock Carnival 2026',
+  title: 'Official 3-Day Program & Timetable | National Livestock Carnival 2026',
   description:
-    'Complete 3-day program schedule for the 2026 Renewed Hope National Livestock Carnival in Abuja. Filter sessions by track - equestrian, trade, culinary, and ceremonial - and sync calendar reminders via .ics.',
+    'Complete 3-day program schedule for the 2026 Renewed Hope National Livestock Carnival in Abuja. Filter sessions by track - ceremonies, livestock judging, agribusiness B2B, and live concert entertainments.',
 };
 
 export default function SchedulePage() {
@@ -20,19 +19,18 @@ export default function SchedulePage() {
         <ScrollReveal direction="zoom" delay={0}>
           <span className="text-xs font-bold tracking-widest text-[#1E4D38] uppercase bg-[#D8EADF] px-4 py-1.5 rounded-full inline-flex items-center gap-2 mb-4">
             <span className="w-1.5 h-1.5 bg-[#1E4D38] rounded-full" />
-            Official Timetable
+            Official Master Timetable
           </span>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.08} duration={1.1}>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] mb-4 tracking-tight">
-            3-Day Interactive Festival Program
+            3-Day Official Carnival Program
           </h1>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.16} duration={1.0}>
           <p className="text-base sm:text-lg text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
-            November 21 – 23, 2026 &bull; Old Parade Ground, Area 10, Garki, Abuja.
-            Explore ceremonial sessions, livestock breed judging, B2B trade
-            dialogues, and night culinary showcases.
+            21 – 23 November 2026 &bull; Old Parade Ground, Area 10, Garki, Abuja.
+            Synchronized master timeline for presidential commission, breed judging, B2B investment forums, and grand finale concerts.
           </p>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.1}>
@@ -43,7 +41,7 @@ export default function SchedulePage() {
       {/* Interactive Schedule Tab */}
       <ScrollReveal direction="up" delay={0.1} duration={0.85}>
         <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <ScheduleTab days={scheduleData} />
+          <ScheduleTab />
         </section>
       </ScrollReveal>
 

@@ -5,9 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Compass, Star, Users, Calendar, Award } from 'lucide-react';
-import MagazineRow from '@/components/MagazineRow';
-import CardStackContainer from '@/components/motion/CardStackContainer';
-import carnivalData from '@/data/carnival.json';
+import WhatToExpect from '@/components/WhatToExpect';
 import { dramaticEase } from '@/lib/motion';
 
 const livestockList = [
@@ -61,7 +59,6 @@ const stats = [
 ];
 
 export default function Home() {
-  const rows = carnivalData.magazineRows;
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
 
   useEffect(() => {
@@ -197,40 +194,8 @@ export default function Home() {
               className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/18 text-white text-xs sm:text-sm font-bold uppercase tracking-[0.16em] rounded-xl backdrop-blur-sm border border-white/20 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
             >
               <Compass className="w-4 h-4 text-[#E4B03A]" />
-              <span>GIS Venue Map</span>
+              <span>Interactive Venue Map</span>
             </Link>
-          </motion.div>
-
-          {/* Species Switcher Pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.0, delay: 0.7, ease: dramaticEase }}
-            className="flex flex-wrap items-center justify-center gap-2 pt-5 border-t border-white/10 w-full max-w-3xl"
-          >
-            {livestockList.map((item, idx) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveHeroIndex(idx)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
-                  activeHeroIndex === idx
-                    ? 'bg-[#E4B03A] text-[#0A1A10] shadow-md scale-105'
-                    : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'
-                }`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${activeHeroIndex === idx ? 'bg-[#0A1A10]' : 'bg-[#E4B03A]'}`} />
-                <span>{item.name}</span>
-              </button>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="mt-3 text-xs text-gray-400"
-          >
-            Now Viewing: <strong className="text-white">{livestockList[activeHeroIndex].species}</strong> &mdash; {livestockList[activeHeroIndex].tag}
           </motion.div>
         </div>
 
@@ -262,55 +227,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── 3. FRAMER MOTION CARD STACK MAGAZINE ROWS ── */}
-      <section className="w-full py-16 md:py-24 bg-[#FBFBFA]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 sm:mb-16 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.85, ease: dramaticEase }}
-          >
-            <span className="text-xs font-extrabold tracking-[0.26em] text-[#1E4D38] uppercase bg-[#D8EADF] px-4 py-1.5 rounded-full inline-block mb-4">
-              Highlights &amp; Signature Arenas
-            </span>
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 1.0, delay: 0.1, ease: dramaticEase }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111827] tracking-tight mb-3"
-          >
-            Explore the Festival Story
-          </motion.h2>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2, ease: dramaticEase }}
-            className="w-16 h-0.5 bg-[#E4B03A] mx-auto"
-            style={{ transformOrigin: 'center' }}
-          />
-        </div>
-
-        <CardStackContainer topOffsetStart={100} topOffsetIncrement={25}>
-          {rows.map((row: any, index: number) => (
-            <MagazineRow
-              key={row.id || index}
-              eyebrow={row.eyebrow || row.kicker || 'HIGHLIGHT'}
-              title={row.title || row.headline || ''}
-              body={row.body}
-              image={row.image}
-              images={row.images}
-              imageAlt={row.imageAlt}
-              ctaText={row.ctaText || row.cta?.label || 'Explore Details'}
-              ctaLink={row.ctaLink || row.cta?.href || '/attractions'}
-              isTextLeft={index % 2 === 0}
-            />
-          ))}
-        </CardStackContainer>
-      </section>
+      {/* ── 3. MERGED "WHAT TO EXPECT" TOP-TO-BOTTOM STACKED CARD DECK ── */}
+      <WhatToExpect />
 
       {/* ── 4. EDITORIAL CLOSING BANNER ── */}
       <section className="w-full py-24 bg-[#0F2A1A] text-white relative overflow-hidden">
@@ -348,7 +266,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1.0, delay: 0.2, ease: dramaticEase }}
-            className="text-base sm:text-lg text-gray-300/85 max-w-2xl mb-10 leading-relaxed"
+            className="text-base sm:text-lg text-[#D8EADF] max-w-2xl mb-10 leading-relaxed"
           >
             Admission to the public grounds, Durbar viewing arenas, livestock pavilions, and cultural villages is complimentary for all registered citizens and delegates.
           </motion.p>
@@ -378,7 +296,7 @@ export default function Home() {
             </a>
             <Link
               href="/schedule"
-              className="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/12 text-gray-200 text-xs sm:text-sm font-bold uppercase tracking-[0.16em] rounded-xl border border-white/12 transition-all hover:-translate-y-0.5"
+              className="w-full sm:w-auto px-8 py-4 bg-white/5 hover:bg-white/12 text-[#D8EADF] text-xs sm:text-sm font-bold uppercase tracking-[0.16em] rounded-xl border border-white/12 transition-all hover:-translate-y-0.5"
             >
               View 3-Day Program
             </Link>

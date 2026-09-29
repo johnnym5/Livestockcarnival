@@ -351,10 +351,7 @@ export default function NhesicsPage() {
               <ExternalLink className="w-5 h-5 text-[#111827] group-hover:scale-110 transition-transform" />
             </a>
 
-            <span className="text-xs text-slate-400 mt-4 font-medium flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              Redirects to official portal: nhesics.gov.ng
-            </span>
+
           </div>
         </div>
       </section>

@@ -147,7 +147,7 @@ function renderGlobalFooter() {
               <li><a href="attractions.html#meat-market" class="footer-nav-link">Fresh Meat &amp; Scale Market</a></li>
               <li><a href="attractions.html#suya-village" class="footer-nav-link">Twilight Suya Village</a></li>
               <li><a href="attractions.html#livestock-judging" class="footer-nav-link">Championship Judging</a></li>
-              <li><a href="venue-map.html" class="footer-nav-link">GIS Satellite Venue Map</a></li>
+              <li><a href="venue-map.html" class="footer-nav-link">Interactive Venue Map</a></li>
             </ul>
           </div>
 
