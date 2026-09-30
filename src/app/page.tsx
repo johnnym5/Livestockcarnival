@@ -252,7 +252,7 @@ export default function Home() {
             pointerEvents: 'none',
           });
 
-          gsap.set(`${cardEl} .card-inner`, { rotationY: 0 });
+          gsap.set(`${cardEl} .card-inner`, { rotationX: 0 });
           gsap.set(`${cardEl} .card-face`, { opacity: 1, visibility: 'visible', filter: 'blur(0px)' });
         });
 
@@ -268,7 +268,7 @@ export default function Home() {
           gsap.set(sceneEl, { clearProps: 'backgroundColor' });
           cards.forEach((card) => {
             gsap.set(`#${card.id}`, { clearProps: 'transform,opacity,pointerEvents,zIndex' });
-            gsap.set(`#${card.id} .card-inner`, { rotationY: 0 });
+            gsap.set(`#${card.id} .card-inner`, { rotationX: 0 });
           });
           sceneEl.classList.add('scene-ready');
           return;
@@ -362,11 +362,11 @@ export default function Home() {
           const cardId = `#${card.id}`;
           const innerId = `${cardId} .card-inner`;
 
-          // Flip & Zoom Card i (Top Card lifts, zooms forward to camera, flips 180deg to reveal back face)
+          // Flip & Zoom Card i (Top Card lifts, zooms forward to camera, flips vertically bottom-to-top to reveal back face)
           tl.to(
             innerId,
             {
-              rotationY: 180,
+              rotationX: -180,
               duration: 2.5,
               ease: 'power2.inOut',
             },
@@ -411,7 +411,7 @@ export default function Home() {
           tl.to(
             innerId,
             {
-              rotationY: 0,
+              rotationX: 0,
               duration: 1.5,
               ease: 'power1.out',
             },
@@ -463,7 +463,7 @@ export default function Home() {
         tl.to(
           lastInnerId,
           {
-            rotationY: 180,
+            rotationX: -180,
             duration: 2.5,
             ease: 'power2.inOut',
           },
@@ -532,7 +532,7 @@ export default function Home() {
           tl.to(
             innerId,
             {
-              rotationY: 180,
+              rotationX: -180,
               duration: 2.5,
               ease: 'power2.out',
             },
