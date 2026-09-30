@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ChevronLeft, ChevronRight, Compass, X } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 /* ─── 10 Highlight Cards Connecting to All 10 Major Site Pages ─────────── */
 interface CardData {
@@ -165,6 +165,9 @@ export default function Home() {
   const [mobileCardIndex, setMobileCardIndex] = useState(0);
   const [mobileCardFlipped, setMobileCardFlipped] = useState(false);
   const [useStaticDeck, setUseStaticDeck] = useState(false);
+  const touchStartRef = useRef<{ x: number; y: number; cardId: string } | null>(null);
+  const suppressCardClickRef = useRef(false);
+  const scrollTriggerRef = useRef<{ disable: (revert?: boolean) => void; enable: () => void } | null>(null);
 
   // Store original fanned positions for cards when in spread state
   const fannedCoordsRef = useRef<
@@ -173,6 +176,8 @@ export default function Home() {
       { x: string | number; y: string | number; z: number; rotationZ: number; scale: number; zIndex: number }
     >
   >({});
+
+  const isMobileViewport = () => window.matchMedia('(max-width: 767px)').matches;
 
   useEffect(() => {
     // Force browser scroll to top on load
@@ -210,8 +215,8 @@ export default function Home() {
 
       if (isCancelled) return;
 
-      const Y_OFFSET = isMobile ? 3 : 5;
-      const Z_OFFSET = isMobile ? 4 : 6;
+      const Y_OFFSET = isMobile ? 2 : 3;
+      const Z_OFFSET = isMobile ? 3 : 4;
       const totalCards = cards.length;
 
       ctx = gsap.context(() => {
@@ -221,20 +226,19 @@ export default function Home() {
         /* Center scene elements */
         gsap.set('.scene-element', { xPercent: -50, yPercent: 0 });
 
-        /* Fixed solid dark background for scene to prevent background jitter */
-        gsap.set(sceneEl, { backgroundColor: '#030A05' });
-
-        /* Hero title setup with fixed high-contrast colors */
+        /* Hero title setup with clean high-contrast colors */
         gsap.set('#welcome-title', {
           opacity: 1,
           scale: 1,
           z: 0,
           filter: 'none',
+          transformOrigin: '50% 50%',
+          zIndex: 0,
         });
 
-        gsap.set('#welcome-title h1', { color: '#F9FAFB' });
-        gsap.set('#welcome-title h1 span', { color: '#E4B03A' });
-        gsap.set('#welcome-title p', { color: '#D1D5DB' });
+        gsap.set('#welcome-title h1', { color: '#111827' });
+        gsap.set('#welcome-title h1 span', { color: '#8D6B1B' });
+        gsap.set('#welcome-title p', { color: '#4B5563' });
 
         cards.forEach((card) => {
           const cardEl = `#${card.id}`;
@@ -248,11 +252,11 @@ export default function Home() {
             rotationY: 0,
             rotationZ: 0,
             scale: 0.88,
-            opacity: 0,
+            opacity: 1,
             pointerEvents: 'none',
           });
 
-          gsap.set(`${cardEl} .card-inner`, { rotationX: 0 });
+          gsap.set(`${cardEl} .card-inner`, { rotationX: 0, rotationY: 0 });
           gsap.set(`${cardEl} .card-face`, { opacity: 1, visibility: 'visible', filter: 'none' });
         });
 
@@ -279,8 +283,8 @@ export default function Home() {
           scrollTrigger: {
             trigger: sceneEl,
             start: 'top top',
-            end: `+=${isMobile ? totalCards * 1800 + 3000 : totalCards * 2600 + 4000}`,
-            scrub: isMobile ? 0.6 : 0.8,
+            end: `+=${isMobile ? totalCards * 700 + 1300 : totalCards * 800 + 1600}`,
+            scrub: isMobile ? 0.25 : 0.35,
             pin: true,
             anticipatePin: 1,
             pinSpacing: true,
@@ -288,10 +292,39 @@ export default function Home() {
           },
         });
 
+        const backdropLayers = gsap.utils.toArray<HTMLElement>('.deck-backdrop-image');
+        const backdropShade = sceneEl.querySelector<HTMLElement>('.deck-backdrop-shade');
+        const sceneDarkenAt = 0.25;
+        const sceneDarkenDuration = 2.2;
+        gsap.set(backdropLayers, { opacity: 0, scale: 1.08, visibility: 'hidden' });
+        if (backdropShade) gsap.set(backdropShade, { opacity: 0 });
+        if (backdropShade) {
+          tl.to(backdropShade, {
+            opacity: 1,
+            duration: sceneDarkenDuration,
+            ease: 'sine.inOut',
+          }, sceneDarkenAt);
+        }
+        if (backdropLayers[0]) {
+          tl.set(backdropLayers[0], { visibility: 'visible' }, 0);
+          tl.to(backdropLayers[0], {
+            opacity: 0.52,
+            duration: sceneDarkenDuration,
+            ease: 'sine.inOut',
+          }, sceneDarkenAt);
+          tl.to(backdropLayers[0], { scale: 1.16, duration: 12, ease: 'none' }, sceneDarkenAt);
+        }
+
         /* ── STEP 0: CARD 1 RISES FROM BOTTOM OVER HERO TEXT ── */
+        // Explicitly guarantee Card 1 starts at rotationX: 0 (front cover) when at top of page
+        tl.to('#card-1', {
+          rotationX: 0,
+          rotationY: 0,
+          duration: 0.1,
+        }, 0);
+
         tl.to('#card-1', {
           y: 0,
-          opacity: 1,
           scale: isMobile ? 1.0 : 1.05,
           pointerEvents: 'auto',
           zIndex: totalCards,
@@ -299,15 +332,56 @@ export default function Home() {
           ease: 'power2.out',
         }, 0);
 
+        // Recede the hero from the first instant of the card entrance.
         tl.to('#welcome-title', {
-          opacity: 0.35,
-          scale: 0.98,
-          z: -100,
-          duration: 2,
-          ease: 'power1.out',
-        }, 0.2);
+          opacity: 0.04,
+          scale: isMobile ? 0.48 : 0.56,
+          z: -120,
+          filter: 'blur(1.25px)',
+          duration: 1.6,
+          ease: 'power1.inOut',
+        }, 0);
 
-        // Cards 2 to 10 move up from bottom into their tight 3D stack position behind Card 1
+        const pinSpacer = sceneEl.parentElement;
+        tl.to([sceneEl, pinSpacer], {
+          backgroundColor: '#030A05',
+          duration: sceneDarkenDuration,
+          ease: 'sine.inOut',
+        }, sceneDarkenAt);
+        tl.to('#welcome-title h1', {
+          color: '#F9FAFB',
+          duration: sceneDarkenDuration,
+          ease: 'sine.inOut',
+        }, sceneDarkenAt);
+        tl.to('#welcome-title h1 span', {
+          color: '#E4B03A',
+          duration: sceneDarkenDuration,
+          ease: 'sine.inOut',
+        }, sceneDarkenAt);
+        tl.to('#welcome-title p', {
+          color: '#D1D5DB',
+          duration: sceneDarkenDuration,
+          ease: 'sine.inOut',
+        }, sceneDarkenAt);
+
+        const cardSequenceStart = 2.8;
+        const cardStepDuration = 2.9;
+        tl.addLabel('step-0', cardSequenceStart);
+
+        const revealPoses = [
+          { origin: '50% 50%', rotationX: 164, rotationY: -4, x: -4 },
+          { origin: '50% 50%', rotationX: 168, rotationY: 4, x: 4 },
+          { origin: '50% 50%', rotationX: 165, rotationY: 3, x: -3 },
+          { origin: '50% 50%', rotationX: 167, rotationY: -3, x: 3 },
+          { origin: '50% 50%', rotationX: 163, rotationY: 5, x: -4 },
+          { origin: '50% 50%', rotationX: 169, rotationY: -4, x: 4 },
+          { origin: '50% 50%', rotationX: 165, rotationY: -5, x: -3 },
+          { origin: '50% 50%', rotationX: 168, rotationY: 3, x: 3 },
+          { origin: '50% 50%', rotationX: 166, rotationY: 4, x: -4 },
+          { origin: '50% 50%', rotationX: 164, rotationY: -3, x: 4 },
+        ];
+
+        // Cards 2 to 10 move up into a tight, solid stack behind Card 1.
         cards.slice(1).forEach((card, idx) => {
           const cardIndex = idx + 1;
           const cardEl = `#${card.id}`;
@@ -315,42 +389,63 @@ export default function Home() {
             y: cardIndex * Y_OFFSET,
             z: -cardIndex * Z_OFFSET,
             scale: isMobile ? 1.0 : 1.05,
-            opacity: 1,
             pointerEvents: 'auto',
             zIndex: totalCards - cardIndex,
             duration: 2.2,
             ease: 'power2.out',
           }, 0.2);
+
         });
 
         /* ── LOOP SEQUENCE (Cards 0 to N-2) ── */
         for (let i = 0; i < totalCards - 1; i++) {
           const card = cards[i];
           const cardId = `#${card.id}`;
-          const innerId = `${cardId} .card-inner`;
+          const pose = revealPoses[i % revealPoses.length];
+          tl.addLabel(`step-${i}`, cardSequenceStart + i * cardStepDuration);
 
-          // Flip & Zoom Card i (Top Card lifts, zooms forward to camera, flips vertically bottom-to-top to reveal back face)
+          if (i > 0) {
+            const previousBackdrop = backdropLayers[i - 1];
+            const currentBackdrop = backdropLayers[i];
+            if (previousBackdrop && currentBackdrop) {
+              tl.set(currentBackdrop, { visibility: 'visible' }, `step-${i}`);
+              tl.to(previousBackdrop, { opacity: 0, duration: 2.6, ease: 'power1.inOut' }, `step-${i}`);
+              tl.set(previousBackdrop, { visibility: 'hidden' }, `step-${i}+=2.6`);
+              tl.to(currentBackdrop, { opacity: 0.52, duration: 2.6, ease: 'power1.inOut' }, `step-${i}`);
+              tl.to(currentBackdrop, { scale: 1.2, duration: 4.2, ease: 'none' }, `step-${i}`);
+            }
+          }
+
+          tl.set(cardId, { transformOrigin: pose.origin }, `step-${i}`);
+
+          // Flip & Zoom Card i (Top Card lifts, zooms forward to camera, flips vertically bottom-to-top with 3D pitch foreshortening)
           tl.to(
-            innerId,
+            cardId,
             {
-              rotationX: -180,
-              duration: 2.5,
+              rotationX: pose.rotationX,
+              rotationY: pose.rotationY,
+              rotationZ: 0,
+              duration: 0.75,
               ease: 'power2.inOut',
             },
-            `step-${i}`
+            `step-${i}+=0.45`
           );
 
           tl.to(
             cardId,
             {
               z: isMobile ? 120 : 220,
-              scale: isMobile ? 1.03 : 1.25,
+              x: pose.x,
+              scale: isMobile ? 1.03 : 1.08,
               y: -20,
-              duration: 2.5,
+              duration: 0.3,
               ease: 'power2.inOut',
             },
             `step-${i}`
           );
+
+          tl.to({}, { duration: 0.15 }, `step-${i}+=0.3`);
+          tl.to({}, { duration: 0.15 }, `step-${i}+=1.2`);
 
           // Peel Card i off to the side
           tl.to(cardId, {
@@ -358,10 +453,10 @@ export default function Home() {
             y: 80,
             z: 0,
             scale: 0.95,
-            rotationZ: 15,
-            duration: 2,
+            rotationZ: 3,
+            duration: 0.65,
             ease: 'power2.in',
-          });
+          }, `step-${i}+=1.35`);
 
           // Return to Stack Bottom & Reset Rotation
           tl.to(cardId, {
@@ -370,16 +465,18 @@ export default function Home() {
             z: -totalCards * Z_OFFSET - 50,
             rotationZ: 0,
             scale: isMobile ? 1.0 : 1.05,
+            rotationY: 0,
             zIndex: -1,
-            duration: 2,
+            transformOrigin: '50% 50%',
+            duration: 0.7,
             ease: 'power2.out',
-          });
+          }, `step-${i}+=2`);
 
           tl.to(
-            innerId,
+            cardId,
             {
               rotationX: 0,
-              duration: 1.5,
+              duration: 0.2,
               ease: 'power1.out',
             },
             '<'
@@ -396,58 +493,88 @@ export default function Home() {
                 y: relativePos * Y_OFFSET,
                 z: -relativePos * Z_OFFSET,
                 zIndex: totalCards - relativePos,
-                duration: 2,
+                duration: 0.7,
                 ease: 'power2.out',
               },
               '<'
             );
+
           }
         }
 
         /* ── FINAL CARD (Card 10): Flip & Focus in Center ── */
         const lastCard = cards[totalCards - 1];
         const lastCardId = `#${lastCard.id}`;
-        const lastInnerId = `${lastCardId} .card-inner`;
-
+        const lastPose = revealPoses[(totalCards - 1) % revealPoses.length];
+        const lastCardRevealAt = cardSequenceStart + (totalCards - 1) * cardStepDuration;
+        tl.addLabel('last-card-reveal', lastCardRevealAt);
+        const previousBackdrop = backdropLayers[totalCards - 2];
+        const finalBackdrop = backdropLayers[totalCards - 1];
+        if (previousBackdrop && finalBackdrop) {
+          tl.set(finalBackdrop, { visibility: 'visible' }, lastCardRevealAt);
+          tl.to(previousBackdrop, { opacity: 0, duration: 2.6, ease: 'power1.inOut' }, lastCardRevealAt);
+          tl.set(previousBackdrop, { visibility: 'hidden' }, lastCardRevealAt + 2.6);
+          tl.to(finalBackdrop, { opacity: 0.52, duration: 2.6, ease: 'power1.inOut' }, lastCardRevealAt);
+          tl.to(finalBackdrop, { scale: 1.2, duration: 4.2, ease: 'none' }, lastCardRevealAt);
+        }
+        tl.set(lastCardId, { transformOrigin: lastPose.origin }, lastCardRevealAt);
         tl.to(
-          lastInnerId,
+          lastCardId,
           {
-            rotationX: -180,
-            duration: 2.5,
+            rotationX: lastPose.rotationX,
+            rotationY: lastPose.rotationY,
+            rotationZ: 0,
+            duration: 0.75,
             ease: 'power2.inOut',
           },
-          'last-card-reveal'
+          'last-card-reveal+=0.45'
         );
 
         tl.to(
           lastCardId,
           {
             z: isMobile ? 100 : 200,
-            scale: isMobile ? 1.03 : 1.25,
+            x: lastPose.x,
+            scale: isMobile ? 1.03 : 1.08,
             y: 0,
-            duration: 2.5,
+            duration: 0.3,
             ease: 'power2.inOut',
           },
           'last-card-reveal'
         );
 
         /* ── THE CLIMAX: THE SHUFFLE SPREAD (spreadAll) ── */
-        tl.addLabel('spreadAll');
+        tl.addLabel('spreadAll', 'last-card-reveal+=1.4');
+
+        backdropLayers.forEach((layer) => {
+          tl.to(layer, { opacity: 0, duration: 3.5, ease: 'power1.inOut' }, 'spreadAll');
+          tl.set(layer, { visibility: 'hidden' }, 'spreadAll+=3.5');
+        });
+        if (backdropShade) {
+          tl.to(backdropShade, { opacity: 0, duration: 3.5, ease: 'power1.inOut' }, 'spreadAll');
+        }
+        tl.to('#welcome-title', {
+          opacity: 0.3,
+          scale: isMobile ? 0.68 : 0.74,
+          z: -40,
+          filter: 'blur(2px)',
+          duration: 3.5,
+          ease: 'power1.inOut',
+        }, 'spreadAll');
 
         cards.forEach((card, index) => {
           const cardId = `#${card.id}`;
-          const innerId = `${cardId} .card-inner`;
 
           // Calculate 10-card fan arc positions (Tighter spread on mobile so all cards fit inside screen!)
-          const totalSpreadWidth = isMobile ? 64 : 68;
+          const totalSpreadWidth = 68;
           const stepPercent = totalSpreadWidth / (totalCards - 1);
           const xPosVal = (index - (totalCards - 1) / 2) * stepPercent;
           const xPos = `${xPosVal}vw`;
 
           const normIndex = (index - (totalCards - 1) / 2) / ((totalCards - 1) / 2);
-          const yArcVal = Math.pow(normIndex, 2) * (isMobile ? 18 : 35) - (isMobile ? 5 : 15);
-          const rotZVal = normIndex * (isMobile ? 8 : 18);
-          const spreadScale = isMobile ? 0.36 : 0.3;
+          const yArcVal = Math.pow(normIndex, 2) * 35 - 15;
+          const rotZVal = normIndex * 18;
+          const spreadScale = 0.3;
           const spreadZIndex = index + 10;
 
           fannedCoordsRef.current[card.id] = {
@@ -462,11 +589,13 @@ export default function Home() {
           tl.to(
             cardId,
             {
-              x: xPos,
+              x: isMobile ? 0 : xPos,
               y: yArcVal,
-              z: 50,
-              rotationZ: rotZVal,
-              scale: spreadScale,
+              z: isMobile ? 80 : 50,
+              rotationY: isMobile ? 0 : 0,
+              rotationZ: isMobile ? 0 : rotZVal,
+              scale: isMobile ? 0.74 : spreadScale,
+              transformOrigin: '50% 50%',
               zIndex: spreadZIndex,
               duration: 3,
               ease: 'back.out(1.2)',
@@ -475,9 +604,9 @@ export default function Home() {
           );
 
           tl.to(
-            innerId,
+            cardId,
             {
-              rotationX: -180,
+              rotationX: 166,
               duration: 2.5,
               ease: 'power2.out',
             },
@@ -485,9 +614,22 @@ export default function Home() {
           );
         });
 
-        tl.eventCallback('onUpdate', () => updateFanState(tl.progress() >= 0.999));
+        /* Hold the finished fan so the following CTA section scrolls over the pinned scene. */
+        tl.to({}, { duration: 3.5 });
+        cards.forEach((card) => {
+          tl.to(`#${card.id}`, {
+            ...(isMobile ? {} : { scale: 0.276 }),
+            filter: 'blur(3px)',
+            duration: 3.5,
+            ease: 'power1.inOut',
+          }, 'spreadAll+=3.5');
+        });
+
+        const fanReadyAt = (tl.labels.spreadAll ?? tl.duration()) + 2.5;
+        tl.eventCallback('onUpdate', () => updateFanState(tl.time() >= fanReadyAt));
         tl.eventCallback('onComplete', () => updateFanState(true));
         tl.eventCallback('onReverseComplete', () => updateFanState(false));
+        scrollTriggerRef.current = tl.scrollTrigger ?? null;
 
         sceneEl.classList.add('scene-ready');
         ScrollTrigger.refresh();
@@ -500,6 +642,7 @@ export default function Home() {
       isCancelled = true;
       removeLenisListener?.();
       ctx?.revert();
+      scrollTriggerRef.current = null;
       sceneElement?.classList.remove('scene-ready');
     };
   }, []);
@@ -521,13 +664,13 @@ export default function Home() {
   };
 
   const navigateToCardPage = async (card: CardData) => {
-    if (!isFanned || isNavigatingRef.current) return;
+    if (isNavigatingRef.current) return;
     isNavigatingRef.current = true;
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile = window.matchMedia('(max-width: 767px)').matches;
     const duration = reducedMotion ? 0.12 : 1.35;
-    const zoomPose = getCardZoomPose(card.id, isMobile ? 1.12 : 1.42);
+    const zoomPose = getCardZoomPose(card.id, isMobile ? 0.92 : 1.42);
     const gsapMod = await import('gsap');
     const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
     const timeline = gsap.timeline({
@@ -553,13 +696,44 @@ export default function Home() {
 
   /* ── Interactive Click / Depth of Field Handling ── */
   const handleCardClick = async (cardId: string) => {
-    if (!isFanned) return;
+    if (suppressCardClickRef.current) {
+      suppressCardClickRef.current = false;
+      return;
+    }
+
+    if (useStaticDeck) {
+      setMobileCardFlipped((flipped) => !flipped);
+      return;
+    }
+
+    if (isMobileViewport() && isFanned && activeFocusedCard !== cardId) {
+      const clickedIndex = cards.findIndex((card) => card.id === cardId);
+      if (clickedIndex !== mobileCardIndex) {
+        void moveMobileFan(clickedIndex);
+        return;
+      }
+    }
+
+    if (!isFanned && activeFocusedCard && activeFocusedCard !== cardId) return;
 
     const gsapMod = await import('gsap');
     const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
     const isMobile = window.matchMedia('(max-width: 767px)').matches;
 
+    if (!isFanned && !activeFocusedCard) {
+      scrollTriggerRef.current?.disable(false);
+    }
+
     if (activeFocusedCard === cardId) {
+      if (isMobile && isFanned) {
+        void moveMobileFan(mobileCardIndex);
+        return;
+      }
+      if (!isFanned) {
+        setActiveFocusedCard(null);
+        scrollTriggerRef.current?.enable();
+        return;
+      }
       const orig = fannedCoordsRef.current[cardId];
       if (orig) {
         gsap.to(`#${cardId}`, {
@@ -574,14 +748,8 @@ export default function Home() {
         });
       }
 
-      cards.forEach((c) => {
-        gsap.to(`#${c.id} .card-face`, {
-          filter: 'blur(0px)',
-          duration: 0.8,
-        });
-      });
-
       setActiveFocusedCard(null);
+      if (!isFanned) scrollTriggerRef.current?.enable();
     } else {
       if (activeFocusedCard && fannedCoordsRef.current[activeFocusedCard]) {
         const prevOrig = fannedCoordsRef.current[activeFocusedCard];
@@ -593,6 +761,15 @@ export default function Home() {
           scale: prevOrig.scale,
           zIndex: prevOrig.zIndex,
           duration: 0.5,
+          ease: 'power2.out',
+        });
+      }
+
+      if (!isFanned) {
+        gsap.to(`#${cardId}`, {
+          rotationX: 166,
+          rotationY: 0,
+          duration: 0.65,
           ease: 'power2.out',
         });
       }
@@ -609,26 +786,23 @@ export default function Home() {
         ease: 'power3.out',
       });
 
-      cards.forEach((c) => {
-        if (c.id === cardId) {
-          gsap.to(`#${c.id} .card-face`, {
-            filter: 'blur(0px)',
-            duration: 0.8,
-          });
-        } else {
-          gsap.to(`#${c.id} .card-face`, {
-            filter: 'blur(12px)',
-            duration: 0.8,
-          });
-        }
-      });
-
       setActiveFocusedCard(cardId);
     }
   };
 
   const dismissFocus = async () => {
     if (!activeFocusedCard) return;
+
+    if (isFanned && isMobileViewport()) {
+      void moveMobileFan(mobileCardIndex);
+      return;
+    }
+
+    if (!isFanned) {
+      setActiveFocusedCard(null);
+      scrollTriggerRef.current?.enable();
+      return;
+    }
 
     const gsapMod = await import('gsap');
     const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
@@ -647,21 +821,78 @@ export default function Home() {
       });
     }
 
-    cards.forEach((c) => {
-      gsap.to(`#${c.id} .card-face`, {
-        filter: 'blur(0px)',
-        duration: 0.8,
+    setActiveFocusedCard(null);
+    if (!isFanned) scrollTriggerRef.current?.enable();
+  };
+
+  const moveMobileFan = useCallback(async (nextIndex: number) => {
+    const boundedIndex = Math.max(0, Math.min(cards.length - 1, nextIndex));
+    setMobileCardIndex(boundedIndex);
+    setActiveFocusedCard(null);
+    setMobileCardFlipped(false);
+    if (useStaticDeck || !isMobileViewport()) return;
+    const gsapMod = await import('gsap');
+    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
+    const cardWidth = Math.min(window.innerWidth * 0.76, 320);
+    const availableHeight = window.innerHeight * 0.64;
+    const focusedScale = Math.max(0.52, Math.min(0.76, availableHeight / (cardWidth * 16 / 9)));
+
+    cards.forEach((card, index) => {
+      const distance = index - boundedIndex;
+      const absDistance = Math.abs(distance);
+      gsap.to(`#${card.id}`, {
+        x: `${distance * 56}vw`,
+        y: Math.min(absDistance, 2) * 10,
+        z: 80 - absDistance * 65,
+        rotationY: Math.max(-28, Math.min(28, distance * -12)),
+        rotationZ: 0,
+        scale: Math.max(0.42, focusedScale - absDistance * 0.12),
+        zIndex: cards.length - absDistance,
+        pointerEvents: absDistance <= 1 ? 'auto' : 'none',
+        duration: 0.65,
+        ease: 'power3.out',
       });
     });
+  }, [useStaticDeck]);
 
-    setActiveFocusedCard(null);
+  const handleCardPointerDown = (event: React.PointerEvent<HTMLDivElement>, cardId: string) => {
+    if (event.pointerType !== 'touch' || !isFanned || activeFocusedCard) return;
+    if (isMobileViewport()) event.currentTarget.setPointerCapture(event.pointerId);
+    touchStartRef.current = { x: event.clientX, y: event.clientY, cardId };
+  };
+
+  const handleCardPointerUp = (event: React.PointerEvent<HTMLDivElement>, cardId: string) => {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!start || start.cardId !== cardId || !isMobileViewport()) return;
+    const deltaX = event.clientX - start.x;
+    const deltaY = event.clientY - start.y;
+    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY) * 1.15) return;
+    suppressCardClickRef.current = true;
+    window.setTimeout(() => { suppressCardClickRef.current = false; }, 350);
+    void moveMobileFan(mobileCardIndex + (deltaX < 0 ? 1 : -1));
+  };
+
+  const handleCardPointerMove = async (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== 'touch' || !touchStartRef.current || !isFanned || activeFocusedCard) return;
+    const cardEl = event.currentTarget;
+    const rect = cardEl.getBoundingClientRect();
+    const xRatio = (event.clientX - rect.left) / rect.width - 0.5;
+    const yRatio = (event.clientY - rect.top) / rect.height - 0.5;
+    const gsapMod = await import('gsap');
+    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
+    gsap.to(cardEl, {
+      rotationX: 166 - yRatio * 8,
+      rotationY: xRatio * 10,
+      duration: 0.18,
+      overwrite: true,
+    });
   };
 
   /* ── Dynamic 3D Depth & Tilt Effect on Mouse Move ── */
   const handleCardMouseMove = async (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobileViewport() || !isFanned || useStaticDeck) return;
     const cardEl = e.currentTarget;
-    const inner = cardEl.querySelector('.card-inner');
-    if (!inner) return;
 
     const rect = cardEl.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -670,13 +901,13 @@ export default function Home() {
     const xPct = x / rect.width - 0.5;
     const yPct = y / rect.height - 0.5;
 
-    const tiltX = -yPct * 18;
-    const tiltY = xPct * 18;
+    const tiltX = -yPct * 8;
+    const tiltY = xPct * 10;
 
     const gsapMod = await import('gsap');
     const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    gsap.to(inner, {
-      rotationX: -180 + tiltX,
+    gsap.to(cardEl, {
+      rotationX: 166 + tiltX,
       rotationY: tiltY,
       duration: 0.2,
       ease: 'power1.out',
@@ -684,27 +915,32 @@ export default function Home() {
   };
 
   const handleCardMouseLeave = async (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobileViewport() || !isFanned || useStaticDeck) return;
     const cardEl = e.currentTarget;
-    const inner = cardEl.querySelector('.card-inner');
-    if (!inner) return;
 
     const gsapMod = await import('gsap');
     const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    gsap.to(inner, {
-      rotationX: -180,
+    gsap.to(cardEl, {
+      rotationX: 166,
       rotationY: 0,
       duration: 0.5,
       ease: 'power2.out',
     });
   };
 
+  useEffect(() => {
+    if (!isFanned || useStaticDeck || !isMobileViewport()) return;
+    void moveMobileFan(0);
+  }, [isFanned, useStaticDeck, moveMobileFan]);
+
   return (
-    <div ref={containerRef} className="w-full bg-[#030A05] text-white overflow-x-hidden select-none">
+      <div ref={containerRef} className="w-full bg-[#FBFBFA] text-white overflow-x-hidden select-none">
       {/* ═══════════════ 3D PINNED DECK SCENE ═══════════════ */}
       <div
         id="scene-container"
         ref={sceneRef}
-        className="w-full h-[100dvh] min-h-[550px] relative bg-[#030A05] overflow-hidden transition-colors"
+        data-fanned={isFanned}
+        className="w-full h-[100dvh] min-h-[100svh] relative bg-[#FBFBFA] overflow-hidden"
         onClick={(e) => {
           if (
             activeFocusedCard &&
@@ -715,6 +951,23 @@ export default function Home() {
           }
         }}
       >
+        {/* Blurred card imagery stays behind the hero and deck during the pinned reveal. */}
+        <div id="deck-backdrop" aria-hidden="true">
+          {cards.map((card, index) => (
+            <div key={`${card.id}-backdrop`} className="deck-backdrop-image">
+              <Image
+                src={card.image}
+                alt=""
+                fill
+                sizes="100vw"
+                quality={45}
+                priority={index === 0}
+              />
+            </div>
+          ))}
+          <div className="deck-backdrop-shade" />
+        </div>
+
         {/* Particle Glow Overlay */}
         <div className="absolute inset-0 pointer-events-none z-0 hidden opacity-40 sm:block">
           {[...Array(30)].map((_, i) => (
@@ -761,46 +1014,18 @@ export default function Home() {
 
           {/* Main Headline (Dark on white initially, light on black as cards rise) */}
           <h1 className="hero-intro-item text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-[#111827] leading-[1.02] tracking-tight mb-3 sm:mb-4">
-            RENEWED HOPE <span className="text-[#E4B03A]">NATIONAL LIVESTOCK CARNIVAL</span>
+            Welcome to the <span className="text-[#E4B03A]">National Livestock Carnival</span>
           </h1>
 
           {/* Subtitle */}
           <p className="hero-intro-item text-xs sm:text-base md:text-lg text-[#4B5563] max-w-4xl mx-auto font-medium leading-relaxed mb-4 sm:mb-6">
-            Scroll down to unfold the 10-card deck experience &mdash; exploring Durbar cavalry, championship livestock, Suya village, cultural fashion, digital RFID tagging, and interactive map.
+            Explore championship livestock, Nigerian culture, live performances, festival food and the carnival grounds. Scroll through the cards to discover what&apos;s waiting for you.
           </p>
-
-          {/* CTAs */}
-          <div className="hero-intro-item flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full sm:w-auto">
-            <a
-              href="https://pass.livestockcarnival.ng"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto px-6 py-2.5 sm:py-3.5 bg-[#E4B03A] hover:bg-[#D4A030] text-[#030A05] text-xs sm:text-sm font-extrabold uppercase tracking-[0.14em] rounded-xl transition-all shadow-button hover:-translate-y-0.5 flex items-center justify-center gap-2 group"
-            >
-              <span>Claim Free Gate Pass</span>
-              <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="https://vendors.livestockcarnival.ng"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto px-6 py-2.5 sm:py-3.5 bg-[#1E4D38] hover:bg-[#256147] text-white text-xs sm:text-sm font-bold uppercase tracking-[0.14em] rounded-xl border border-[#B8D8C5]/30 transition-all shadow-md hover:-translate-y-0.5 flex items-center justify-center"
-            >
-              Exhibitor Booths
-            </a>
-            <Link
-              href="/venue-map"
-              className="w-full sm:w-auto px-6 py-2.5 sm:py-3.5 bg-[#1E4D38] hover:bg-[#256147] text-white text-xs sm:text-sm font-bold uppercase tracking-[0.14em] rounded-xl border border-[#B8D8C5]/30 transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2"
-            >
-              <Compass className="w-4 h-4 text-[#E4B03A]" />
-              <span>Interactive Map</span>
-            </Link>
-          </div>
 
           {/* Scroll cue */}
           <div className="hero-intro-item mt-6 sm:mt-8 flex flex-col items-center gap-1.5 animate-pulse">
             <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.25em] text-[#8D6B1B]/90">
-              Scroll Down to Flip Deck
+              Scroll Down to Explore
             </span>
             <div className="w-3.5 sm:w-4 h-6 sm:h-7 rounded-full border-2 border-[#E4B03A]/50 flex items-start justify-center p-1">
               <div className="w-1 h-2 rounded-full bg-[#E4B03A]" />
@@ -822,10 +1047,14 @@ export default function Home() {
                 EXPANSIVE CANVAS CARD DIMENSIONS:
                 Portrait cards on mobile; landscape cards on desktop.
               */
-              className="deck-card w-[76vw] max-w-[320px] aspect-[9/16] md:w-[82vw] md:max-w-[920px] md:aspect-video lg:w-[84vw] lg:max-w-[1040px] pointer-events-auto"
+              className={`deck-card bg-gradient-to-br ${card.coverBg} w-[76vw] max-w-[320px] aspect-[9/16] md:w-[78vw] md:max-w-[880px] md:aspect-video lg:w-[80vw] lg:max-w-[960px] pointer-events-auto`}
               data-mobile-active={mobileCardIndex === Number(card.number) - 1}
               onMouseMove={handleCardMouseMove}
               onMouseLeave={handleCardMouseLeave}
+              onPointerDown={(event) => handleCardPointerDown(event, card.id)}
+              onPointerMove={handleCardPointerMove}
+              onPointerUp={(event) => handleCardPointerUp(event, card.id)}
+              onPointerCancel={() => { touchStartRef.current = null; }}
               onClick={() => {
                 if (useStaticDeck) {
                   setMobileCardFlipped((flipped) => !flipped);
@@ -869,9 +1098,9 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* ════ REVEALED CONTENT (Face Up State - Matching User Reference Screenshots) ════ */}
+                {/* ════ REVEALED CONTENT (Face Up State - Unique Card Color Theme) ════ */}
                 <div
-                  className="card-face card-face-back bg-[#08150B] border-2 border-[#E4B03A]/45 shadow-[0_35px_100px_-15px_rgba(0,0,0,0.95)] flex flex-col justify-between rounded-[1.5rem]"
+                  className={`card-face card-face-back bg-gradient-to-br ${card.coverBg} border-2 border-[#E4B03A]/45 shadow-[0_35px_100px_-15px_rgba(0,0,0,0.95)] flex flex-col justify-between rounded-[1.5rem]`}
                 >
                   {/* Top Image Banner Section (52% height) */}
                   <div className="relative w-full h-[52%] rounded-t-[1.5rem] shrink-0">
@@ -882,7 +1111,7 @@ export default function Home() {
                       className="object-cover object-center rounded-t-[1.5rem]"
                       sizes="(max-width: 640px) 90vw, (max-width: 1024px) 1000px, 1280px"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#08150B] via-[#08150B]/25 to-transparent rounded-t-[1.5rem]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent rounded-t-[1.5rem]" />
 
                     {/* Floating Pill Eyebrow Badge on top left of image */}
                     <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between">
@@ -896,6 +1125,7 @@ export default function Home() {
                             dismissFocus();
                           }}
                           className="p-1.5 rounded-full bg-[#030A05]/90 text-white hover:text-[#E4B03A] border border-white/20 transition-colors"
+                          aria-label="Close focused card"
                           title="Close full view"
                         >
                           <X className="w-4 h-4" />
@@ -936,14 +1166,11 @@ export default function Home() {
           ))}
         </div>
 
-        <nav className="mobile-deck-controls" aria-label="Carnival highlights">
+        <nav className="mobile-deck-controls" data-visible={isFanned && !useStaticDeck} aria-label="Carnival highlights">
           <button
             type="button"
             aria-label="Previous highlight"
-            onClick={() => {
-              setMobileCardIndex((index) => Math.max(0, index - 1));
-              setMobileCardFlipped(false);
-            }}
+            onClick={() => void moveMobileFan(mobileCardIndex - 1)}
             disabled={mobileCardIndex === 0}
           >
             <ChevronLeft aria-hidden="true" />
@@ -954,10 +1181,7 @@ export default function Home() {
           <button
             type="button"
             aria-label="Next highlight"
-            onClick={() => {
-              setMobileCardIndex((index) => Math.min(cards.length - 1, index + 1));
-              setMobileCardFlipped(false);
-            }}
+            onClick={() => void moveMobileFan(mobileCardIndex + 1)}
             disabled={mobileCardIndex === cards.length - 1}
           >
             <ChevronRight aria-hidden="true" />
@@ -965,8 +1189,8 @@ export default function Home() {
         </nav>
       </div>
 
-      {/* ═══════════════ EDITORIAL CLOSING SECTION ═══════════════ */}
-      <section className="w-full py-20 sm:py-24 bg-[#08150B] text-white relative overflow-hidden border-t border-[#E4B03A]/30">
+      {/* ═══════════════ EDITORIAL CLOSING SECTION (Rises over pinned fanned cards) ═══════════════ */}
+      <section className="closing-cta-section w-full py-20 sm:py-24 bg-[#08150B] text-white relative overflow-hidden border-t border-[#E4B03A]/30">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E4B03A]/50 to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(228,176,58,0.08)_0%,transparent_70%)] pointer-events-none" />
 

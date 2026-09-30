@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import MediaPostsFeed from "@/components/MediaPostsFeed";
+import MediaGalleryFeed from "@/components/MediaGalleryFeed";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -48,7 +50,20 @@ export default function MediaCenterPage() {
                 <span className="text-xs font-bold uppercase tracking-wider text-[#8D6B1B]">Newsroom</span>
               </div>
             </ScrollReveal>
-            <MediaPostsFeed />
+            <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-slate-100" />}>
+              <MediaPostsFeed />
+            </Suspense>
+          </section>
+          <section>
+            <ScrollReveal direction="right" delay={0}>
+              <div className="mb-8 flex items-center justify-between border-b border-[#E5E7EB] pb-4">
+                <h2 className="text-2xl font-extrabold text-[#111827]">Photo Galleries</h2>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#8D6B1B]">Gallery</span>
+              </div>
+            </ScrollReveal>
+            <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-slate-100" />}>
+              <MediaGalleryFeed />
+            </Suspense>
           </section>
         </div>
       </div>

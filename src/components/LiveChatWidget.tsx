@@ -34,6 +34,7 @@ interface UserSession {
 
 export default function LiveChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
+  const [hasNotification, setHasNotification] = useState(false);
   const [session, setSession] = useState<UserSession | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [threadId, setThreadId] = useState<string | null>(null);
@@ -105,7 +106,35 @@ export default function LiveChatWidget() {
     };
   }, []);
 
-  // Load existing thread and messages when session is active and widget is open
+  // Check for existing thread & unread status when session is active
+  useEffect(() => {
+    if (!session) return;
+    let isMounted = true;
+
+    const checkUnread = async () => {
+      const { data: threadData } = await supabase
+        .from('chat_threads')
+        .select('id, unread_by_user')
+        .eq('user_id', session.id)
+        .maybeSingle();
+
+      if (!isMounted) return;
+
+      if (threadData) {
+        setThreadId(threadData.id);
+        if (threadData.unread_by_user && !isOpen) {
+          setHasNotification(true);
+        }
+      }
+    };
+
+    void checkUnread();
+    return () => {
+      isMounted = false;
+    };
+  }, [session, isOpen]);
+
+  // Load existing messages when session is active and widget is open
   useEffect(() => {
     if (!session || !isOpen) return;
 
@@ -137,6 +166,7 @@ export default function LiveChatWidget() {
 
           if (isMounted) {
             setMessages((msgsData ?? []) as ChatMessage[]);
+            setHasNotification(false);
           }
 
           // Mark unread_by_user = false
@@ -161,10 +191,10 @@ export default function LiveChatWidget() {
 
   // Realtime subscription for incoming messages
   useEffect(() => {
-    if (!threadId || !isOpen) return;
+    if (!threadId) return;
 
     const channel = supabase
-      .channel(`thread:${threadId}`)
+      .channel(`user_thread:${threadId}`)
       .on(
         'postgres_changes',
         {
@@ -175,10 +205,15 @@ export default function LiveChatWidget() {
         },
         (payload) => {
           const newMsg = payload.new as ChatMessage;
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === newMsg.id)) return prev;
-            return [...prev, newMsg];
-          });
+          if (newMsg.sender_type === 'admin' && !isOpen) {
+            setHasNotification(true);
+          }
+          if (isOpen) {
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === newMsg.id)) return prev;
+              return [...prev, newMsg];
+            });
+          }
         }
       )
       .subscribe();
@@ -353,6 +388,16 @@ export default function LiveChatWidget() {
     }
   };
 
+  const toggleWidget = () => {
+    setIsOpen((prev) => {
+      const nextState = !prev;
+      if (nextState) {
+        setHasNotification(false);
+      }
+      return nextState;
+    });
+  };
+
   return (
     <>
       {/* Floating Draggable FAB Button */}
@@ -364,7 +409,7 @@ export default function LiveChatWidget() {
       >
         <button
           type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
+          onClick={toggleWidget}
           aria-label={isOpen ? 'Close Live Help Desk' : 'Open Live Help Desk'}
           className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-[#0F4A2F] text-white shadow-xl transition-all duration-300 hover:scale-105 hover:bg-[#0B3B24] active:scale-95"
         >
@@ -374,11 +419,11 @@ export default function LiveChatWidget() {
             <MessageSquare className="h-6 w-6" />
           )}
 
-          {/* Pulse Indicator */}
-          {!isOpen && (
+          {/* Pulse Indicator - Shown ONLY when closed AND there is an unread notification */}
+          {!isOpen && hasNotification && (
             <span className="absolute right-0 top-0 flex h-3.5 w-3.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#D8EADF] opacity-75" />
-              <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-white bg-[#0F4A2F]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#25D366] opacity-75" />
+              <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-white bg-[#25D366]" />
             </span>
           )}
         </button>

@@ -292,18 +292,56 @@ html.lenis, html.lenis body {
 /* ── 3D Scene Container & Deck Architecture ───────────────────────────── */
 
 #scene-container {
-  perspective: 950px; /* Strong 3D perspective depth & foreshortening */
+  perspective: 950px;
   overflow: hidden;
   width: 100%;
   height: 100vh;
   height: 100dvh;
   position: relative;
-  background-color: #FFFFFF;
+  background-color: #FBFBFA;
   touch-action: pan-y;
 }
 
+#deck-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.deck-backdrop-image {
+  position: absolute;
+  inset: -6%;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  filter: blur(18px) saturate(0.78);
+  transform: scale(1.08);
+}
+
+.deck-backdrop-image img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.deck-backdrop-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(3, 10, 5, 0.42), rgba(3, 10, 5, 0.68) 78%),
+    linear-gradient(180deg, rgba(3, 10, 5, 0.34), rgba(3, 10, 5, 0.48));
+}
+
+#scene-container:not(.scene-ready) #deck-backdrop {
+  visibility: hidden;
+}
+
 .pin-spacer {
-  background-color: #FFFFFF !important;
+  background-color: #FBFBFA;
 }
 
 /* Base utility for absolute centering */
@@ -324,6 +362,9 @@ html.lenis, html.lenis body {
   -webkit-transform-style: preserve-3d;
   will-change: transform;
   cursor: pointer;
+  transform-origin: center center;
+  border-radius: 1.5rem;
+  background-color: #08150B;
 }
 
 .card-inner {
@@ -333,9 +374,11 @@ html.lenis, html.lenis body {
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
   will-change: transform;
+  border-radius: 1.5rem;
+  background-color: #08150B;
 }
 
-/* The faces of the card */
+/* The faces of the card - 100% Solid, Fully Opaque, Zero Translucency */
 .card-face {
   position: absolute;
   inset: 0;
@@ -346,16 +389,31 @@ html.lenis, html.lenis body {
   border-radius: 1.5rem;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
+  background-color: #08150B !important;
+  background-blend-mode: normal;
+  background-clip: border-box;
+  opacity: 1 !important;
+  isolation: isolate;
+  border: 2px solid #E4B03A;
+  box-shadow: inset 0 0 0 1px #8D6B1B, 0 0 0 1px rgba(228, 176, 58, 0.4), 0 22px 48px rgba(0, 0, 0, 0.8);
 }
 
 .card-face-front {
-  transform: rotateX(0deg) translateZ(1px);
-  -webkit-transform: rotateX(0deg) translateZ(1px);
+  transform: rotateX(0deg) translateZ(4px);
+  -webkit-transform: rotateX(0deg) translateZ(4px);
 }
 
 .card-face-back {
-  transform: rotateX(-180deg) translateZ(1px);
-  -webkit-transform: rotateX(-180deg) translateZ(1px);
+  transform: rotateX(180deg) translateZ(4px);
+  -webkit-transform: rotateX(180deg) translateZ(4px);
+}
+
+.closing-cta-section {
+  margin-top: -100dvh;
+  z-index: 40;
+  display: flex;
+  min-height: 100dvh;
+  align-items: center;
 }
 
 #scene-container:not(.scene-ready) .deck-card {
@@ -368,15 +426,15 @@ html.lenis, html.lenis body {
 }
 
 #scene-container.scene-ready .hero-intro-item {
-  animation: hero-intro-in 900ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+  animation: hero-intro-in 1600ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
 }
 
-#scene-container.scene-ready .hero-intro-item:nth-child(1) { animation-delay: 80ms; }
-#scene-container.scene-ready .hero-intro-item:nth-child(2) { animation-delay: 200ms; }
-#scene-container.scene-ready .hero-intro-item:nth-child(3) { animation-delay: 340ms; }
-#scene-container.scene-ready .hero-intro-item:nth-child(4) { animation-delay: 480ms; }
-#scene-container.scene-ready .hero-intro-item:nth-child(5) { animation-delay: 620ms; }
-#scene-container.scene-ready .hero-intro-item:nth-child(6) { animation-delay: 760ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(1) { animation-delay: 120ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(2) { animation-delay: 340ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(3) { animation-delay: 560ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(4) { animation-delay: 780ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(5) { animation-delay: 1000ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(6) { animation-delay: 1220ms; }
 
 @keyframes hero-intro-in {
   from {
@@ -446,16 +504,76 @@ html.lenis, html.lenis body {
     flex: 0 0 auto;
   }
 
-  #scene-container .card-face-back > div:first-child > div:last-child {
+  #scene-container .card-face-back > div:first-child > div:last-child > span {
     display: none;
   }
 
   .mobile-deck-controls {
     display: none;
+    position: absolute;
+    z-index: 40;
+    left: 50%;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .mobile-deck-controls[data-visible='true'] {
+    display: flex;
+  }
+
+  #scene-container[data-fanned='true'] .deck-card {
+    width: min(76vw, 320px);
+    height: min(64dvh, 560px);
+    aspect-ratio: auto;
+  }
+
+  #scene-container[data-fanned='true'] .deck-card:not([style*='pointer-events: none']) {
+    cursor: grab;
+  }
+
+  #scene-container[data-fanned='true'] .deck-card:active {
+    cursor: grabbing;
+  }
+
+  .mobile-deck-controls button {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border: 1px solid rgba(228, 176, 58, 0.55);
+    border-radius: 9999px;
+    color: #f4c95d;
+    background: rgba(8, 21, 11, 0.92);
+  }
+
+  .mobile-deck-controls button:disabled {
+    opacity: 0.38;
+  }
+
+  .mobile-deck-controls button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  #deck-backdrop {
+    display: none;
+  }
+
+  .closing-cta-section {
+    margin-top: 0;
+    display: block;
+    min-height: 0;
+  }
+
   #scene-container {
     height: auto;
     min-height: 100dvh;
@@ -512,6 +630,8 @@ html.lenis, html.lenis body {
 
   .mobile-deck-controls {
     display: flex;
+    position: static;
+    transform: none;
     align-items: center;
     justify-content: center;
     gap: 1.25rem;
@@ -547,6 +667,13 @@ html.lenis, html.lenis body {
   #scene-container .deck-card {
     width: min(92vw, 1120px);
     aspect-ratio: 16 / 9;
+  }
+}
+
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+  .mobile-deck-controls {
+    position: static;
+    transform: none;
   }
 }
 

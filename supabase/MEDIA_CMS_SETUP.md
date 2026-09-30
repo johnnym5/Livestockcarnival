@@ -12,7 +12,7 @@ npx supabase link --project-ref <your-project-ref>
 npx supabase db push
 ```
 
-This creates `cms_users`, `media_posts`, the public `media-assets` bucket, RLS policies, and the auth-backed role check.
+This creates `cms_users`, `media_posts`, `media_galleries`, the public `media-assets` bucket, RLS policies, and the auth-backed role check. Galleries store up to 10 image references per set in the existing storage bucket.
 
 ## 2. Bootstrap the super admin
 
