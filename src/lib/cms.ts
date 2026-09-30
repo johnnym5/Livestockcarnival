@@ -49,14 +49,14 @@ export interface MediaPost {
 
 export interface StorageFileItem {
   name: string;
-  id?: string;
-  updated_at?: string;
-  created_at?: string;
-  last_accessed_at?: string;
+  id?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  last_accessed_at?: string | null;
   metadata?: {
     size?: number;
     mimetype?: string;
-  };
+  } | null;
   publicUrl: string;
 }
 
