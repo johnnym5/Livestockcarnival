@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import LiveChatWidget from '@/components/LiveChatWidget';
 import SmoothScroll from '@/components/SmoothScroll';
+import InitialLoadOverlay from '@/components/InitialLoadOverlay';
 
 export default function SiteFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -13,6 +14,7 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
 
   return (
     <SmoothScroll enabled={!isAdminRoute}>
+      <InitialLoadOverlay />
       {!isAdminRoute && <Header />}
       <main className="flex-1">{children}</main>
       {!isAdminRoute && <Footer />}

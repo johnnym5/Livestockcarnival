@@ -410,12 +410,27 @@ html.lenis, html.lenis body {
   -webkit-transform: rotateX(180deg) translateZ(4px);
 }
 
-.closing-cta-section {
+.magazine-highlights-section {
+  position: relative;
+  z-index: 40;
   margin-top: -100dvh;
+}
+
+.closing-cta-section {
+  position: relative;
   z-index: 40;
   display: flex;
   min-height: 100dvh;
   align-items: center;
+}
+
+@keyframes initial-load-enter {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.initial-load-content {
+  animation: initial-load-enter 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 #scene-container:not(.scene-ready) .deck-card {
@@ -566,6 +581,10 @@ html.lenis, html.lenis body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .initial-load-content {
+    animation: none;
+  }
+
   #deck-backdrop {
     display: none;
   }
@@ -574,6 +593,10 @@ html.lenis, html.lenis body {
     margin-top: 0;
     display: block;
     min-height: 0;
+  }
+
+  .magazine-highlights-section {
+    margin-top: 0;
   }
 
   #scene-container {

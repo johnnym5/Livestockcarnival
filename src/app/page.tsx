@@ -4,7 +4,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import ScrollReveal from '@/components/ScrollReveal';
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { ArrowDown, ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 /* ─── 10 Highlight Cards Connecting to All 10 Major Site Pages ─────────── */
 interface CardData {
@@ -20,6 +22,8 @@ interface CardData {
   coverBg: string;
   accentColor: string;
 }
+
+type DeckControlMode = 'hidden' | 'skip' | 'top' | 'magazine';
 
 const cards: CardData[] = [
   {
@@ -154,18 +158,107 @@ const cards: CardData[] = [
   },
 ];
 
+function MagazineFeature({ card, index }: { card: CardData; index: number }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const isInView = useInView(sectionRef, { once: false, amount: 0.05 });
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start 92%', 'end 8%'],
+  });
+  const opacity = useTransform(scrollYProgress, [0, 0.24, 0.72, 1], [0, 1, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.28, 0.72, 1], [0.96, 1, 1, 0.96]);
+  const imageOpacity = useTransform(scrollYProgress, [0, 0.28, 0.62, 0.95, 1], [0, 0.35, 1, 1, 0]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.58, 1], [0.96, 1, 1.035]);
+  const categoryOpacity = useTransform(scrollYProgress, [0, 0.12, 0.2, 0.9, 1], [0, 0, 1, 1, 0]);
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.21, 0.3, 0.91, 1], [0, 0, 1, 1, 0]);
+  const bodyOpacity = useTransform(scrollYProgress, [0, 0.3, 0.4, 0.92, 1], [0, 0, 1, 1, 0]);
+  const ctaOpacity = useTransform(scrollYProgress, [0, 0.39, 0.5, 0.94, 1], [0, 0, 1, 1, 0]);
+  const categoryY = useTransform(scrollYProgress, [0.1, 0.2, 0.9, 1], [18, 0, 0, -10]);
+  const titleY = useTransform(scrollYProgress, [0.2, 0.3, 0.91, 1], [20, 0, 0, -10]);
+  const bodyY = useTransform(scrollYProgress, [0.3, 0.4, 0.92, 1], [20, 0, 0, -10]);
+  const ctaY = useTransform(scrollYProgress, [0.39, 0.5, 0.94, 1], [18, 0, 0, -8]);
+  const imageFirst = index % 2 === 0;
+
+  return (
+    <motion.article
+      ref={sectionRef}
+      style={prefersReducedMotion ? undefined : { opacity, scale }}
+      aria-hidden={!isInView && !prefersReducedMotion}
+      inert={!isInView && !prefersReducedMotion}
+      className="magazine-feature relative grid min-h-[18rem] aspect-[4/3] md:aspect-video md:min-h-0 grid-cols-[40%_60%] overflow-hidden rounded-xl border border-[#D9DDDA] bg-[#E5E7E6] shadow-[0_18px_55px_rgba(17,24,39,0.10)]"
+    >
+      <div className={`relative min-w-0 overflow-hidden ${imageFirst ? 'order-1' : 'order-2'}`}>
+        <motion.div className="absolute inset-0" style={prefersReducedMotion ? undefined : { opacity: imageOpacity, scale: imageScale }}>
+          <Image
+            src={card.image}
+            alt={card.title}
+            fill
+            sizes="(max-width: 767px) 42vw, 50vw"
+            className="object-cover"
+          />
+        </motion.div>
+        <div
+          aria-hidden="true"
+          className={`absolute inset-0 ${imageFirst ? 'bg-gradient-to-r' : 'bg-gradient-to-l'} from-transparent via-[#E5E7E6]/25 to-[#E5E7E6]`}
+        />
+      </div>
+
+      <div className={`relative z-10 flex min-w-0 flex-col justify-center bg-[#E5E7E6] px-3 py-5 sm:px-6 md:px-10 md:py-12 lg:px-14 ${imageFirst ? 'order-2' : 'order-1'}`}>
+        <motion.p
+          style={prefersReducedMotion ? undefined : { opacity: categoryOpacity, y: categoryY }}
+          className="mb-2 text-[8px] font-extrabold uppercase tracking-[0.12em] text-[#8D6B1B] sm:mb-4 sm:text-[10px] md:text-xs md:tracking-[0.22em]"
+        >
+          {card.eyebrow}
+        </motion.p>
+        <motion.h3
+          style={prefersReducedMotion ? undefined : { opacity: titleOpacity, y: titleY }}
+          className="text-sm font-black leading-tight text-[#111827] sm:text-xl md:text-3xl lg:text-4xl"
+        >
+          {card.title}
+        </motion.h3>
+        <motion.p
+          style={prefersReducedMotion ? undefined : { opacity: bodyOpacity, y: bodyY }}
+          className="mt-2 text-[10px] leading-snug text-[#354354] sm:mt-4 sm:text-sm sm:leading-relaxed md:text-base lg:text-lg"
+        >
+          {card.body}
+        </motion.p>
+        <motion.div style={prefersReducedMotion ? undefined : { opacity: ctaOpacity, y: ctaY }}>
+          <Link
+            href={card.link}
+            className="mt-3 inline-flex min-h-9 max-w-full items-center gap-1.5 self-start text-[8px] font-extrabold uppercase tracking-[0.08em] text-[#1E4D38] hover:text-[#8D6B1B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1E4D38] sm:mt-6 sm:min-h-11 sm:gap-2 sm:text-[10px] sm:tracking-[0.14em] md:text-xs"
+          >
+            <span>{card.cta}</span>
+            <ArrowRight aria-hidden="true" className="h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+          </Link>
+        </motion.div>
+      </div>
+    </motion.article>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
+  const magazineRef = useRef<HTMLElement>(null);
   const isNavigatingRef = useRef(false);
   const isDeckHandoffRef = useRef(false);
+  const skipAvailableRef = useRef(false);
+  const skipInProgressRef = useRef(false);
+  const deckControlModeRef = useRef<DeckControlMode>('hidden');
   const [isFanned, setIsFanned] = useState(false);
   const isFannedRef = useRef(false);
   const [activeFocusedCard, setActiveFocusedCard] = useState<string | null>(null);
   const [mobileCardIndex, setMobileCardIndex] = useState(0);
   const [mobileCardFlipped, setMobileCardFlipped] = useState(false);
   const [useStaticDeck, setUseStaticDeck] = useState(false);
+  const [skipAvailable, setSkipAvailable] = useState(false);
+  const [deckControlMode, setDeckControlMode] = useState<DeckControlMode>('hidden');
+  const [skipInProgress, setSkipInProgress] = useState(false);
+  const [skipTransitionVisible, setSkipTransitionVisible] = useState(false);
+  const [skipTransitionCovered, setSkipTransitionCovered] = useState(false);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number; cardId: string } | null>(null);
   const suppressCardClickRef = useRef(false);
   const scrollTriggerRef = useRef<{ disable: (revert?: boolean) => void; enable: () => void } | null>(null);
@@ -179,6 +272,20 @@ export default function Home() {
   >({});
 
   const isMobileViewport = () => window.matchMedia('(max-width: 767px)').matches;
+  const prefersReducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const updateScrollToTopVisibility = () => {
+      setShowScrollToTop(window.scrollY > window.innerHeight * 0.65);
+    };
+    updateScrollToTopVisibility();
+    window.addEventListener('scroll', updateScrollToTopVisibility, { passive: true });
+    window.addEventListener('resize', updateScrollToTopVisibility);
+    return () => {
+      window.removeEventListener('scroll', updateScrollToTopVisibility);
+      window.removeEventListener('resize', updateScrollToTopVisibility);
+    };
+  }, []);
 
   useEffect(() => {
     // Force browser scroll to top on load
@@ -204,6 +311,10 @@ export default function Home() {
       const isMobile = window.matchMedia('(max-width: 767px)').matches;
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       setUseStaticDeck(prefersReducedMotion);
+      deckControlModeRef.current = 'hidden';
+      setDeckControlMode('hidden');
+      skipAvailableRef.current = false;
+      setSkipAvailable(false);
 
       // Synchronize Lenis smooth scroll if present
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -240,7 +351,6 @@ export default function Home() {
         gsap.set('#welcome-title h1', { color: '#111827' });
         gsap.set('#welcome-title h1 span', { color: '#8D6B1B' });
         gsap.set('#welcome-title p', { color: '#4B5563' });
-
         cards.forEach((card) => {
           const cardEl = `#${card.id}`;
           gsap.set(cardEl, {
@@ -269,6 +379,10 @@ export default function Home() {
         };
 
         if (prefersReducedMotion) {
+          deckControlModeRef.current = 'hidden';
+          setDeckControlMode('hidden');
+          skipAvailableRef.current = false;
+          setSkipAvailable(false);
           gsap.set('#welcome-title', { xPercent: -50, clearProps: 'opacity,scale,z,filter' });
           gsap.set(sceneEl, { clearProps: 'backgroundColor' });
           cards.forEach((card) => {
@@ -503,6 +617,9 @@ export default function Home() {
           }
         }
 
+        const controlStartAt = 0.08;
+        const topControlAt = tl.labels['step-9'] ?? cardSequenceStart + 9 * cardStepDuration;
+
         /* ── FINAL CARD (Card 10): Flip & Focus in Center ── */
         const lastCard = cards[totalCards - 1];
         const lastCardId = `#${lastCard.id}`;
@@ -615,8 +732,9 @@ export default function Home() {
           );
         });
 
-        /* Hold the finished fan so the following CTA section scrolls over the pinned scene. */
-        tl.to({}, { duration: 3.5 });
+        /* Ease into the magazine handoff slowly while the fan softens behind it. */
+        const magazineHandoffDuration = 5.5;
+        tl.to({}, { duration: magazineHandoffDuration });
         cards.forEach((card) => {
           tl.to(`#${card.id}`, {
             rotationX: 166,
@@ -628,12 +746,12 @@ export default function Home() {
             ...(isMobile ? {} : { scale: 0.24 }),
             duration: 3.5,
             ease: 'power1.inOut',
-          }, 'spreadAll+=3.5');
+          }, `spreadAll+=${magazineHandoffDuration}`);
           tl.to(`#${card.id} .card-face`, {
             filter: 'blur(4px)',
-            duration: 3.5,
+            duration: magazineHandoffDuration,
             ease: 'power1.inOut',
-          }, 'spreadAll+=3.5');
+          }, `spreadAll+=${magazineHandoffDuration}`);
         });
 
         const fanReadyAt = (tl.labels.spreadAll ?? tl.duration()) + 2.5;
@@ -641,11 +759,34 @@ export default function Home() {
         tl.eventCallback('onUpdate', () => {
           isDeckHandoffRef.current = tl.time() >= handoffLockAt;
           updateFanState(tl.time() >= fanReadyAt);
+          let nextControlMode: DeckControlMode = 'hidden';
+          if (tl.time() >= controlStartAt) nextControlMode = 'skip';
+          if (tl.time() >= topControlAt) nextControlMode = 'top';
+          if (tl.time() >= tl.duration() - 0.01) nextControlMode = 'magazine';
+          if (deckControlModeRef.current !== nextControlMode) {
+            deckControlModeRef.current = nextControlMode;
+            setDeckControlMode(nextControlMode);
+          }
+          const nextSkipAvailable = nextControlMode === 'skip';
+          if (skipAvailableRef.current !== nextSkipAvailable) {
+            skipAvailableRef.current = nextSkipAvailable;
+            setSkipAvailable(nextSkipAvailable);
+          }
         });
-        tl.eventCallback('onComplete', () => updateFanState(true));
+        tl.eventCallback('onComplete', () => {
+          updateFanState(true);
+          deckControlModeRef.current = 'magazine';
+          setDeckControlMode('magazine');
+          skipAvailableRef.current = false;
+          setSkipAvailable(false);
+        });
         tl.eventCallback('onReverseComplete', () => {
           isDeckHandoffRef.current = false;
           updateFanState(false);
+          deckControlModeRef.current = 'hidden';
+          setDeckControlMode('hidden');
+          skipAvailableRef.current = false;
+          setSkipAvailable(false);
         });
         scrollTriggerRef.current = tl.scrollTrigger ?? null;
 
@@ -664,6 +805,79 @@ export default function Home() {
       sceneElement?.classList.remove('scene-ready');
     };
   }, []);
+
+  const handleSkipToMagazine = () => {
+    if (!magazineRef.current || !skipAvailable || skipInProgressRef.current) return;
+
+    skipInProgressRef.current = true;
+    setSkipInProgress(true);
+    setSkipTransitionVisible(true);
+    window.setTimeout(() => setSkipTransitionCovered(true), 40);
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 72;
+    const targetY = Math.max(
+      0,
+      window.scrollY + magazineRef.current.getBoundingClientRect().top - headerHeight - 12
+    );
+    let completed = false;
+    let fallbackTimer = 0;
+    const finishSkip = () => {
+      if (completed) return;
+      completed = true;
+      window.clearTimeout(fallbackTimer);
+      setSkipTransitionVisible(false);
+      setSkipTransitionCovered(false);
+      skipInProgressRef.current = false;
+      setSkipInProgress(false);
+      deckControlModeRef.current = 'magazine';
+      setDeckControlMode('magazine');
+      skipAvailableRef.current = false;
+      setSkipAvailable(false);
+      magazineRef.current?.focus({ preventScroll: true });
+    };
+
+    const lenis = (window as Window & {
+      __lenisInstance?: {
+        scrollTo: (target: number, options: { duration: number; onComplete: () => void }) => void;
+      };
+    }).__lenisInstance;
+
+    if (lenis) {
+      lenis.scrollTo(targetY, { duration: 0.85, onComplete: finishSkip });
+      fallbackTimer = window.setTimeout(finishSkip, 1800);
+      return;
+    }
+
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+    window.addEventListener('scrollend', finishSkip, { once: true });
+    fallbackTimer = window.setTimeout(finishSkip, 2200);
+  };
+
+  const handleControlClick = () => {
+    if (activeControlMode === 'skip') {
+      handleSkipToMagazine();
+      return;
+    }
+
+    if (activeControlMode !== 'hidden') {
+      const lenis = (window as Window & {
+        __lenisInstance?: {
+          scrollTo: (target: number, options: { duration?: number; immediate?: boolean }) => void;
+        };
+      }).__lenisInstance;
+      if (lenis) {
+        lenis.scrollTo(0, prefersReducedMotion ? { immediate: true } : { duration: 1.2 });
+      } else {
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      }
+    }
+  };
+
+  const activeControlMode: DeckControlMode = useStaticDeck
+    ? showScrollToTop ? 'magazine' : 'hidden'
+    : deckControlMode;
+  const controlHidden = activeControlMode === 'hidden';
+  const controlIsSkip = activeControlMode === 'skip';
+  const controlLabel = controlIsSkip ? 'Skip 3D cards and view highlights' : 'Go to top';
 
   const getCardZoomPose = (cardId: string, preferredScale: number) => {
     const cardElement = document.getElementById(cardId);
@@ -1205,9 +1419,40 @@ export default function Home() {
             <ChevronRight aria-hidden="true" />
           </button>
         </nav>
+
       </div>
 
-      {/* ═══════════════ EDITORIAL CLOSING SECTION (Rises over pinned fanned cards) ═══════════════ */}
+      <section
+        ref={magazineRef}
+        id="magazine-highlights"
+        tabIndex={-1}
+        aria-labelledby="magazine-highlights-title"
+        className="magazine-highlights-section bg-[#FBFBFA] text-[#111827] border-t border-[#E4B03A]/35"
+      >
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24">
+          <ScrollReveal direction="up" duration={0.8} once>
+            <div className="mb-10 max-w-3xl sm:mb-14">
+              <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.22em] text-[#8D6B1B]">
+                Explore the carnival
+              </p>
+              <h2 id="magazine-highlights-title" className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                Ten ways to experience the celebration
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#4B5563] sm:text-base">
+                From championship breeds and cultural pageantry to live music, food, and the festival grounds, find the experiences you want to explore.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="flex flex-col gap-6 sm:gap-8 lg:gap-10">
+            {cards.map((card, index) => (
+              <MagazineFeature key={`magazine-${card.id}`} card={card} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Closing CTA follows the magazine highlights. */}
       <section className="closing-cta-section w-full py-20 sm:py-24 bg-[#08150B] text-white relative overflow-hidden border-t border-[#E4B03A]/30">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E4B03A]/50 to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(228,176,58,0.08)_0%,transparent_70%)] pointer-events-none" />
@@ -1253,6 +1498,53 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none fixed inset-0 z-[100] bg-[#FBFBFA] transition-opacity duration-500 ease-out ${skipTransitionVisible ? (skipTransitionCovered ? 'opacity-100' : 'opacity-0') : 'opacity-0'}`}
+      />
+
+      <div className="pointer-events-none fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-1/2 z-[70] -translate-x-1/2 md:bottom-[calc(1.25rem+env(safe-area-inset-bottom))]">
+        <motion.button
+          type="button"
+          id="deck-navigation-control"
+          aria-label={controlLabel}
+          title={controlLabel}
+          aria-hidden={controlHidden}
+          tabIndex={controlHidden ? -1 : 0}
+          disabled={controlHidden || (controlIsSkip && skipInProgress)}
+          animate={{
+            opacity: controlHidden ? 0 : 1,
+            scale: controlHidden ? 0.78 : 1,
+            width: controlHidden || controlIsSkip ? 40 : activeControlMode === 'top' ? 120 : 136,
+          }}
+          transition={{
+            duration: prefersReducedMotion ? 0 : 0.75,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          onClick={handleControlClick}
+          className={`pointer-events-auto flex h-10 items-center justify-center gap-2 overflow-hidden rounded-full border px-2 text-[#1E4D38] shadow-[0_8px_30px_rgba(3,10,5,0.16)] backdrop-blur-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E4B03A] ${activeControlMode === 'magazine' ? 'border-white/90 bg-white/75' : 'border-white/85 bg-white/75'}`}
+        >
+          <motion.span
+            initial={false}
+            animate={{ rotate: controlIsSkip ? 0 : 180, opacity: controlHidden ? 0 : 1 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="flex shrink-0"
+          >
+            <ArrowDown aria-hidden="true" className="h-4 w-4" strokeWidth={2.5} />
+          </motion.span>
+          {(activeControlMode === 'top' || activeControlMode === 'magazine') && (
+            <motion.span
+              initial={prefersReducedMotion ? false : { opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: prefersReducedMotion ? 0 : 0.45, delay: prefersReducedMotion ? 0 : 0.12 }}
+              className="whitespace-nowrap text-xs font-bold"
+            >
+              Go to top
+            </motion.span>
+          )}
+        </motion.button>
+      </div>
     </div>
   );
 }
