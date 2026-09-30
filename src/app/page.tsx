@@ -210,8 +210,8 @@ export default function Home() {
 
       if (isCancelled) return;
 
-      const Y_OFFSET = isMobile ? 8 : 12;
-      const Z_OFFSET = isMobile ? 12 : 16;
+      const Y_OFFSET = isMobile ? 3 : 5;
+      const Z_OFFSET = isMobile ? 4 : 6;
       const totalCards = cards.length;
 
       ctx = gsap.context(() => {
@@ -221,20 +221,20 @@ export default function Home() {
         /* Center scene elements */
         gsap.set('.scene-element', { xPercent: -50, yPercent: 0 });
 
-          /* ── INITIAL STATE AT SCROLL = 0 (PAGE LOAD) ──
-            - Compact dark hero text is visible over the white scene
-           - All 10 Cards start OFF-SCREEN BELOW the viewport (y: '110vh')
-        */
+        /* Fixed solid dark background for scene to prevent background jitter */
+        gsap.set(sceneEl, { backgroundColor: '#030A05' });
+
+        /* Hero title setup with fixed high-contrast colors */
         gsap.set('#welcome-title', {
           opacity: 1,
           scale: 1,
           z: 0,
-          filter: 'blur(0px)',
+          filter: 'none',
         });
 
-        gsap.set('#welcome-title h1', { color: '#111827' });
-        gsap.set('#welcome-title h1 span', { color: '#8D6B1B' });
-        gsap.set('#welcome-title p', { color: '#4B5563' });
+        gsap.set('#welcome-title h1', { color: '#F9FAFB' });
+        gsap.set('#welcome-title h1 span', { color: '#E4B03A' });
+        gsap.set('#welcome-title p', { color: '#D1D5DB' });
 
         cards.forEach((card) => {
           const cardEl = `#${card.id}`;
@@ -253,7 +253,7 @@ export default function Home() {
           });
 
           gsap.set(`${cardEl} .card-inner`, { rotationX: 0 });
-          gsap.set(`${cardEl} .card-face`, { opacity: 1, visibility: 'visible', filter: 'blur(0px)' });
+          gsap.set(`${cardEl} .card-face`, { opacity: 1, visibility: 'visible', filter: 'none' });
         });
 
         const updateFanState = (ready: boolean) => {
@@ -274,13 +274,13 @@ export default function Home() {
           return;
         }
 
-        /* ── ScrollTrigger Timeline Setup ── */
+        /* ── ScrollTrigger Timeline Setup (60FPS Hardware Accelerated) ── */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sceneEl,
             start: 'top top',
             end: `+=${isMobile ? totalCards * 1800 + 3000 : totalCards * 2600 + 4000}`,
-            scrub: isMobile ? 1 : 1.5,
+            scrub: isMobile ? 0.6 : 0.8,
             pin: true,
             anticipatePin: 1,
             pinSpacing: true,
@@ -299,41 +299,15 @@ export default function Home() {
           ease: 'power2.out',
         }, 0);
 
-        /* Transition the white hero into the dark deck scene as the first card rises. */
-        tl.to(sceneEl, {
-          backgroundColor: '#030A05',
-          duration: 2.2,
-          ease: 'power1.inOut',
-        }, 0.2);
-
-        tl.to('#welcome-title h1', {
-          color: '#F9FAFB',
-          duration: 2,
-          ease: 'power1.inOut',
-        }, 0.2);
-
-        tl.to('#welcome-title h1 span', {
-          color: '#E4B03A',
-          duration: 2,
-          ease: 'power1.inOut',
-        }, 0.2);
-
-        tl.to('#welcome-title p', {
-          color: '#D1D5DB',
-          duration: 2,
-          ease: 'power1.inOut',
-        }, 0.2);
-
         tl.to('#welcome-title', {
-          opacity: 0.58,
-          scale: 1,
+          opacity: 0.35,
+          scale: 0.98,
           z: -100,
-          filter: 'blur(3px)',
           duration: 2,
           ease: 'power1.out',
         }, 0.2);
 
-        // Cards 2 to 10 move up from bottom into their 3D stack position behind Card 1
+        // Cards 2 to 10 move up from bottom into their tight 3D stack position behind Card 1
         cards.slice(1).forEach((card, idx) => {
           const cardIndex = idx + 1;
           const cardEl = `#${card.id}`;
@@ -347,13 +321,6 @@ export default function Home() {
             duration: 2.2,
             ease: 'power2.out',
           }, 0.2);
-
-          if (!isMobile) {
-            tl.to(`${cardEl} .card-face`, {
-              filter: 'blur(5px)',
-              duration: 1.5,
-            }, 0.5);
-          }
         });
 
         /* ── LOOP SEQUENCE (Cards 0 to N-2) ── */
@@ -418,14 +385,9 @@ export default function Home() {
             '<'
           );
 
-          if (!isMobile) {
-            tl.to(`${cardId} .card-face`, { filter: 'blur(5px)', duration: 1.5, ease: 'power1.out' }, '<');
-          }
-
           // Shift remaining cards forward in the stack
           for (let j = i + 1; j < totalCards; j++) {
             const nextCardId = `#${cards[j].id}`;
-            const nextFaces = `${nextCardId} .card-face`;
             const relativePos = j - (i + 1);
 
             tl.to(
@@ -439,19 +401,6 @@ export default function Home() {
               },
               '<'
             );
-
-            // Unblur the card moving to position 0
-            if (relativePos === 0 && !isMobile) {
-              tl.to(
-                nextFaces,
-                {
-                  filter: 'blur(0px)',
-                  duration: 1.5,
-                  ease: 'power1.out',
-                },
-                '<'
-              );
-            }
           }
         }
 
@@ -469,10 +418,6 @@ export default function Home() {
           },
           'last-card-reveal'
         );
-
-        if (!isMobile) {
-          tl.to(`${lastCardId} .card-face`, { filter: 'blur(0px)', duration: 1.5 }, 'last-card-reveal');
-        }
 
         tl.to(
           lastCardId,
@@ -538,9 +483,6 @@ export default function Home() {
             },
             'spreadAll'
           );
-          if (!isMobile) {
-            tl.to(`${cardId} .card-face`, { filter: 'blur(0px)', duration: 2.5 }, 'spreadAll');
-          }
         });
 
         tl.eventCallback('onUpdate', () => updateFanState(tl.progress() >= 0.999));
