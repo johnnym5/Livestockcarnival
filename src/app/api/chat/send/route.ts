@@ -63,22 +63,27 @@ export async function POST(request: Request) {
       );
     }
 
-    // Admin client for DB operations
-    const adminDb = createClient(supabaseUrl, serviceRoleKey || supabaseAnonKey, {
-      auth: { persistSession: false },
+    // Create DB client configured with user session or service role
+    const dbClient = createClient(supabaseUrl, serviceRoleKey || supabaseAnonKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
     });
 
     const userEmail = user.email || 'user@livestockcarnival.ng';
-    const userName = sanitizeText(
-      user.user_metadata?.full_name ||
-      user.user_metadata?.name ||
-      userEmail.split('@')[0] ||
-      'Help Desk User'
-    );
+    const userName =
+      sanitizeText(
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        userEmail.split('@')[0]
+      ) || 'Help Desk User';
     const userAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
 
     // Check if user has an existing thread
-    const { data: existingThread, error: threadFetchError } = await adminDb
+    const { data: existingThread, error: threadFetchError } = await dbClient
       .from('chat_threads')
       .select('id')
       .eq('user_id', user.id)
@@ -92,7 +97,7 @@ export async function POST(request: Request) {
 
     if (!threadId) {
       // Create new chat thread
-      const { data: newThread, error: createThreadError } = await adminDb
+      const { data: newThread, error: createThreadError } = await dbClient
         .from('chat_threads')
         .insert({
           user_id: user.id,
@@ -110,7 +115,7 @@ export async function POST(request: Request) {
       if (createThreadError || !newThread) {
         console.error('Error creating chat thread:', createThreadError);
         return NextResponse.json(
-          { error: 'Unable to initialize chat thread. Please try again.' },
+          { error: createThreadError?.message || 'Unable to initialize chat thread. Please try again.' },
           { status: 500 }
         );
       }
@@ -119,7 +124,7 @@ export async function POST(request: Request) {
     }
 
     // Insert message into chat_messages
-    const { data: insertedMessage, error: insertMsgError } = await adminDb
+    const { data: insertedMessage, error: insertMsgError } = await dbClient
       .from('chat_messages')
       .insert({
         thread_id: threadId,
@@ -132,13 +137,13 @@ export async function POST(request: Request) {
     if (insertMsgError || !insertedMessage) {
       console.error('Error inserting message:', insertMsgError);
       return NextResponse.json(
-        { error: 'Failed to deliver message. Please try again.' },
+        { error: insertMsgError?.message || 'Failed to deliver message. Please try again.' },
         { status: 500 }
       );
     }
 
     // Update thread metadata
-    await adminDb
+    await dbClient
       .from('chat_threads')
       .update({
         last_message_text: sanitizedText,
@@ -159,7 +164,7 @@ export async function POST(request: Request) {
     const errorMsg = err instanceof Error ? err.message : 'Internal server error';
     console.error('Chat API Error:', errorMsg);
     return NextResponse.json(
-      { error: 'An unexpected error occurred while processing your request.' },
+      { error: errorMsg || 'An unexpected error occurred while processing your request.' },
       { status: 500 }
     );
   }

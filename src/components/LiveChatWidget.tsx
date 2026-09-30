@@ -218,7 +218,15 @@ export default function LiveChatWidget() {
   // Send message
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!inputText.trim() || !session || isSending) return;
+    if (!inputText.trim() || isSending) return;
+
+    const { data: { session: freshSession } } = await supabase.auth.getSession();
+    const tokenToUse = freshSession?.access_token || session?.token;
+
+    if (!tokenToUse) {
+      setErrorNotice('Your session has expired. Please sign in again.');
+      return;
+    }
 
     const textToSend = inputText.trim();
     setInputText('');
@@ -230,7 +238,7 @@ export default function LiveChatWidget() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.token}`,
+          Authorization: `Bearer ${tokenToUse}`,
         },
         body: JSON.stringify({ text: textToSend }),
       });
