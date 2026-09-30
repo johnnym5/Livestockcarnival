@@ -292,7 +292,7 @@ html.lenis, html.lenis body {
 /* ── 3D Scene Container & Deck Architecture ───────────────────────────── */
 
 #scene-container {
-  perspective: 2000px; /* Crucial for 3D depth */
+  perspective: 950px; /* Strong 3D perspective depth & foreshortening */
   overflow: hidden;
   width: 100%;
   height: 100vh;

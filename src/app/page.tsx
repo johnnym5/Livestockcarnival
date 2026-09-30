@@ -715,6 +715,47 @@ export default function Home() {
     setActiveFocusedCard(null);
   };
 
+  /* ── Dynamic 3D Depth & Tilt Effect on Mouse Move ── */
+  const handleCardMouseMove = async (e: React.MouseEvent<HTMLDivElement>) => {
+    const cardEl = e.currentTarget;
+    const inner = cardEl.querySelector('.card-inner');
+    if (!inner) return;
+
+    const rect = cardEl.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const xPct = x / rect.width - 0.5;
+    const yPct = y / rect.height - 0.5;
+
+    const tiltX = -yPct * 18;
+    const tiltY = xPct * 18;
+
+    const gsapMod = await import('gsap');
+    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
+    gsap.to(inner, {
+      rotationX: -180 + tiltX,
+      rotationY: tiltY,
+      duration: 0.2,
+      ease: 'power1.out',
+    });
+  };
+
+  const handleCardMouseLeave = async (e: React.MouseEvent<HTMLDivElement>) => {
+    const cardEl = e.currentTarget;
+    const inner = cardEl.querySelector('.card-inner');
+    if (!inner) return;
+
+    const gsapMod = await import('gsap');
+    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
+    gsap.to(inner, {
+      rotationX: -180,
+      rotationY: 0,
+      duration: 0.5,
+      ease: 'power2.out',
+    });
+  };
+
   return (
     <div ref={containerRef} className="w-full bg-[#030A05] text-white overflow-x-hidden select-none">
       {/* ═══════════════ 3D PINNED DECK SCENE ═══════════════ */}
@@ -841,6 +882,8 @@ export default function Home() {
               */
               className="deck-card w-[76vw] max-w-[320px] aspect-[9/16] md:w-[82vw] md:max-w-[920px] md:aspect-video lg:w-[84vw] lg:max-w-[1040px] pointer-events-auto"
               data-mobile-active={mobileCardIndex === Number(card.number) - 1}
+              onMouseMove={handleCardMouseMove}
+              onMouseLeave={handleCardMouseLeave}
               onClick={() => {
                 if (useStaticDeck) {
                   setMobileCardFlipped((flipped) => !flipped);
@@ -930,16 +973,13 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="pt-2 sm:pt-0">
+                    <div className="pt-2 sm:pt-0 relative z-30">
                       <Link
                         href={card.link}
-                        aria-disabled={!isFanned}
-                        tabIndex={isFanned ? undefined : -1}
-                        className={`inline-flex items-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-[#E4B03A] text-[#0A1A10] text-xs sm:text-sm font-extrabold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-button transition-all group ${isFanned ? 'card-cta-ready hover:bg-[#D4A030] hover:-translate-y-0.5' : 'pointer-events-none cursor-not-allowed opacity-45'}`}
+                        className="inline-flex items-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-[#E4B03A] text-[#0A1A10] text-xs sm:text-sm font-extrabold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-button transition-all group hover:bg-[#D4A030] hover:-translate-y-0.5 cursor-pointer pointer-events-auto relative z-30 opacity-100"
                         onClick={(event) => {
                           event.preventDefault();
                           event.stopPropagation();
-                          if (!isFanned) return;
                           navigateToCardPage(card);
                         }}
                       >
