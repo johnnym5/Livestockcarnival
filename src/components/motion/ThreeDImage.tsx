@@ -43,7 +43,7 @@ export default function ThreeDImage({
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
-    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches)) {
+    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches)) {
       return;
     }
     const rect = containerRef.current.getBoundingClientRect();
@@ -66,7 +66,7 @@ export default function ThreeDImage({
   };
 
   const handleMouseEnter = () => {
-    if (prefersReducedMotion || !window.matchMedia('(hover: hover)').matches) return;
+    if (prefersReducedMotion || !window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches) return;
     setIsHovered(true);
   };
 

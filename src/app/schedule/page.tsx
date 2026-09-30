@@ -3,23 +3,23 @@ import ScrollReveal from '@/components/ScrollReveal';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Official 3-Day Program & Timetable | National Livestock Carnival 2026',
+  title: 'Official 3-Day Carnival Program | National Livestock Carnival 2026',
   description:
     'Complete 3-day program schedule for the 2026 Renewed Hope National Livestock Carnival in Abuja. Filter sessions by track - ceremonies, livestock judging, agribusiness B2B, and live concert entertainments.',
 };
 
 export default function SchedulePage() {
   return (
-    <main className="min-h-screen bg-[#FBFBFA] pt-24 pb-20 overflow-x-hidden">
+    <main className="relative isolate min-h-screen bg-[#FBFBFA] pt-24 pb-20 overflow-x-clip">
       {/* Ambient glow */}
-      <div className="absolute top-32 left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-[#D8EADF]/30 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-32 left-1/2 -translate-x-1/2 w-[min(700px,100vw)] h-[300px] bg-[#D8EADF]/30 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Header Banner */}
       <section className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-12">
         <ScrollReveal direction="zoom" delay={0}>
           <span className="text-xs font-bold tracking-widest text-[#1E4D38] uppercase bg-[#D8EADF] px-4 py-1.5 rounded-full inline-flex items-center gap-2 mb-4">
             <span className="w-1.5 h-1.5 bg-[#1E4D38] rounded-full" />
-            Official Master Timetable
+            Carnival Program
           </span>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.08} duration={1.1}>
@@ -30,7 +30,7 @@ export default function SchedulePage() {
         <ScrollReveal direction="up" delay={0.16} duration={1.0}>
           <p className="text-base sm:text-lg text-[#4B5563] max-w-2xl mx-auto leading-relaxed">
             21 – 23 November 2026 &bull; Old Parade Ground, Area 10, Garki, Abuja.
-            Synchronized master timeline for presidential commission, breed judging, B2B investment forums, and grand finale concerts.
+            Explore the ceremonies, breed judging, business forums, and live performances planned across all three days.
           </p>
         </ScrollReveal>
         <ScrollReveal direction="up" delay={0.1}>

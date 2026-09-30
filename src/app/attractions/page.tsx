@@ -56,11 +56,22 @@ const livestockList = [
   },
 ];
 
+type Attraction = {
+  id: string;
+  zone: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  summary: string;
+  features: string[];
+  scheduleWindow: string;
+};
+
 export default function AttractionsPage() {
   return (
-    <main className="min-h-screen bg-[#FBFBFA] pt-24 pb-24 overflow-x-hidden">
+    <main className="relative isolate min-h-screen bg-[#FBFBFA] pt-24 pb-24 overflow-x-clip">
       {/* Ambient orbs */}
-      <div className="absolute top-20 right-0 w-[500px] h-[500px] bg-[#D8EADF]/20 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-20 right-0 w-[min(500px,100vw)] aspect-square bg-[#D8EADF]/20 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Hero header */}
@@ -89,7 +100,7 @@ export default function AttractionsPage() {
 
         {/* Primary Festival Arenas */}
         <div className="space-y-16 mb-24">
-          {attractions.map((attraction: any, index: number) => (
+          {attractions.map((attraction: Attraction, index: number) => (
             <ScrollReveal key={attraction.id} direction={index % 2 === 0 ? 'right' : 'left'} delay={0.05} duration={0.95}>
               <div
                 id={attraction.id}

@@ -104,7 +104,7 @@ export default function Header() {
 
           {/* ── Mobile & Tablet Hamburger Toggle (Pushed right, shrink-0, z-30) ── */}
           <button
-            className="2xl:hidden text-[#111827] p-2 focus:outline-none shrink-0 z-30 bg-slate-100 hover:bg-[#D8EADF]/50 rounded-xl border border-slate-200 active:scale-95 transition-all ml-auto"
+            className={`${pathname === '/schedule' ? '!flex' : '2xl:hidden'} text-[#111827] p-2 focus:outline-none shrink-0 z-30 bg-slate-100 hover:bg-[#D8EADF]/50 rounded-xl border border-slate-200 active:scale-95 transition-all ml-auto`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle Navigation Menu"
           >
@@ -122,7 +122,7 @@ export default function Header() {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="2xl:hidden w-full bg-white/95 backdrop-blur-lg shadow-2xl border-b border-[#E5E7EB] flex flex-col p-6 max-h-[calc(100vh-80px)] overflow-y-auto"
+            className={`${pathname === '/schedule' ? 'flex' : '2xl:hidden'} w-full bg-white/95 backdrop-blur-lg shadow-2xl border-b border-[#E5E7EB] flex-col p-6 max-h-[calc(100vh-80px)] overflow-y-auto`}
           >
             <motion.nav
               variants={slideDownDrawer}

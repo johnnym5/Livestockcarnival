@@ -46,7 +46,7 @@
   transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.75s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.75s ease;
 }
 
-@media (hover: hover) and (pointer: fine) {
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
   .shadow-card:hover,
   .shadow-card:focus-within {
     transform: perspective(1100px) translateY(-5px) rotateX(0.8deg);
@@ -76,9 +76,11 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
+  overflow-x: clip;
   background-color: var(--color-canvas);
   color: var(--color-charcoal);
   font-family: var(--font-sans);
@@ -217,7 +219,7 @@ html.lenis, html.lenis body {
   transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.75s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.75s ease;
 }
 
-@media (hover: hover) and (pointer: fine) {
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
   .card-lift:hover,
   .card-lift:focus-within {
     transform: perspective(1000px) translateY(-6px) rotateX(1deg) scale(1.008);

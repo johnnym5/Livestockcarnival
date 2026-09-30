@@ -159,6 +159,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const isNavigatingRef = useRef(false);
+  const isDeckHandoffRef = useRef(false);
   const [isFanned, setIsFanned] = useState(false);
   const isFannedRef = useRef(false);
   const [activeFocusedCard, setActiveFocusedCard] = useState<string | null>(null);
@@ -618,17 +619,34 @@ export default function Home() {
         tl.to({}, { duration: 3.5 });
         cards.forEach((card) => {
           tl.to(`#${card.id}`, {
-            ...(isMobile ? {} : { scale: 0.276 }),
-            filter: 'blur(3px)',
+            rotationX: 166,
+            rotationY: 0,
+            duration: 0.3,
+            ease: 'power1.out',
+          }, 'spreadAll+=3.2');
+          tl.to(`#${card.id}`, {
+            ...(isMobile ? {} : { scale: 0.24 }),
+            duration: 3.5,
+            ease: 'power1.inOut',
+          }, 'spreadAll+=3.5');
+          tl.to(`#${card.id} .card-face`, {
+            filter: 'blur(4px)',
             duration: 3.5,
             ease: 'power1.inOut',
           }, 'spreadAll+=3.5');
         });
 
         const fanReadyAt = (tl.labels.spreadAll ?? tl.duration()) + 2.5;
-        tl.eventCallback('onUpdate', () => updateFanState(tl.time() >= fanReadyAt));
+        const handoffLockAt = (tl.labels.spreadAll ?? tl.duration()) + 3.2;
+        tl.eventCallback('onUpdate', () => {
+          isDeckHandoffRef.current = tl.time() >= handoffLockAt;
+          updateFanState(tl.time() >= fanReadyAt);
+        });
         tl.eventCallback('onComplete', () => updateFanState(true));
-        tl.eventCallback('onReverseComplete', () => updateFanState(false));
+        tl.eventCallback('onReverseComplete', () => {
+          isDeckHandoffRef.current = false;
+          updateFanState(false);
+        });
         scrollTriggerRef.current = tl.scrollTrigger ?? null;
 
         sceneEl.classList.add('scene-ready');
@@ -874,7 +892,7 @@ export default function Home() {
   };
 
   const handleCardPointerMove = async (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType !== 'touch' || !touchStartRef.current || !isFanned || activeFocusedCard) return;
+    if (event.pointerType !== 'touch' || !touchStartRef.current || !isFanned || activeFocusedCard || isDeckHandoffRef.current) return;
     const cardEl = event.currentTarget;
     const rect = cardEl.getBoundingClientRect();
     const xRatio = (event.clientX - rect.left) / rect.width - 0.5;
@@ -891,7 +909,7 @@ export default function Home() {
 
   /* ── Dynamic 3D Depth & Tilt Effect on Mouse Move ── */
   const handleCardMouseMove = async (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobileViewport() || !isFanned || useStaticDeck) return;
+    if (isMobileViewport() || !isFanned || useStaticDeck || isDeckHandoffRef.current) return;
     const cardEl = e.currentTarget;
 
     const rect = cardEl.getBoundingClientRect();
@@ -915,7 +933,7 @@ export default function Home() {
   };
 
   const handleCardMouseLeave = async (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobileViewport() || !isFanned || useStaticDeck) return;
+    if (isMobileViewport() || !isFanned || useStaticDeck || isDeckHandoffRef.current) return;
     const cardEl = e.currentTarget;
 
     const gsapMod = await import('gsap');

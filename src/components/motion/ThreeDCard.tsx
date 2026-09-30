@@ -40,7 +40,7 @@ export default function ThreeDCard({
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
-    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches)) {
+    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches)) {
       return;
     }
     const rect = cardRef.current.getBoundingClientRect();
@@ -66,7 +66,7 @@ export default function ThreeDCard({
   };
 
   const handleMouseEnter = () => {
-    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches)) {
+    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches)) {
       return;
     }
     setIsHovered(true);
