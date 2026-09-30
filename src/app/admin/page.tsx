@@ -11,6 +11,7 @@ import {
   ImagePlus,
   LogOut,
   MailPlus,
+  MessageSquare,
   Newspaper,
   Search,
   Send,
@@ -351,6 +352,12 @@ export default function AdminDashboardPage() {
           >
             <FileText className="h-4 w-4" /> Stories
           </button>
+          <Link
+            href="/admin/chat"
+            className="flex min-h-11 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/55 hover:bg-white/5 hover:text-white transition lg:flex-none"
+          >
+            <MessageSquare className="h-4 w-4" /> Live Support Chat
+          </Link>
           {profile.role === 'super_admin' && (
             <button
               type="button"

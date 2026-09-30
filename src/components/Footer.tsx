@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Shield } from 'lucide-react';
+import { Shield, Phone, MessageCircle } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -109,23 +109,37 @@ export default function Footer() {
                 Exhibitor Booths →
               </a>
             </nav>
-            <div className="text-xs text-[#9CA3AF] leading-relaxed pt-2 border-t border-white/10">
-              <p className="font-semibold text-white">Abuja National Grounds</p>
-              <p>Old Parade Ground, Area 10, Garki, Abuja FCT</p>
-              <p className="mt-1">November 21 – 23, 2026</p>
+            <div className="text-xs text-[#9CA3AF] leading-relaxed pt-2 border-t border-white/10 space-y-1">
+              <p className="font-semibold text-white">Secretariat Contact</p>
+              <a href="tel:+2349014740776" className="flex items-center gap-1.5 hover:text-white transition-colors">
+                <Phone size={12} className="text-[#D4AF37]" /> 09014740776 (Call)
+              </a>
+              <a href="https://wa.me/2349014740776" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
+                <MessageCircle size={12} className="text-[#25D366]" /> 09014740776 (WhatsApp)
+              </a>
+              <div className="pt-2">
+                <p className="font-semibold text-white">Abuja National Grounds</p>
+                <p>Old Parade Ground, Area 10, Garki, Abuja FCT</p>
+                <p className="mt-0.5">November 21 – 23, 2026</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Legal & Copyright */}
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#9CA3AF]">
+        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-[#9CA3AF]">
           <div>
             &copy; 2026 Federal Republic of Nigeria · Renewed Hope National Livestock Carnival. All rights reserved.
           </div>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap items-center gap-6">
+            <a href="https://x.com/livestockcarnival" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              Twitter (X)
+            </a>
+            <a href="https://instagram.com/livestockcarnival" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+              Instagram
+            </a>
             <Link href="/contact" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/accreditation" className="hover:text-white transition-colors">Terms of Accreditation</Link>
-            <Link href="/contact" className="hover:text-white transition-colors">Security Protocols</Link>
           </div>
         </div>
       </div>

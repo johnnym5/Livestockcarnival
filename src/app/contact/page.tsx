@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail, ArrowRight, ExternalLink, Ticket, Store, Building2 } from "lucide-react";
+import { MapPin, Phone, Mail, ArrowRight, ExternalLink, Ticket, Store, Building2, Share2, MessageCircle } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const departments = [
@@ -62,11 +62,17 @@ export default function ContactPage() {
                   icon: Phone,
                   bg: 'bg-[#FEF3D6]',
                   color: 'text-[#8D6B1B]',
-                  title: 'Phone Lines',
+                  title: 'Phone Lines & WhatsApp',
                   content: (
-                    <div className="space-y-1">
-                      <a href="tel:+2348000000000" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm">+234 800 000 0000 - General Enquiries</a>
-                      <a href="tel:+2348000000001" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm">+234 800 000 0001 - Exhibitor Hotline</a>
+                    <div className="space-y-1.5">
+                      <a href="tel:+2349014740776" className="flex items-center gap-2 text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm font-medium">
+                        <Phone className="w-3.5 h-3.5 text-[#1E4D38]" />
+                        09014740776 - Secretariat Phone Line
+                      </a>
+                      <a href="https://wa.me/2349014740776" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm font-medium">
+                        <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                        09014740776 - Official WhatsApp Line
+                      </a>
                     </div>
                   ),
                 },
@@ -79,6 +85,22 @@ export default function ContactPage() {
                     <div className="space-y-1">
                       <a href="mailto:info@livestockcarnival.ng" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm">info@livestockcarnival.ng</a>
                       <a href="mailto:press@livestockcarnival.ng" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm">press@livestockcarnival.ng</a>
+                    </div>
+                  ),
+                },
+                {
+                  icon: Share2,
+                  bg: 'bg-[#FEF3D6]',
+                  color: 'text-[#8D6B1B]',
+                  title: 'Social Media Channels',
+                  content: (
+                    <div className="space-y-1">
+                      <a href="https://x.com/livestockcarnival" target="_blank" rel="noopener noreferrer" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm font-medium">
+                        Twitter (X): @livestockcarnival
+                      </a>
+                      <a href="https://instagram.com/livestockcarnival" target="_blank" rel="noopener noreferrer" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm font-medium">
+                        Instagram: @livestockcarnival
+                      </a>
                     </div>
                   ),
                 },

@@ -36,3 +36,4 @@ process_logo.cs
 docx_temp/
 *.docx
 *.txt
+supabase/.temp/

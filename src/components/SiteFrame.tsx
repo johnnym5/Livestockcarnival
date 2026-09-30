@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
+import LiveChatWidget from '@/components/LiveChatWidget';
 import SmoothScroll from '@/components/SmoothScroll';
 
 export default function SiteFrame({ children }: { children: ReactNode }) {
@@ -15,6 +16,7 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
       {!isAdminRoute && <Header />}
       <main className="flex-1">{children}</main>
       {!isAdminRoute && <Footer />}
+      {!isAdminRoute && <LiveChatWidget />}
     </SmoothScroll>
   );
 }
