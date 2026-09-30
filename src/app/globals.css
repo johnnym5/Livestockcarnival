@@ -40,6 +40,30 @@
 /* Custom elevation utility classes */
 .shadow-card {
   box-shadow: 0 10px 30px -5px rgba(17, 24, 39, 0.06), 0 8px 15px -6px rgba(17, 24, 39, 0.04);
+  background-color: rgba(255, 255, 255, 0.82);
+  border-color: rgba(255, 255, 255, 0.72);
+  transform-style: preserve-3d;
+  transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.75s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.75s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shadow-card:hover,
+  .shadow-card:focus-within {
+    transform: perspective(1100px) translateY(-5px) rotateX(0.8deg);
+    border-color: rgba(228, 176, 58, 0.3);
+    -webkit-backdrop-filter: blur(12px) saturate(145%);
+    backdrop-filter: blur(12px) saturate(145%);
+    box-shadow: 0 24px 48px -12px rgba(17, 24, 39, 0.14), 0 12px 24px -12px rgba(30, 77, 56, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shadow-card,
+  .shadow-card:hover,
+  .shadow-card:focus-within {
+    transform: none;
+    transition: none;
+  }
 }
 
 .shadow-card-hover {
@@ -167,12 +191,30 @@ html.lenis, html.lenis body {
 /* ── Card Hover Lift System ───────────────────────────────────────────── */
 
 .card-lift {
-  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  background-color: rgba(255, 255, 255, 0.78);
+  border-color: rgba(255, 255, 255, 0.72);
+  transform-style: preserve-3d;
+  transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.75s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.75s ease;
 }
 
-.card-lift:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 28px 56px -8px rgba(17, 24, 39, 0.14), 0 16px 24px -6px rgba(17, 24, 39, 0.10);
+@media (hover: hover) and (pointer: fine) {
+  .card-lift:hover,
+  .card-lift:focus-within {
+    transform: perspective(1000px) translateY(-6px) rotateX(1deg) scale(1.008);
+    border-color: rgba(228, 176, 58, 0.32);
+    -webkit-backdrop-filter: blur(12px) saturate(145%);
+    backdrop-filter: blur(12px) saturate(145%);
+    box-shadow: 0 28px 56px -8px rgba(17, 24, 39, 0.14), 0 16px 24px -6px rgba(30, 77, 56, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-lift,
+  .card-lift:hover,
+  .card-lift:focus-within {
+    transform: none;
+    transition: none;
+  }
 }
 
 /* ── Image Parallax Clip ─────────────────────────────────────────────── */
@@ -227,52 +269,284 @@ html.lenis, html.lenis body {
   border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
-/* ── 3D Scene Container ──────────────────────────────────────────────── */
+/* ── 3D Scene Container & Deck Architecture ───────────────────────────── */
 
 #scene-container {
-  perspective: 1200px;
-  transform-style: preserve-3d;
+  perspective: 2000px; /* Crucial for 3D depth */
   overflow: hidden;
   width: 100%;
+  height: 100vh;
   height: 100dvh;
   position: relative;
-  background-color: #0A1A10;
+  background-color: #FFFFFF;
   touch-action: pan-y;
 }
 
 .pin-spacer {
-  background-color: #0A1A10 !important;
+  background-color: #FFFFFF !important;
 }
 
+/* Base utility for absolute centering */
 .scene-element {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   transform-style: preserve-3d;
-  backface-visibility: hidden;
-  will-change: transform, opacity;
+  will-change: transform;
 }
 
-/* ── Solid 3D Opaque Card Surface ────────────────────────────────────── */
+/* Card 3D Structure */
+.deck-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
+  cursor: pointer;
+}
 
-.glass-card {
-  background: #08150B;
-  border: 1px solid rgba(228, 176, 58, 0.30);
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* The faces of the card */
+.card-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
   border-radius: 1.5rem;
-  box-shadow:
-    0 40px 100px -15px rgba(0, 0, 0, 0.95),
-    0 0 45px 0 rgba(228, 176, 58, 0.22),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.card-face-front {
+  transform: rotateY(0deg) translateZ(1px);
+  -webkit-transform: rotateY(0deg) translateZ(1px);
+}
+
+.card-face-back {
+  transform: rotateY(180deg) translateZ(1px);
+  -webkit-transform: rotateY(180deg) translateZ(1px);
+}
+
+#scene-container:not(.scene-ready) .deck-card {
+  visibility: hidden;
+}
+
+.hero-intro-item {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+#scene-container.scene-ready .hero-intro-item {
+  animation: hero-intro-in 900ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+#scene-container.scene-ready .hero-intro-item:nth-child(1) { animation-delay: 80ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(2) { animation-delay: 200ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(3) { animation-delay: 340ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(4) { animation-delay: 480ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(5) { animation-delay: 620ms; }
+#scene-container.scene-ready .hero-intro-item:nth-child(6) { animation-delay: 760ms; }
+
+@keyframes hero-intro-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-deck-controls {
+  display: none;
 }
 
 @media (max-width: 767px) {
-  .glass-card {
-    background: #08150B;
-    border: 1px solid rgba(228, 176, 58, 0.32);
-    box-shadow:
-      0 25px 70px -10px rgba(0, 0, 0, 0.95),
-      0 0 30px 0 rgba(228, 176, 58, 0.18);
+  #scene-container .deck-card {
+    width: 76vw;
+    max-width: 320px;
+    aspect-ratio: 9 / 16;
+  }
+
+  #scene-container .card-face-back {
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #scene-container .card-face-back > div:first-child {
+    width: 100%;
+    height: 42%;
+    border-radius: 1.5rem 1.5rem 0 0;
+  }
+
+  #scene-container .card-face-back > div:last-child {
+    width: 100%;
+    min-height: 0;
+    height: 58%;
+    overflow-y: auto;
+    padding: 0.85rem 1rem;
+    border-radius: 0 0 1.5rem 1.5rem;
+  }
+
+  #scene-container .card-face-back h3 {
+    font-size: 1rem;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  #scene-container .card-face-back p {
+    font-size: 0.75rem;
+    line-height: 1.4;
+    margin-bottom: 0.55rem;
+  }
+
+  #scene-container .card-face-back a {
+    gap: 0.4rem;
+    padding: 0.55rem 0.65rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+
+  #scene-container .card-face-back a svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex: 0 0 auto;
+  }
+
+  #scene-container .card-face-back > div:first-child > div:last-child {
+    display: none;
+  }
+
+  .mobile-deck-controls {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #scene-container {
+    height: auto;
+    min-height: 100dvh;
+    overflow: hidden;
+    padding-bottom: 1.5rem;
+  }
+
+  #welcome-title {
+    position: relative;
+    top: auto !important;
+    left: auto !important;
+    width: 100%;
+    margin: 0 auto;
+    transform: none !important;
+  }
+
+  #deck-container {
+    position: relative !important;
+    inset: auto !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+    margin-top: 1.5rem;
+    transform: none !important;
+  }
+
+  #scene-container .deck-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    display: none;
+    width: min(82vw, 320px);
+    max-width: 320px;
+    aspect-ratio: 9 / 16;
+    transform: none !important;
+    pointer-events: none;
+  }
+
+  #scene-container .deck-card[data-mobile-active='true'] {
+    display: block;
+    pointer-events: auto;
+  }
+
+  #scene-container .card-inner {
+    transform: rotateY(0deg) !important;
+    transition: transform 700ms cubic-bezier(0.2, 0.75, 0.25, 1);
+  }
+
+  #scene-container .card-inner[data-mobile-flipped='true'] {
+    transform: rotateY(180deg) !important;
+  }
+
+  .mobile-deck-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin: 1rem auto 0;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+  }
+
+  .mobile-deck-controls button {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border: 1px solid rgba(228, 176, 58, 0.55);
+    border-radius: 9999px;
+    color: #f4c95d;
+    background: rgba(8, 21, 11, 0.88);
+  }
+
+  .mobile-deck-controls button:disabled {
+    opacity: 0.38;
+  }
+
+  .mobile-deck-controls button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #scene-container .deck-card {
+    width: min(92vw, 1120px);
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-intro-item {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+
+  #scene-container .card-inner {
+    transition: none !important;
+  }
+
+  .mobile-deck-controls button {
+    transition: none !important;
   }
 }
 

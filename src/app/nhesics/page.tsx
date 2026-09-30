@@ -18,6 +18,7 @@ import {
   Award,
 } from 'lucide-react';
 import { editorialEase, staggerParent, staggerChildItem } from '@/lib/motion';
+import ScrollReveal from '@/components/ScrollReveal';
 
 // ── Strategic Objectives Data ──
 const strategicObjectives = [
@@ -188,6 +189,7 @@ export default function NhesicsPage() {
       {/* ─────────────────────────────────────────────────────────────
           2. KEY STRATEGIC OBJECTIVES (BENTO GRID WITH FRAMER MOTION)
       ───────────────────────────────────────────────────────────── */}
+      <ScrollReveal direction="up" duration={1.1}>
       <section className="w-full py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FEF3D6] border border-[#FCE6A8] text-[#8D6B1B] text-xs font-bold tracking-[0.2em] uppercase mb-3">
@@ -208,7 +210,7 @@ export default function NhesicsPage() {
           variants={staggerParent}
           initial="initial"
           whileInView="animate"
-          viewport={{ once: true, margin: '-80px' }}
+          viewport={{ once: false, margin: '-80px' }}
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
         >
           {strategicObjectives.map((obj) => {
@@ -273,10 +275,12 @@ export default function NhesicsPage() {
           })}
         </motion.div>
       </section>
+      </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           3. SECTORAL VALUE BREAKDOWN: The $7T Global Halal Spectrum
       ───────────────────────────────────────────────────────────── */}
+      <ScrollReveal direction="up" duration={1.1}>
       <section className="w-full py-20 bg-white border-y border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-12">
@@ -312,10 +316,12 @@ export default function NhesicsPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           4. PROMINENT EXTERNAL CTA SECTION (Mandate #3)
       ───────────────────────────────────────────────────────────── */}
+      <ScrollReveal direction="up" duration={1.1}>
       <section className="w-full py-20 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center">
         <div className="rounded-3xl bg-gradient-to-br from-[#111827] via-[#1E4D38] to-[#111827] text-white p-8 sm:p-14 lg:p-16 shadow-2xl relative overflow-hidden border border-white/10 flex flex-col items-center">
           {/* Subtle Ambient Radial Lighting */}
@@ -355,6 +361,7 @@ export default function NhesicsPage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
     </div>
   );
 }

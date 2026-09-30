@@ -1,7 +1,8 @@
 'use client';
 
 import { motion, MotionProps } from 'framer-motion';
-import { ReactNode, ElementType } from 'react';
+import { useInView, useReducedMotion } from 'framer-motion';
+import { ReactNode, ElementType, useRef } from 'react';
 import { dramaticEase } from '@/lib/motion';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'zoom' | 'zoom-out' | 'fade' | 'clip';
@@ -45,23 +46,40 @@ export default function ScrollReveal({
   delay = 0,
   direction = 'up',
   duration = 0.9,
-  once = true,
+  once = false,
   amount = 0.1,
   as: Tag = 'div',
 }: ScrollRevealProps) {
-  const MotionTag = motion[Tag as keyof typeof motion] as React.ComponentType<MotionProps & { className?: string }>;
+  const elementRef = useRef<HTMLElement | null>(null);
+  const isInView = useInView(elementRef, {
+    once,
+    amount,
+    margin: '-6% 0px -6% 0px',
+  });
+  const prefersReducedMotion = useReducedMotion();
+  const MotionTag = motion[Tag as keyof typeof motion] as React.ComponentType<
+    MotionProps & {
+      className?: string;
+      ref?: React.Ref<HTMLElement>;
+      inert?: boolean;
+      'aria-hidden'?: boolean;
+    }
+  >;
+  const isVisible = prefersReducedMotion || isInView;
 
   return (
     <MotionTag
+      ref={elementRef}
       className={className}
       variants={getVariants(direction)}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once, amount }}
+      initial={prefersReducedMotion ? false : 'hidden'}
+      animate={isVisible ? 'visible' : 'hidden'}
+      aria-hidden={!isVisible}
+      inert={!isVisible}
       transition={{
         duration,
         ease: dramaticEase,
-        delay,
+        delay: isVisible ? delay : 0,
       }}
     >
       {children}

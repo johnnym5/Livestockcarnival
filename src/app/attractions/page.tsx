@@ -175,7 +175,7 @@ export default function AttractionsPage() {
               <ScrollReveal key={animal.id} direction="up" delay={idx * 0.1} duration={0.85}>
                 <ThreeDCard
                   variant="light"
-                  maxTilt={12}
+                  maxTilt={8}
                   depth={24}
                   className="flex flex-col group h-full [transform-style:preserve-3d]"
                 >

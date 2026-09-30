@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, MouseEvent } from 'react';
-import { motion, useSpring } from 'framer-motion';
+import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
 
 interface ThreeDCardProps {
   children: React.ReactNode;
@@ -26,10 +26,13 @@ export default function ThreeDCard({
 }: ThreeDCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50 });
+  const prefersReducedMotion = useReducedMotion();
+  const glareX = useMotionValue(50);
+  const glareY = useMotionValue(50);
+  const glareBackground = useMotionTemplate`radial-gradient(circle 320px at ${glareX}% ${glareY}%, ${glowColor}, transparent 70%)`;
 
   // Spring physics for buttery-smooth 3D rotation
-  const springConfig = { stiffness: 350, damping: 26 };
+  const springConfig = { stiffness: 240, damping: 30, mass: 0.7 };
   const rotateX = useSpring(0, springConfig);
   const rotateY = useSpring(0, springConfig);
   const scale = useSpring(1, springConfig);
@@ -37,7 +40,7 @@ export default function ThreeDCard({
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
-    if (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches) {
+    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches)) {
       return;
     }
     const rect = cardRef.current.getBoundingClientRect();
@@ -58,14 +61,12 @@ export default function ThreeDCard({
     z.set(depth);
 
     // Update specular glare reflection
-    setGlarePosition({
-      x: (mouseX / width) * 100,
-      y: (mouseY / height) * 100,
-    });
+    glareX.set((mouseX / width) * 100);
+    glareY.set((mouseY / height) * 100);
   };
 
   const handleMouseEnter = () => {
-    if (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches) {
+    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches)) {
       return;
     }
     setIsHovered(true);
@@ -112,11 +113,11 @@ export default function ThreeDCard({
         }`}
       >
         {/* Dynamic Specular Glass Glare / Sheen */}
-        <div
+        <motion.div
           className="absolute inset-0 pointer-events-none transition-opacity duration-300 z-30"
           style={{
             opacity: isHovered ? 1 : 0,
-            background: `radial-gradient(circle 320px at ${glarePosition.x}% ${glarePosition.y}%, ${glowColor}, transparent 70%)`,
+            background: glareBackground,
           }}
         />
 

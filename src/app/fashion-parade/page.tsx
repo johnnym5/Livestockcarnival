@@ -44,6 +44,8 @@ import {
   Handshake,
   ArrowLeftRight,
 } from 'lucide-react';
+import ThreeDImage from '@/components/motion/ThreeDImage';
+import ScrollReveal from '@/components/ScrollReveal';
 
 // ── Subtle 500ms editorial transition ──
 const editorialTransition = {
@@ -278,11 +280,11 @@ export default function FashionParadePage() {
               transition={{ ...editorialTransition, delay: 0.15 }}
               className="relative w-full aspect-[4/5] lg:aspect-auto lg:h-[600px] rounded-3xl overflow-hidden shadow-2xl border-4 border-white"
             >
-              <Image 
-                src="/assets/fashion-parade/handler-walking-white-bull-runway.jpg" 
-                alt="White Bunaji bull being walked on a wooden runway by handler in green/gold Agbada, large crowd watching at sunset" 
-                fill 
-                className="object-cover" 
+              <ThreeDImage
+                src="/assets/fashion-parade/handler-walking-white-bull-runway.jpg"
+                alt="White Bunaji bull being walked on a wooden runway by handler in green and gold Agbada"
+                containerClassName="w-full h-full"
+                glowColor="rgba(228, 176, 58, 0.34)"
               />
             </motion.div>
           </div>
@@ -292,6 +294,7 @@ export default function FashionParadePage() {
       {/* ─────────────────────────────────────────────────────────────
           B. THE 4 STRATEGIC PILLARS
       ───────────────────────────────────────────────────────────── */}
+      <ScrollReveal direction="up" duration={1.1}>
       <section id="pillars" className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FEF3D6] border border-[#E4B03A]/30 text-[#9E7519] text-xs font-bold uppercase tracking-widest mb-3">
@@ -380,12 +383,14 @@ export default function FashionParadePage() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+        </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           C. THE LINE-UP: 7 EXHIBITION CATEGORIES
       ───────────────────────────────────────────────────────────── */}
-      <section id="lineup" className="w-full py-20 bg-white border-y border-[#0F4A2F]/10">
+        <ScrollReveal direction="up" duration={1.1}>
+        <section id="lineup" className="w-full py-20 bg-white border-y border-[#0F4A2F]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -558,12 +563,14 @@ export default function FashionParadePage() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+        </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           D. CULTURAL REPRESENTATION BY REGION ("ONE NIGERIA")
       ───────────────────────────────────────────────────────────── */}
-      <section id="regions" className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <ScrollReveal direction="up" duration={1.1}>
+        <section id="regions" className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D8EADF] text-[#0F4A2F] text-xs font-bold uppercase tracking-widest mb-3">
             <Map className="w-3.5 h-3.5" />
@@ -722,12 +729,14 @@ export default function FashionParadePage() {
             &ldquo;Different cultures. Different traditions. One Nigeria.&rdquo;
           </p>
         </div>
-      </section>
+        </section>
+        </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           E. THE MAIN ATTRACTION: FASHION MEETS AGRICULTURE
       ───────────────────────────────────────────────────────────── */}
-      <section id="fashion" className="w-full py-20 bg-[#FBFBFA] border-t border-[#0F4A2F]/10">
+        <ScrollReveal direction="up" duration={1.1}>
+        <section id="fashion" className="w-full py-20 bg-[#FBFBFA] border-t border-[#0F4A2F]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FEF3D6] text-[#9E7519] text-xs font-bold uppercase tracking-widest mb-3 border border-[#E4B03A]/30">
@@ -838,12 +847,14 @@ export default function FashionParadePage() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+        </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           F. LIVESTOCK VILLAGE & ANIMAL WELFARE
       ───────────────────────────────────────────────────────────── */}
-      <section id="village" className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <ScrollReveal direction="up" duration={1.1}>
+        <section id="village" className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Welfare Anchor Banner */}
         <div className="rounded-2xl bg-[#0F4A2F] text-white p-6 sm:p-10 mb-10 text-center shadow-md relative overflow-hidden flex flex-col md:flex-row items-center gap-8">
           <div className="relative z-10 w-full md:w-1/2 text-left">
@@ -973,12 +984,14 @@ export default function FashionParadePage() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+        </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           G. INTERACTIVE EDUCATION & BREED SEARCH
       ───────────────────────────────────────────────────────────── */}
-      <section id="directory" className="w-full py-20 bg-white border-y border-[#0F4A2F]/10">
+        <ScrollReveal direction="up" duration={1.1}>
+        <section id="directory" className="w-full py-20 bg-white border-y border-[#0F4A2F]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Visitor Journey Banner */}
           <div className="rounded-2xl bg-[#FBFBFA] border border-[#0F4A2F]/15 p-6 sm:p-8 mb-16 shadow-card">
@@ -1206,12 +1219,14 @@ export default function FashionParadePage() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+        </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           H. PHOTO GALLERY
       ───────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <ScrollReveal direction="up" duration={1.1}>
+        <section className="w-full py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D8EADF] text-[#0F4A2F] text-xs font-bold uppercase tracking-widest mb-3">
             <Camera className="w-3.5 h-3.5" />
@@ -1263,12 +1278,14 @@ export default function FashionParadePage() {
             </div>
           </div>
         </div>
-      </section>
+        </section>
+        </ScrollReveal>
 
       {/* ─────────────────────────────────────────────────────────────
           I. ENTRY PASS & REGISTRATION ANCHOR
       ───────────────────────────────────────────────────────────── */}
-      <section id="pass" className="w-full pb-20 pt-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+        <ScrollReveal direction="up" duration={1.1}>
+        <section id="pass" className="w-full pb-20 pt-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         <div className="rounded-3xl bg-[#0F4A2F] text-white p-8 sm:p-14 lg:p-16 shadow-2xl relative overflow-hidden border border-[#E4B03A]/30 text-center flex flex-col items-center">
           <div className="relative z-10 max-w-2xl flex flex-col items-center">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#E4B03A] text-xs font-bold uppercase tracking-widest mb-4 border border-white/15">
@@ -1302,6 +1319,7 @@ export default function FashionParadePage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
     </div>
   );
 }

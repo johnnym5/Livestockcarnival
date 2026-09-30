@@ -52,7 +52,7 @@ export function RevealContainer({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: viewportAmount }}
+      viewport={{ once: false, amount: viewportAmount }}
       custom={{ stagger: staggerDelay, delay: initialDelay }}
       variants={containerVariants}
       className={className}

@@ -143,11 +143,16 @@ export default function ScheduleTab() {
           transition={{ duration: 0.4 }}
           className="space-y-6"
         >
-          {filteredTimeBlocks.map((block: TimeBlock) => (
-            <div
+          {filteredTimeBlocks.map((block: TimeBlock, index: number) => (
+            <motion.div
               key={block.id}
-              className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-card hover:shadow-card-hover transition-all duration-300"
+              initial={{ opacity: 0, y: 28, rotateX: 3, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, rotateX: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -16, scale: 0.99 }}
+              transition={{ duration: 0.75, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
+              className="[transform-style:preserve-3d]"
             >
+              <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-card transition-all duration-700">
               {/* Top Row: Time Badge & Track Tag */}
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <span className="bg-[#D8EADF] text-[#0F4A2F] px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold tracking-wide inline-flex items-center gap-2 shadow-sm">
@@ -211,7 +216,8 @@ export default function ScheduleTab() {
                   <span>Save to Calendar</span>
                 </button>
               </div>
-            </div>
+              </div>
+            </motion.div>
           ))}
 
           {filteredTimeBlocks.length === 0 && (
