@@ -195,18 +195,85 @@ export default function LiveChatWidget() {
     }
   }, [isOpen, messages]);
 
-  // Trigger Google OAuth Login
+  // Auto-close popup window if running inside an OAuth popup callback
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.opener && window.opener !== window) {
+      const checkSession = async () => {
+        const { data: { session: popupSession } } = await supabase.auth.getSession();
+        if (popupSession) {
+          window.close();
+        }
+      };
+      void checkSession();
+    }
+  }, []);
+
+  // Trigger Google OAuth Login in a centered popup window
   const handleGoogleSignIn = async () => {
     setErrorNotice(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: typeof window !== 'undefined' ? window.location.href : undefined,
-      },
-    });
+    try {
+      const redirectUrl = typeof window !== 'undefined' ? window.location.href : undefined;
 
-    if (error) {
-      setErrorNotice('Google sign-in could not be initiated. Please try again.');
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          skipBrowserRedirect: true,
+          redirectTo: redirectUrl,
+        },
+      });
+
+      if (error || !data?.url) {
+        setErrorNotice('Google sign-in could not be initiated. Please try again.');
+        return;
+      }
+
+      // Calculate center position for popup window
+      const width = 520;
+      const height = 650;
+      const left = window.screenX + (window.innerWidth - width) / 2;
+      const top = window.screenY + (window.innerHeight - height) / 2;
+
+      const popup = window.open(
+        data.url,
+        'GoogleSignInPopup',
+        `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+      );
+
+      if (!popup) {
+        // Fallback to normal browser redirect if popup was blocked by browser
+        window.location.href = data.url;
+        return;
+      }
+
+      // Poll popup closure or session updates
+      const timer = setInterval(async () => {
+        if (popup.closed) {
+          clearInterval(timer);
+          const { data: { session: newSession } } = await supabase.auth.getSession();
+          if (newSession?.user) {
+            const u = newSession.user;
+            setSession({
+              id: u.id,
+              email: u.email || '',
+              name: u.user_metadata?.full_name || u.user_metadata?.name || u.email?.split('@')[0] || 'User',
+              avatar: u.user_metadata?.avatar_url || u.user_metadata?.picture || null,
+              token: newSession.access_token,
+            });
+          }
+        }
+      }, 500);
+
+      // Listen for auth state change to close popup automatically when signed in
+      const { data: authListener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+        if (newSession?.user && popup && !popup.closed) {
+          popup.close();
+          clearInterval(timer);
+          authListener.subscription.unsubscribe();
+        }
+      });
+    } catch (err) {
+      console.error('Google Popup Error:', err);
+      setErrorNotice('Google sign-in popup error. Please try again.');
     }
   };
 
