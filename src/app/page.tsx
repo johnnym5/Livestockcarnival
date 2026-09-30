@@ -183,6 +183,7 @@ function MagazineFeature({ card, index }: { card: CardData; index: number }) {
   return (
     <motion.article
       ref={sectionRef}
+      id={index === 0 ? 'magazine-first-feature' : undefined}
       style={prefersReducedMotion ? undefined : { opacity, scale }}
       aria-hidden={!isInView && !prefersReducedMotion}
       inert={!isInView && !prefersReducedMotion}
@@ -259,6 +260,7 @@ export default function Home() {
   const [skipTransitionVisible, setSkipTransitionVisible] = useState(false);
   const [skipTransitionCovered, setSkipTransitionCovered] = useState(false);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const [isFirstMagazineFeatureVisible, setIsFirstMagazineFeatureVisible] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number; cardId: string } | null>(null);
   const suppressCardClickRef = useRef(false);
   const scrollTriggerRef = useRef<{ disable: (revert?: boolean) => void; enable: () => void } | null>(null);
@@ -285,6 +287,18 @@ export default function Home() {
       window.removeEventListener('scroll', updateScrollToTopVisibility);
       window.removeEventListener('resize', updateScrollToTopVisibility);
     };
+  }, []);
+
+  useEffect(() => {
+    const firstFeature = document.getElementById('magazine-first-feature');
+    if (!firstFeature) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsFirstMagazineFeatureVisible(entry.isIntersecting),
+      { threshold: 0.08 }
+    );
+    observer.observe(firstFeature);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -873,8 +887,8 @@ export default function Home() {
   };
 
   const activeControlMode: DeckControlMode = useStaticDeck
-    ? showScrollToTop ? 'magazine' : 'hidden'
-    : deckControlMode;
+    ? showScrollToTop && isFirstMagazineFeatureVisible ? 'magazine' : 'hidden'
+    : deckControlMode === 'magazine' && !isFirstMagazineFeatureVisible ? 'hidden' : deckControlMode;
   const controlHidden = activeControlMode === 'hidden';
   const controlIsSkip = activeControlMode === 'skip';
   const controlLabel = controlIsSkip ? 'Skip 3D cards and view highlights' : 'Go to top';
@@ -1523,7 +1537,7 @@ export default function Home() {
             ease: [0.22, 1, 0.36, 1],
           }}
           onClick={handleControlClick}
-          className={`pointer-events-auto flex h-10 items-center justify-center gap-2 overflow-hidden rounded-full border px-2 text-[#1E4D38] shadow-[0_8px_30px_rgba(3,10,5,0.16)] backdrop-blur-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E4B03A] ${activeControlMode === 'magazine' ? 'border-white/90 bg-white/75' : 'border-white/85 bg-white/75'}`}
+          className={`pointer-events-auto flex h-10 items-center justify-center gap-2 overflow-hidden rounded-full border px-2 text-[#1E4D38] shadow-[0_8px_30px_rgba(3,10,5,0.16)] backdrop-blur-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E4B03A] ${activeControlMode === 'magazine' ? 'border-white/80 bg-white/60' : 'border-white/80 bg-white/55'}`}
         >
           <motion.span
             initial={false}
