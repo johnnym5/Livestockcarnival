@@ -554,6 +554,22 @@ export default function Home() {
     };
   }, []);
 
+  const getCardZoomPose = (cardId: string, preferredScale: number) => {
+    const cardElement = document.getElementById(cardId);
+    if (!cardElement) return { scale: 1, y: 0 };
+
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 64;
+    const availableHeight = window.innerHeight - headerHeight - 40;
+    const availableWidth = window.innerWidth - 32;
+    const scale = Math.max(
+      0.6,
+      Math.min(preferredScale, availableHeight / cardElement.offsetHeight, availableWidth / cardElement.offsetWidth)
+    );
+    const y = Math.max(0, headerHeight + 20 + (scale * cardElement.offsetHeight - window.innerHeight) / 2);
+
+    return { scale, y };
+  };
+
   const navigateToCardPage = async (card: CardData) => {
     if (isNavigatingRef.current) return;
     isNavigatingRef.current = true;
@@ -561,6 +577,7 @@ export default function Home() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile = window.matchMedia('(max-width: 767px)').matches;
     const duration = reducedMotion ? 0.12 : 1.35;
+    const zoomPose = getCardZoomPose(card.id, isMobile ? 1.12 : 1.42);
     const gsapMod = await import('gsap');
     const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
     const timeline = gsap.timeline({
@@ -570,10 +587,10 @@ export default function Home() {
 
     timeline.to(`#${card.id}`, {
       x: 0,
-      y: 0,
+      y: zoomPose.y,
       z: 320,
       rotationZ: 0,
-      scale: isMobile ? 1.12 : 1.42,
+      scale: zoomPose.scale,
       zIndex: 1000,
       duration,
     });
@@ -590,7 +607,7 @@ export default function Home() {
 
     const gsapMod = await import('gsap');
     const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    const isMobile = window.innerWidth < 768;
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
 
     if (activeFocusedCard === cardId) {
       const orig = fannedCoordsRef.current[cardId];
@@ -630,12 +647,13 @@ export default function Home() {
         });
       }
 
+      const zoomPose = getCardZoomPose(cardId, isMobile ? 1.08 : 1.28);
       gsap.to(`#${cardId}`, {
         x: 0,
-        y: 0,
+        y: zoomPose.y,
         z: 180,
         rotationZ: 0,
-          scale: isMobile ? 1.08 : 1.28,
+        scale: zoomPose.scale,
         zIndex: 200,
           duration: 1.05,
         ease: 'power3.out',
