@@ -579,7 +579,7 @@ export default function Home() {
   };
 
   const navigateToCardPage = async (card: CardData) => {
-    if (isNavigatingRef.current) return;
+    if (!isFanned || isNavigatingRef.current) return;
     isNavigatingRef.current = true;
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -933,10 +933,13 @@ export default function Home() {
                     <div className="pt-2 sm:pt-0">
                       <Link
                         href={card.link}
-                        className="inline-flex items-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-[#E4B03A] hover:bg-[#D4A030] text-[#0A1A10] text-xs sm:text-sm font-extrabold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-button hover:shadow-[0_12px_30px_rgba(212,175,55,0.4)] transition-all hover:-translate-y-0.5 group"
+                        aria-disabled={!isFanned}
+                        tabIndex={isFanned ? undefined : -1}
+                        className={`inline-flex items-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-[#E4B03A] text-[#0A1A10] text-xs sm:text-sm font-extrabold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-button transition-all group ${isFanned ? 'card-cta-ready hover:bg-[#D4A030] hover:-translate-y-0.5' : 'pointer-events-none cursor-not-allowed opacity-45'}`}
                         onClick={(event) => {
                           event.preventDefault();
                           event.stopPropagation();
+                          if (!isFanned) return;
                           navigateToCardPage(card);
                         }}
                       >

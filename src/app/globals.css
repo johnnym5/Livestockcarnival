@@ -188,6 +188,26 @@ html.lenis, html.lenis body {
   animation: grain 0.5s steps(1) infinite;
 }
 
+.card-cta-ready {
+  animation: card-cta-ready-glow 3.2s ease-in-out infinite;
+}
+
+@keyframes card-cta-ready-glow {
+  0%, 100% {
+    box-shadow: 0 8px 20px -4px rgba(212, 175, 55, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(228, 176, 58, 0.14), 0 12px 30px -4px rgba(212, 175, 55, 0.52);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-cta-ready {
+    animation: none;
+    box-shadow: 0 0 0 2px rgba(228, 176, 58, 0.2), 0 8px 20px -4px rgba(212, 175, 55, 0.35);
+  }
+}
+
 /* ── Card Hover Lift System ───────────────────────────────────────────── */
 
 .card-lift {
