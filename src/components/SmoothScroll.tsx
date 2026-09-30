@@ -3,10 +3,18 @@
 import { useEffect, useRef, ReactNode } from 'react';
 import Lenis from 'lenis';
 
-export default function SmoothScroll({ children }: { children: ReactNode }) {
+export default function SmoothScroll({
+  children,
+  enabled = true,
+}: {
+  children: ReactNode;
+  enabled?: boolean;
+}) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
+    if (!enabled || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
     // Disable native browser scroll restoration so page always starts at top
     if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
@@ -14,7 +22,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     window.scrollTo(0, 0);
 
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.85,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
@@ -25,18 +33,20 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     // Force scroll reset to top
     lenis.scrollTo(0, { immediate: true });
 
+    let animationFrameId = 0;
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      animationFrameId = requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
+    animationFrameId = requestAnimationFrame(raf);
 
     return () => {
+      cancelAnimationFrame(animationFrameId);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (window as any).__lenisInstance;
       lenis.destroy();
     };
-  }, []);
+  }, [enabled]);
 
   return <>{children}</>;
 }

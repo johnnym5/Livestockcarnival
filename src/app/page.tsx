@@ -264,7 +264,7 @@ export default function Home() {
         };
 
         if (prefersReducedMotion) {
-          gsap.set('#welcome-title', { clearProps: 'transform,opacity,scale,z,filter' });
+          gsap.set('#welcome-title', { xPercent: -50, clearProps: 'opacity,scale,z,filter' });
           gsap.set(sceneEl, { clearProps: 'backgroundColor' });
           cards.forEach((card) => {
             gsap.set(`#${card.id}`, { clearProps: 'transform,opacity,pointerEvents,zIndex' });
@@ -279,8 +279,8 @@ export default function Home() {
           scrollTrigger: {
             trigger: sceneEl,
             start: 'top top',
-            end: `+=${totalCards * 2600 + 4000}`,
-            scrub: 2,
+            end: `+=${isMobile ? totalCards * 1800 + 3000 : totalCards * 2600 + 4000}`,
+            scrub: isMobile ? 1 : 1.5,
             pin: true,
             anticipatePin: 1,
             pinSpacing: true,
@@ -348,10 +348,12 @@ export default function Home() {
             ease: 'power2.out',
           }, 0.2);
 
-          tl.to(`${cardEl} .card-face`, {
-            filter: 'blur(5px)',
-            duration: 1.5,
-          }, 0.5);
+          if (!isMobile) {
+            tl.to(`${cardEl} .card-face`, {
+              filter: 'blur(5px)',
+              duration: 1.5,
+            }, 0.5);
+          }
         });
 
         /* ── LOOP SEQUENCE (Cards 0 to N-2) ── */
@@ -416,7 +418,9 @@ export default function Home() {
             '<'
           );
 
-          tl.to(`${cardId} .card-face`, { filter: 'blur(5px)', duration: 1.5, ease: 'power1.out' }, '<');
+          if (!isMobile) {
+            tl.to(`${cardId} .card-face`, { filter: 'blur(5px)', duration: 1.5, ease: 'power1.out' }, '<');
+          }
 
           // Shift remaining cards forward in the stack
           for (let j = i + 1; j < totalCards; j++) {
@@ -437,7 +441,7 @@ export default function Home() {
             );
 
             // Unblur the card moving to position 0
-            if (relativePos === 0) {
+            if (relativePos === 0 && !isMobile) {
               tl.to(
                 nextFaces,
                 {
@@ -466,7 +470,9 @@ export default function Home() {
           'last-card-reveal'
         );
 
-        tl.to(`${lastCardId} .card-face`, { filter: 'blur(0px)', duration: 1.5 }, 'last-card-reveal');
+        if (!isMobile) {
+          tl.to(`${lastCardId} .card-face`, { filter: 'blur(0px)', duration: 1.5 }, 'last-card-reveal');
+        }
 
         tl.to(
           lastCardId,
@@ -532,7 +538,9 @@ export default function Home() {
             },
             'spreadAll'
           );
-          tl.to(`${cardId} .card-face`, { filter: 'blur(0px)', duration: 2.5 }, 'spreadAll');
+          if (!isMobile) {
+            tl.to(`${cardId} .card-face`, { filter: 'blur(0px)', duration: 2.5 }, 'spreadAll');
+          }
         });
 
         tl.eventCallback('onUpdate', () => updateFanState(tl.progress() >= 0.999));
@@ -725,7 +733,7 @@ export default function Home() {
         }}
       >
         {/* Particle Glow Overlay */}
-        <div className="absolute inset-0 pointer-events-none z-0 opacity-40">
+        <div className="absolute inset-0 pointer-events-none z-0 hidden opacity-40 sm:block">
           {[...Array(30)].map((_, i) => (
             <span
               key={i}
@@ -746,7 +754,7 @@ export default function Home() {
         {/* ── HERO TEXT (Top-anchored so logo emblem is 100% visible below sticky header) ── */}
         <div
           id="welcome-title"
-          className="scene-element !top-0 !left-1/2 -translate-x-1/2 w-[95vw] max-w-5xl text-center z-0 px-3 sm:px-4 pt-20 sm:pt-24 md:pt-28"
+          className="scene-element !top-0 !left-1/2 w-[95vw] max-w-5xl text-center z-0 px-3 sm:px-4 pt-20 sm:pt-24 md:pt-28"
         >
           <div className="hero-intro-item relative w-28 h-16 sm:w-40 sm:h-24 md:w-48 md:h-28 mx-auto mb-3">
             <Image

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import SmoothScroll from "@/components/SmoothScroll";
+import SiteFrame from "@/components/SiteFrame";
 
 export const metadata: Metadata = {
   title: {
@@ -33,11 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="antialiased">
       <body className="min-h-screen flex flex-col bg-canvas text-charcoal font-sans">
-        <SmoothScroll>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </SmoothScroll>
+        <SiteFrame>{children}</SiteFrame>
       </body>
     </html>
   );
