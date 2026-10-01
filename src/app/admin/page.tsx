@@ -35,7 +35,7 @@ import {
 import { CmsProfile, CmsStaff, formatFileSize, makeSlug, MediaGallery, MediaPost, MediaPostStatus, StorageFileItem } from '@/lib/cms';
 import { supabase } from '@/lib/supabase/client';
 
-type AdminView = 'stories' | 'galleries' | 'storage' | 'team';
+type AdminView = 'stories' | 'galleries' | 'storage' | 'team' | 'homepage';
 type StorageBucketName = 'livestock-images' | 'media-assets' | 'credentials';
 
 const BUCKET_OPTIONS: { id: StorageBucketName; label: string; maxMb: number }[] = [
@@ -54,6 +54,16 @@ interface PostDraft {
   coverImageUrl: string;
   coverImagePath: string;
 }
+
+interface HomepageCardDraft {
+  id: string; position: number; number: string; eyebrow: string; title: string; body: string; image: string;
+  link: string; cta: string; pageTitle: string; coverBg: string; accentColor: string; enabled: boolean; status: 'draft' | 'published';
+}
+
+const blankHomepageCard = (position: number): HomepageCardDraft => ({
+  id: `card-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`, position, number: String(position).padStart(2, '0'), eyebrow: '', title: '', body: '', image: '',
+  link: '/', cta: 'EXPLORE THIS PAGE', pageTitle: '', coverBg: 'from-[#062412] via-[#0D4020] to-[#031209]', accentColor: '#E4B03A', enabled: true, status: 'draft',
+});
 
 const emptyDraft: PostDraft = {
   title: '',
@@ -77,6 +87,8 @@ export default function AdminDashboardPage() {
   const [posts, setPosts] = useState<MediaPost[]>([]);
   const [galleries, setGalleries] = useState<MediaGallery[]>([]);
   const [staff, setStaff] = useState<CmsStaff[]>([]);
+  const [homepageCards, setHomepageCards] = useState<HomepageCardDraft[]>([]);
+  const [homepageDraft, setHomepageDraft] = useState<HomepageCardDraft | null>(null);
   const [activeView, setActiveView] = useState<AdminView>('stories');
   const [statusFilter, setStatusFilter] = useState<'all' | MediaPostStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,7 +124,7 @@ export default function AdminDashboardPage() {
 
   const [galleryBackendImages, setGalleryBackendImages] = useState<{ url: string; path: string; alt: string }[]>([]);
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
-  const [mediaPickerTarget, setMediaPickerTarget] = useState<'gallery' | 'story'>('gallery');
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<'gallery' | 'story' | 'homepage'>('gallery');
   const [mediaPickerBucket, setMediaPickerBucket] = useState<StorageBucketName>('media-assets');
   const [mediaPickerFiles, setMediaPickerFiles] = useState<StorageFileItem[]>([]);
   const [mediaPickerSearch, setMediaPickerSearch] = useState('');
@@ -162,6 +174,15 @@ export default function AdminDashboardPage() {
       if (galleryError) setError('Image galleries could not be loaded. Apply the media galleries migration to enable this section.');
       else setGalleries((galleryData ?? []) as MediaGallery[]);
 
+      const { data: homepageData, error: homepageError } = await supabase.from('homepage_cards').select('*').order('position');
+      if (!active) return;
+      if (homepageError) setError('Homepage cards could not be loaded. Apply the homepage cards migration.');
+      else setHomepageCards((homepageData ?? []).map((row) => ({
+        id: row.id, position: row.position, number: row.number, eyebrow: row.eyebrow, title: row.title, body: row.body,
+        image: row.image, link: row.link, cta: row.cta, pageTitle: row.page_title, coverBg: row.cover_bg,
+        accentColor: row.accent_color, enabled: row.enabled, status: row.status,
+      })));
+
       if (cmsProfile.role === 'super_admin') {
         const { data: staffResult, error: staffError } = await supabase.functions.invoke('cms-user-management', {
           body: { action: 'list' },
@@ -209,6 +230,53 @@ export default function AdminDashboardPage() {
       .order('updated_at', { ascending: false });
     if (reloadError) throw reloadError;
     setGalleries((data ?? []) as MediaGallery[]);
+  };
+
+  const saveHomepageCard = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!homepageDraft || isSaving) return;
+    if (homepageDraft.enabled && homepageCards.filter((card) => card.enabled && card.id !== homepageDraft.id).length >= 10) {
+      setError('A maximum of 10 homepage cards can be enabled.'); return;
+    }
+    setIsSaving(true); setError('');
+    const { error: saveError } = await supabase.from('homepage_cards').upsert({
+      id: homepageDraft.id, position: homepageDraft.position, number: homepageDraft.number, eyebrow: homepageDraft.eyebrow,
+      title: homepageDraft.title, body: homepageDraft.body, image: homepageDraft.image, link: homepageDraft.link,
+      cta: homepageDraft.cta, page_title: homepageDraft.pageTitle, cover_bg: homepageDraft.coverBg,
+      accent_color: homepageDraft.accentColor, enabled: homepageDraft.enabled, status: homepageDraft.status,
+    });
+    if (saveError) setError(`Could not save homepage card: ${saveError.message}`);
+    else {
+      const { data } = await supabase.from('homepage_cards').select('*').order('position');
+      setHomepageCards((data ?? []).map((row) => ({ id: row.id, position: row.position, number: row.number, eyebrow: row.eyebrow, title: row.title, body: row.body, image: row.image, link: row.link, cta: row.cta, pageTitle: row.page_title, coverBg: row.cover_bg, accentColor: row.accent_color, enabled: row.enabled, status: row.status })));
+      setHomepageDraft(null); setNotice('Homepage card saved.');
+    }
+    setIsSaving(false);
+  };
+
+  const moveHomepageCard = async (card: HomepageCardDraft, direction: -1 | 1) => {
+    const ordered = [...homepageCards].sort((a, b) => a.position - b.position);
+    const index = ordered.findIndex((item) => item.id === card.id);
+    const nextIndex = index + direction;
+    if (index < 0 || nextIndex < 0 || nextIndex >= ordered.length) return;
+    [ordered[index], ordered[nextIndex]] = [ordered[nextIndex], ordered[index]];
+    const updates = ordered.map((item, position) => ({ ...item, position: position + 1 }));
+    const { error: updateError } = await supabase.from('homepage_cards').upsert(updates.map((item) => ({
+      id: item.id, position: item.position, number: item.number, eyebrow: item.eyebrow, title: item.title, body: item.body,
+      image: item.image, link: item.link, cta: item.cta, page_title: item.pageTitle, cover_bg: item.coverBg,
+      accent_color: item.accentColor, enabled: item.enabled, status: item.status,
+    })));
+    if (updateError) setError(`Could not reorder cards: ${updateError.message}`);
+    else setHomepageCards(updates);
+  };
+
+  const deleteHomepageCard = async (card: HomepageCardDraft) => {
+    if (homepageCards.length <= 3) { setError('At least 3 homepage cards are required.'); return; }
+    const { error: deleteError } = await supabase.from('homepage_cards').delete().eq('id', card.id);
+    if (deleteError) { setError(`Could not remove card: ${deleteError.message}`); return; }
+    const reordered = homepageCards.filter((item) => item.id !== card.id).map((item, index) => ({ ...item, position: index + 1 }));
+    await supabase.from('homepage_cards').upsert(reordered.map((item) => ({ id: item.id, position: item.position, number: item.number, eyebrow: item.eyebrow, title: item.title, body: item.body, image: item.image, link: item.link, cta: item.cta, page_title: item.pageTitle, cover_bg: item.coverBg, accent_color: item.accentColor, enabled: item.enabled, status: item.status })));
+    setHomepageCards(reordered);
   };
 
   const openNewGallery = () => {
@@ -524,7 +592,7 @@ export default function AdminDashboardPage() {
   const reloadBucketFiles = async (bucketName: StorageBucketName) => {
     setIsStorageLoading(true);
     try {
-      let items = await fetchFilesDeep(bucketName);
+      const items = await fetchFilesDeep(bucketName);
       const knownPaths = new Set(items.map((i) => i.name));
 
       // Fetch fresh database records for galleries and posts
@@ -570,12 +638,12 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    if (activeView === 'storage') {
-      void reloadBucketFiles(selectedBucket);
-    }
+    if (activeView !== 'storage') return;
+    const timer = window.setTimeout(() => { void reloadBucketFiles(selectedBucket); }, 0);
+    return () => window.clearTimeout(timer);
   }, [activeView, selectedBucket]);
 
-  const openMediaPicker = async (target: 'gallery' | 'story') => {
+  const openMediaPicker = async (target: 'gallery' | 'story' | 'homepage') => {
     setMediaPickerTarget(target);
     setMediaPickerSelected([]);
     setMediaPickerUrlInput('');
@@ -617,6 +685,11 @@ export default function AdminDashboardPage() {
       setIsMediaPickerOpen(false);
       return;
     }
+    if (mediaPickerTarget === 'homepage') {
+      setHomepageDraft((current) => current ? { ...current, image: item.publicUrl } : current);
+      setIsMediaPickerOpen(false);
+      return;
+    }
 
     const exists = mediaPickerSelected.some((i) => i.url === item.publicUrl);
     if (exists) {
@@ -648,6 +721,9 @@ export default function AdminDashboardPage() {
       setDraft((current) => ({ ...current, coverImageUrl: url, coverImagePath: '' }));
       setImagePreview(url);
       setSelectedImage(null);
+      setIsMediaPickerOpen(false);
+    } else if (mediaPickerTarget === 'homepage') {
+      setHomepageDraft((current) => current ? { ...current, image: url } : current);
       setIsMediaPickerOpen(false);
     } else {
       const currentTotal = galleryFiles.length + galleryBackendImages.length;
@@ -801,6 +877,9 @@ export default function AdminDashboardPage() {
           >
             <Folder className="h-4 w-4" /> Media Storage
           </button>
+          <button type="button" onClick={() => setActiveView('homepage')} aria-current={activeView === 'homepage' ? 'page' : undefined} className={`flex min-h-11 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition lg:flex-none ${activeView === 'homepage' ? 'bg-white/10 text-white' : 'text-white/55 hover:bg-white/5 hover:text-white'}`}>
+            <Images className="h-4 w-4" /> Homepage cards
+          </button>
           <Link
             href="/admin/chat"
             className="flex min-h-11 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/55 hover:bg-white/5 hover:text-white transition lg:flex-none"
@@ -841,7 +920,7 @@ export default function AdminDashboardPage() {
         <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between border-b border-[#E3E8E2] bg-[#F3F5F2]/90 px-4 backdrop-blur-xl sm:px-8">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8D6B1B]">{activeView === 'team' ? 'People and permissions' : 'Content management'}</p>
-            <h1 className="mt-0.5 text-lg font-extrabold tracking-tight">{activeView === 'stories' ? 'Media newsroom' : activeView === 'galleries' ? 'Image galleries' : activeView === 'storage' ? 'Media Storage Buckets' : 'Editorial team'}</h1>
+            <h1 className="mt-0.5 text-lg font-extrabold tracking-tight">{activeView === 'stories' ? 'Media newsroom' : activeView === 'galleries' ? 'Image galleries' : activeView === 'storage' ? 'Media Storage Buckets' : activeView === 'homepage' ? 'Homepage cards' : 'Editorial team'}</h1>
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden max-w-48 truncate text-xs font-semibold text-[#5B675F] sm:block">{profile.email}</span>
@@ -855,6 +934,7 @@ export default function AdminDashboardPage() {
             </Link>
             {activeView === 'stories' && <button type="button" onClick={openNewPost} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#1E4D38] px-3.5 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#173D2E] sm:px-4"><FilePlus2 className="h-4 w-4" /> New story</button>}
             {activeView === 'galleries' && <button type="button" onClick={openNewGallery} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#1E4D38] px-3.5 text-xs font-bold text-white shadow-sm sm:px-4"><ImagePlus className="h-4 w-4" /> New gallery</button>}
+            {activeView === 'homepage' && <button type="button" disabled={homepageCards.length >= 10} onClick={() => setHomepageDraft(blankHomepageCard(homepageCards.length + 1))} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#1E4D38] px-3.5 text-xs font-bold text-white shadow-sm disabled:opacity-50"><FilePlus2 className="h-4 w-4" /> New card</button>}
             <button type="button" onClick={handleSignOut} aria-label="Sign out" className="grid h-10 w-10 place-items-center rounded-xl border border-[#DDE4DC] bg-white text-[#4F5D53] transition hover:border-rose-200 hover:text-rose-700"><LogOut className="h-4 w-4" /></button>
           </div>
         </header>
@@ -867,7 +947,12 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {activeView === 'storage' ? (
+          {activeView === 'homepage' ? (
+            <section className="overflow-hidden rounded-2xl border border-[#E1E7E0] bg-white shadow-sm">
+              <div className="border-b border-[#E9EDE8] p-5"><h2 className="text-base font-extrabold">Homepage card deck</h2><p className="mt-1 text-xs text-[#758078]">Manage 3–10 cards. Published and enabled cards appear in both the deck and magazine features.</p><p className="mt-2 text-xs font-bold text-[#1E4D38]">{homepageCards.filter((card) => card.enabled && card.status === 'published').length} published and enabled</p></div>
+              <div className="divide-y divide-[#EEF1ED]">{homepageCards.map((card, index) => <article key={card.id} className="grid gap-3 p-4 sm:grid-cols-[96px_1fr_auto] sm:items-center sm:p-5"><div className="relative h-20 overflow-hidden rounded-xl bg-[#E9EEE8]">{card.image && <Image src={card.image} alt="" fill unoptimized sizes="96px" className="object-cover" />}</div><div className="min-w-0"><div className="mb-1 flex items-center gap-2"><span className="text-[10px] font-bold text-[#8D6B1B]">#{card.position}</span><span className="rounded-full bg-[#EEF4EE] px-2 py-0.5 text-[10px] font-bold uppercase">{card.status}</span>{!card.enabled && <span className="text-[10px] text-[#758078]">Disabled</span>}</div><h3 className="truncate text-sm font-extrabold">{card.title || 'Untitled card'}</h3><p className="mt-1 truncate text-xs text-[#68746C]">{card.eyebrow} · {card.link}</p></div><div className="flex flex-wrap gap-2"><button type="button" disabled={!index} onClick={() => void moveHomepageCard(card, -1)} className="h-9 rounded-lg border px-3 text-xs font-bold disabled:opacity-40">Up</button><button type="button" disabled={index === homepageCards.length - 1} onClick={() => void moveHomepageCard(card, 1)} className="h-9 rounded-lg border px-3 text-xs font-bold disabled:opacity-40">Down</button><button type="button" onClick={() => setHomepageDraft(card)} className="h-9 rounded-lg border border-[#1E4D38] px-3 text-xs font-bold text-[#1E4D38]">Edit</button><button type="button" onClick={() => void deleteHomepageCard(card)} className="grid h-9 w-9 place-items-center rounded-lg border border-[#E8D8D8] text-[#9A4B4B]"><Trash2 className="h-4 w-4" /></button></div></article>)}{!homepageCards.length && <p className="p-8 text-center text-xs text-[#758078]">No cards loaded. Apply the homepage cards migration to initialize the default set.</p>}</div>
+            </section>
+          ) : activeView === 'storage' ? (
             <>
               {/* Storage Summary Cards */}
               <section className="mb-7 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -918,7 +1003,7 @@ export default function AdminDashboardPage() {
                     </label>
                     <select
                       value={storageTypeFilter}
-                      onChange={(e) => setStorageTypeFilter(e.target.value as any)}
+                      onChange={(e) => setStorageTypeFilter(e.target.value as 'all' | 'image' | 'video' | 'doc')}
                       className="h-10 rounded-xl border border-[#DDE4DC] bg-[#FBFCFA] px-3 text-xs outline-none focus:border-[#1E4D38]"
                     >
                       <option value="all">All File Types</option>
@@ -1269,6 +1354,28 @@ export default function AdminDashboardPage() {
                 <span className="text-[11px] text-[#7B867E]">{draft.status === 'published' ? 'Visible in the public media center' : 'Only visible to editorial staff'}</span>
                 <button type="submit" disabled={isSaving} className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#1E4D38] px-4 text-xs font-extrabold text-white transition hover:bg-[#173D2E] disabled:opacity-60"><Send className="h-3.5 w-3.5" />{isSaving ? 'Saving…' : draft.status === 'published' ? 'Publish story' : 'Save draft'}</button>
               </footer>
+            </form>
+          </section>
+        </div>
+      )}
+
+      {homepageDraft && (
+        <div className="fixed inset-0 z-[120] flex justify-end bg-[#07150D]/65 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setHomepageDraft(null); }}>
+          <section role="dialog" aria-modal="true" aria-labelledby="homepage-card-editor-title" className="flex h-full w-full max-w-2xl flex-col bg-[#FBFCFA] shadow-2xl">
+            <header className="flex items-center justify-between border-b border-[#E2E8E1] px-5 py-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8D6B1B]">Homepage editor</p><h2 id="homepage-card-editor-title" className="mt-1 text-lg font-extrabold">{homepageCards.some((card) => card.id === homepageDraft.id) ? 'Edit card' : 'New card'}</h2></div><button type="button" onClick={() => setHomepageDraft(null)} aria-label="Close editor" className="grid h-9 w-9 place-items-center rounded-lg border bg-white"><X className="h-4 w-4" /></button></header>
+            <form onSubmit={(event) => void saveHomepageCard(event)} className="flex min-h-0 flex-1 flex-col">
+              <div className="flex-1 space-y-4 overflow-y-auto px-5 py-6">
+                <div className="grid gap-4 sm:grid-cols-2"><label className="text-xs font-bold">Card number<input required value={homepageDraft.number} onChange={(event) => setHomepageDraft({ ...homepageDraft, number: event.target.value })} className="mt-2 h-10 w-full rounded-xl border px-3 text-sm" /></label><label className="text-xs font-bold">Eyebrow<input value={homepageDraft.eyebrow} onChange={(event) => setHomepageDraft({ ...homepageDraft, eyebrow: event.target.value })} className="mt-2 h-10 w-full rounded-xl border px-3 text-sm" /></label></div>
+                <label className="block text-xs font-bold">Title<input required value={homepageDraft.title} onChange={(event) => setHomepageDraft({ ...homepageDraft, title: event.target.value })} className="mt-2 h-10 w-full rounded-xl border px-3 text-sm" /></label>
+                <label className="block text-xs font-bold">Card text<textarea rows={4} value={homepageDraft.body} onChange={(event) => setHomepageDraft({ ...homepageDraft, body: event.target.value })} className="mt-2 w-full rounded-xl border px-3 py-2 text-sm leading-6" /></label>
+                <label className="block text-xs font-bold">Page title on card cover<input value={homepageDraft.pageTitle} onChange={(event) => setHomepageDraft({ ...homepageDraft, pageTitle: event.target.value })} className="mt-2 h-10 w-full rounded-xl border px-3 text-sm" /></label>
+                <div className="rounded-xl border bg-white p-3"><div className="flex items-center gap-3">{homepageDraft.image && <div className="relative h-16 w-24 overflow-hidden rounded-lg"><Image src={homepageDraft.image} alt="" fill unoptimized sizes="96px" className="object-cover" /></div>}<div><p className="text-xs font-bold">Card image</p><p className="mt-1 max-w-xs truncate text-[11px] text-[#758078]">{homepageDraft.image || 'No image selected'}</p></div><button type="button" onClick={() => void openMediaPicker('homepage')} className="ml-auto h-9 rounded-lg bg-[#1E4D38] px-3 text-xs font-bold text-white">Choose image</button></div></div>
+                <div className="grid gap-4 sm:grid-cols-2"><label className="text-xs font-bold">Destination link<input required value={homepageDraft.link} onChange={(event) => setHomepageDraft({ ...homepageDraft, link: event.target.value })} className="mt-2 h-10 w-full rounded-xl border px-3 text-sm" placeholder="/attractions or https://…" /></label><label className="text-xs font-bold">Explore link text<input required value={homepageDraft.cta} onChange={(event) => setHomepageDraft({ ...homepageDraft, cta: event.target.value })} className="mt-2 h-10 w-full rounded-xl border px-3 text-sm" /></label></div>
+                <div className="grid gap-4 sm:grid-cols-2"><label className="text-xs font-bold">Cover background gradient<input value={homepageDraft.coverBg} onChange={(event) => setHomepageDraft({ ...homepageDraft, coverBg: event.target.value })} className="mt-2 h-10 w-full rounded-xl border px-3 text-sm" /></label><label className="text-xs font-bold">Accent color<div className="mt-2 flex h-10 items-center gap-3 rounded-xl border bg-white px-2"><input type="color" value={/^#[\da-f]{6}$/i.test(homepageDraft.accentColor) ? homepageDraft.accentColor : '#E4B03A'} onChange={(event) => setHomepageDraft({ ...homepageDraft, accentColor: event.target.value })} className="h-8 w-10 cursor-pointer border-0" /><input value={homepageDraft.accentColor} onChange={(event) => setHomepageDraft({ ...homepageDraft, accentColor: event.target.value })} className="min-w-0 flex-1 text-sm outline-none" /></div></label></div>
+                <div className="flex flex-wrap gap-6 rounded-xl border bg-white p-4"><label className="flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={homepageDraft.enabled} onChange={(event) => setHomepageDraft({ ...homepageDraft, enabled: event.target.checked })} /> Enabled</label><label className="flex items-center gap-2 text-xs font-bold">Status<select value={homepageDraft.status} onChange={(event) => setHomepageDraft({ ...homepageDraft, status: event.target.value as 'draft' | 'published' })} className="h-9 rounded-lg border px-2"><option value="draft">Draft</option><option value="published">Published</option></select></label></div>
+                {homepageDraft.status === 'published' && homepageDraft.enabled && homepageCards.filter((card) => card.status === 'published' && card.enabled && card.id !== homepageDraft.id).length < 2 && <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900">At least 3 cards must be enabled and published to display this card publicly.</p>}
+              </div>
+              <footer className="flex items-center justify-between border-t bg-white px-5 py-4"><button type="button" onClick={() => setHomepageDraft(null)} className="h-10 rounded-xl border px-4 text-xs font-bold">Cancel</button><button type="submit" disabled={isSaving || (homepageDraft.status === 'published' && homepageDraft.enabled && homepageCards.filter((card) => card.status === 'published' && card.enabled && card.id !== homepageDraft.id).length < 2)} className="h-10 rounded-xl bg-[#1E4D38] px-5 text-xs font-extrabold text-white disabled:opacity-50">{isSaving ? 'Saving…' : 'Save card'}</button></footer>
             </form>
           </section>
         </div>

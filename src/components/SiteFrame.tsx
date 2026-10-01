@@ -18,8 +18,8 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
   const isAdminRoute = pathname.startsWith('/admin');
 
   return (
-    <SmoothScroll enabled={!isAdminRoute}>
-      <InitialLoadOverlay />
+    <SmoothScroll enabled={!isAdminRoute && pathname !== '/'}>
+      <InitialLoadOverlay isHomePage={pathname === '/'} />
       {!isAdminRoute && <Header />}
       <main className="flex-1">{children}</main>
       {!isAdminRoute && <Footer />}

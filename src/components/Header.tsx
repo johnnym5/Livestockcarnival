@@ -37,7 +37,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="w-full flex flex-col z-50 fixed top-0 left-0 right-0">
+    <header className="w-full flex flex-col z-[100] fixed top-0 left-0 right-0">
 
       {/* ── Main Navigation Bar (90% opaque white background with backdrop blur) ── */}
       <div

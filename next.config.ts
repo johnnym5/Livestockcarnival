@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   output: "export",
   images: {
     unoptimized: true,
+    qualities: [45, 75],
   },
   allowedDevOrigins: [
     "localhost",
