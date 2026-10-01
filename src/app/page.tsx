@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -24,6 +24,13 @@ interface CardData {
 }
 
 type DeckControlMode = 'hidden' | 'skip' | 'top' | 'magazine';
+type NetworkInformation = { effectiveType?: string; saveData?: boolean };
+type PerformanceNavigator = Navigator & {
+  deviceMemory?: number;
+  connection?: NetworkInformation;
+};
+
+const smoothstep = (progress: number) => progress * progress * (3 - 2 * progress);
 
 const cards: CardData[] = [
   {
@@ -251,9 +258,13 @@ export default function Home() {
   const [isFanned, setIsFanned] = useState(false);
   const isFannedRef = useRef(false);
   const [activeFocusedCard, setActiveFocusedCard] = useState<string | null>(null);
+  const [raisedCardId, setRaisedCardId] = useState<string | null>(null);
   const [mobileCardIndex, setMobileCardIndex] = useState(0);
   const [mobileCardFlipped, setMobileCardFlipped] = useState(false);
+  const [deckStage, setDeckStage] = useState<'intro' | 'stack' | 'fan' | 'closing' | 'magazine'>('intro');
   const [useStaticDeck, setUseStaticDeck] = useState(false);
+  const [performanceReady, setPerformanceReady] = useState(false);
+  const [isMagazineOnly, setIsMagazineOnly] = useState(false);
   const [skipAvailable, setSkipAvailable] = useState(false);
   const [deckControlMode, setDeckControlMode] = useState<DeckControlMode>('hidden');
   const [skipInProgress, setSkipInProgress] = useState(false);
@@ -261,9 +272,13 @@ export default function Home() {
   const [skipTransitionCovered, setSkipTransitionCovered] = useState(false);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const [isFirstMagazineFeatureVisible, setIsFirstMagazineFeatureVisible] = useState(false);
-  const touchStartRef = useRef<{ x: number; y: number; cardId: string } | null>(null);
-  const suppressCardClickRef = useRef(false);
-  const scrollTriggerRef = useRef<{ disable: (revert?: boolean) => void; enable: () => void } | null>(null);
+  const cardFlipTimerRef = useRef<number | null>(null);
+  const scrollTriggerRef = useRef<{
+    disable: (revert?: boolean) => void;
+    enable: () => void;
+    refresh: () => void;
+    update: () => void;
+  } | null>(null);
 
   // Store original fanned positions for cards when in spread state
   const fannedCoordsRef = useRef<
@@ -275,6 +290,35 @@ export default function Home() {
 
   const isMobileViewport = () => window.matchMedia('(max-width: 767px)').matches;
   const prefersReducedMotion = useReducedMotion();
+  const isMobileDeck = performanceReady && typeof window !== 'undefined' && isMobileViewport();
+  // The performance fallback takes precedence over every deck presentation,
+  // including the lightweight mobile carousel.
+  const shouldRenderDeck = performanceReady;
+  const performanceMode = !performanceReady ? 'checking' : isMagazineOnly ? 'magazine' : 'cinematic';
+
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+    const frame = window.requestAnimationFrame(() => {
+      const performanceNavigator = navigator as PerformanceNavigator;
+      const connection = performanceNavigator.connection;
+      const lowDevice =
+        (typeof performanceNavigator.deviceMemory === 'number' && performanceNavigator.deviceMemory <= 4) ||
+        (typeof performanceNavigator.hardwareConcurrency === 'number' && performanceNavigator.hardwareConcurrency <= 4);
+      const lowNetwork =
+        connection?.saveData === true ||
+        ['slow-2g', '2g', '3g'].includes(connection?.effectiveType?.toLowerCase() ?? '') ||
+        navigator.onLine === false;
+      const useMagazineOnly = lowDevice || lowNetwork;
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      setIsMagazineOnly(useMagazineOnly);
+      setUseStaticDeck(!window.matchMedia('(max-width: 767px)').matches && (useMagazineOnly || reducedMotion));
+      setPerformanceReady(true);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     const updateScrollToTopVisibility = () => {
@@ -302,6 +346,141 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (!performanceReady) return;
+
+    const sceneElement = sceneRef.current;
+    if (isMobileDeck || !prefersReducedMotion) {
+      const sceneEl = sceneElement;
+      if (!sceneEl) return;
+
+      sceneEl.classList.add('scene-ready');
+      if (prefersReducedMotion) {
+        sceneEl.dataset.deckStage = 'fan';
+        const fanFrame = window.requestAnimationFrame(() => {
+          setDeckStage('fan');
+          isFannedRef.current = true;
+          setIsFanned(true);
+        });
+        return () => {
+          window.cancelAnimationFrame(fanFrame);
+          isFannedRef.current = false;
+          setIsFanned(false);
+          sceneEl.classList.remove('scene-ready');
+          delete sceneEl.dataset.deckStage;
+        };
+      }
+
+      let isCancelled = false;
+      let ctx: { revert: () => void } | null = null;
+      const header = document.querySelector<HTMLElement>('header');
+      const magazineSection = magazineRef.current;
+
+      const initMobileAnimation = async () => {
+        const gsapMod = await import('gsap');
+        const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
+        const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+        gsap.registerPlugin(ScrollTrigger);
+        if (isCancelled) return;
+
+        const viewportHeight = window.innerHeight;
+
+        ctx = gsap.context(() => {
+          if (magazineSection) gsap.set(magazineSection, { zIndex: 70 });
+          gsap.set('#welcome-title', { xPercent: -50, transformOrigin: '50% 0%' });
+          sceneEl.dataset.deckStage = 'intro';
+          sceneEl.style.zIndex = 'auto';
+          isFannedRef.current = false;
+
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: sceneEl,
+              start: 'top top',
+              end: `+=${viewportHeight * 2.3}`,
+              scrub: 0.22,
+              pin: true,
+              pinSpacing: true,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          });
+
+          timeline.to('#welcome-title', {
+            opacity: 0.08,
+            duration: 0.85,
+            ease: 'none',
+          }, 0);
+          timeline.to('#welcome-title-content', {
+            scale: 0.62,
+            transformOrigin: '50% 0%',
+            duration: 0.85,
+            ease: 'none',
+          }, 0);
+          timeline.to('#home-page', {
+            backgroundColor: '#030A05',
+            duration: 0.1,
+          }, 0.45);
+
+          timeline.to('#deck-container', {
+            scale: 0.78,
+            opacity: 0.45,
+            duration: 0.4,
+            ease: 'none',
+          }, 1.7);
+          timeline.to('#welcome-title', { opacity: 0, duration: 0.1 }, 1.7);
+
+          timeline.eventCallback('onUpdate', () => {
+            const time = timeline.time();
+            const stage = time < 0.48 ? 'intro' : time < 1.12 ? 'stack' : time < 1.7 ? 'fan' : time < 2.1 ? 'closing' : 'magazine';
+            if (sceneEl.dataset.deckStage !== stage) {
+              sceneEl.dataset.deckStage = stage;
+              setDeckStage(stage);
+            }
+            const isFanStage = stage === 'fan';
+            if (isFannedRef.current !== isFanStage) {
+              isFannedRef.current = isFanStage;
+              setIsFanned(isFanStage);
+            }
+            header?.classList.toggle('mobile-scroll-underlay', time >= 0.45);
+            sceneEl.style.zIndex = time >= 0.45 ? '60' : 'auto';
+          });
+          timeline.eventCallback('onReverseComplete', () => {
+            sceneEl.dataset.deckStage = 'intro';
+            setDeckStage('intro');
+            isFannedRef.current = false;
+            setIsFanned(false);
+            header?.classList.remove('mobile-scroll-underlay');
+            sceneEl.style.zIndex = 'auto';
+          });
+          timeline.eventCallback('onComplete', () => {
+            sceneEl.dataset.deckStage = 'magazine';
+            setDeckStage('magazine');
+            isFannedRef.current = false;
+            setIsFanned(false);
+          });
+          scrollTriggerRef.current = timeline.scrollTrigger ?? null;
+          ScrollTrigger.refresh();
+        }, containerRef);
+      };
+
+      void initMobileAnimation();
+      return () => {
+        isCancelled = true;
+        ctx?.revert();
+        header?.classList.remove('mobile-scroll-underlay');
+        sceneEl.classList.remove('scene-ready');
+        sceneEl.style.removeProperty('z-index');
+        if (magazineSection) magazineSection.style.removeProperty('z-index');
+        delete sceneEl.dataset.deckStage;
+        isFannedRef.current = false;
+        if (cardFlipTimerRef.current !== null) window.clearTimeout(cardFlipTimerRef.current);
+      };
+    }
+
+    if (isMagazineOnly) {
+      sceneElement?.classList.add('scene-ready');
+      return () => sceneElement?.classList.remove('scene-ready');
+    }
+
     // Force browser scroll to top on load
     if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
@@ -311,7 +490,7 @@ export default function Home() {
     let isCancelled = false;
     let ctx: { revert: () => void } | null = null;
     let removeLenisListener: (() => void) | null = null;
-    const sceneElement = sceneRef.current;
+    let removePeekResizeListener: (() => void) | null = null;
 
     const initAnimation = async () => {
       /* Dynamically import GSAP so it remains client-side */
@@ -365,13 +544,20 @@ export default function Home() {
         gsap.set('#welcome-title h1', { color: '#111827' });
         gsap.set('#welcome-title h1 span', { color: '#8D6B1B' });
         gsap.set('#welcome-title p', { color: '#4B5563' });
+        const getInitialPeekY = () => {
+          const firstCard = document.getElementById('card-1');
+          if (!firstCard) return window.innerHeight * 0.75;
+          // A centered card needs this offset to leave roughly one-third visible
+          // above the lower edge of the viewport.
+          return Math.max(0, window.innerHeight / 2 + firstCard.offsetHeight / 6);
+        };
         cards.forEach((card) => {
           const cardEl = `#${card.id}`;
           gsap.set(cardEl, {
             xPercent: -50,
             yPercent: -50,
             x: 0,
-            y: '110vh',
+            y: card.id === 'card-1' && !prefersReducedMotion ? getInitialPeekY() : '110vh',
             z: 0,
             rotationX: 0,
             rotationY: 0,
@@ -461,6 +647,15 @@ export default function Home() {
           ease: 'power2.out',
         }, 0);
 
+        if (!prefersReducedMotion) {
+          const updateInitialPeek = () => {
+            if ((tl.scrollTrigger?.progress ?? 1) > 0.001) return;
+            gsap.set('#card-1', { y: getInitialPeekY() });
+          };
+          window.addEventListener('resize', updateInitialPeek);
+          removePeekResizeListener = () => window.removeEventListener('resize', updateInitialPeek);
+        }
+
         // Recede the hero from the first instant of the card entrance.
         tl.to('#welcome-title', {
           opacity: 0.04,
@@ -531,6 +726,8 @@ export default function Home() {
           const card = cards[i];
           const cardId = `#${card.id}`;
           const pose = revealPoses[i % revealPoses.length];
+          const mobileRotationX = isMobile ? 0 : pose.rotationX;
+          const mobileRotationY = isMobile ? 0 : pose.rotationY;
           tl.addLabel(`step-${i}`, cardSequenceStart + i * cardStepDuration);
 
           if (i > 0) {
@@ -551,8 +748,8 @@ export default function Home() {
           tl.to(
             cardId,
             {
-              rotationX: pose.rotationX,
-              rotationY: pose.rotationY,
+              rotationX: mobileRotationX,
+              rotationY: mobileRotationY,
               rotationZ: 0,
               duration: 0.75,
               ease: 'power2.inOut',
@@ -638,6 +835,8 @@ export default function Home() {
         const lastCard = cards[totalCards - 1];
         const lastCardId = `#${lastCard.id}`;
         const lastPose = revealPoses[(totalCards - 1) % revealPoses.length];
+        const lastCardMobileRotationX = isMobile ? 0 : lastPose.rotationX;
+        const lastCardMobileRotationY = isMobile ? 0 : lastPose.rotationY;
         const lastCardRevealAt = cardSequenceStart + (totalCards - 1) * cardStepDuration;
         tl.addLabel('last-card-reveal', lastCardRevealAt);
         const previousBackdrop = backdropLayers[totalCards - 2];
@@ -653,8 +852,8 @@ export default function Home() {
         tl.to(
           lastCardId,
           {
-            rotationX: lastPose.rotationX,
-            rotationY: lastPose.rotationY,
+            rotationX: lastCardMobileRotationX,
+            rotationY: lastCardMobileRotationY,
             rotationZ: 0,
             duration: 0.75,
             ease: 'power2.inOut',
@@ -705,8 +904,8 @@ export default function Home() {
 
           const normIndex = (index - (totalCards - 1) / 2) / ((totalCards - 1) / 2);
           const yArcVal = Math.pow(normIndex, 2) * 35 - 15;
-          const rotZVal = normIndex * 18;
-          const spreadScale = 0.3;
+          const rotZVal = isMobile ? 0 : normIndex * 18;
+          const spreadScale = isMobile ? 0.74 : 0.3;
           const spreadZIndex = index + 10;
 
           fannedCoordsRef.current[card.id] = {
@@ -722,11 +921,11 @@ export default function Home() {
             cardId,
             {
               x: isMobile ? 0 : xPos,
-              y: yArcVal,
-              z: isMobile ? 80 : 50,
-              rotationY: isMobile ? 0 : 0,
-              rotationZ: isMobile ? 0 : rotZVal,
-              scale: isMobile ? 0.74 : spreadScale,
+              y: isMobile ? 12 + index * 2 : yArcVal,
+              z: isMobile ? 20 : 50,
+              rotationY: 0,
+              rotationZ: rotZVal,
+              scale: spreadScale,
               transformOrigin: '50% 50%',
               zIndex: spreadZIndex,
               duration: 3,
@@ -738,7 +937,7 @@ export default function Home() {
           tl.to(
             cardId,
             {
-              rotationX: 166,
+              rotationX: isMobile ? 0 : 166,
               duration: 2.5,
               ease: 'power2.out',
             },
@@ -751,7 +950,7 @@ export default function Home() {
         tl.to({}, { duration: magazineHandoffDuration });
         cards.forEach((card) => {
           tl.to(`#${card.id}`, {
-            rotationX: 166,
+            rotationX: isMobile ? 0 : 166,
             rotationY: 0,
             duration: 0.3,
             ease: 'power1.out',
@@ -814,56 +1013,109 @@ export default function Home() {
     return () => {
       isCancelled = true;
       removeLenisListener?.();
+      removePeekResizeListener?.();
       ctx?.revert();
       scrollTriggerRef.current = null;
       sceneElement?.classList.remove('scene-ready');
     };
-  }, []);
+  }, [performanceReady, isMagazineOnly, isMobileDeck, prefersReducedMotion]);
 
-  const handleSkipToMagazine = () => {
-    if (!magazineRef.current || !skipAvailable || skipInProgressRef.current) return;
+  const runCoveredScroll = (targetY: number, afterScroll?: () => void) => {
+    if (skipInProgressRef.current) return;
 
     skipInProgressRef.current = true;
     setSkipInProgress(true);
-    setSkipTransitionVisible(true);
-    window.setTimeout(() => setSkipTransitionCovered(true), 40);
-    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 72;
-    const targetY = Math.max(
-      0,
-      window.scrollY + magazineRef.current.getBoundingClientRect().top - headerHeight - 12
-    );
-    let completed = false;
+    let finished = false;
+    let coverTimer = 0;
     let fallbackTimer = 0;
-    const finishSkip = () => {
-      if (completed) return;
-      completed = true;
+    let animationFrame = 0;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      window.clearTimeout(coverTimer);
       window.clearTimeout(fallbackTimer);
+      window.cancelAnimationFrame(animationFrame);
       setSkipTransitionVisible(false);
       setSkipTransitionCovered(false);
       skipInProgressRef.current = false;
       setSkipInProgress(false);
+      afterScroll?.();
+    };
+
+    const startScroll = () => {
+      const clampedTarget = Math.max(0, Math.min(targetY, document.documentElement.scrollHeight - window.innerHeight));
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const lenis = (window as Window & {
+        __lenisInstance?: {
+          scrollTo: (
+            target: number,
+            options: { duration?: number; easing?: (progress: number) => number; immediate?: boolean; lock?: boolean; onComplete?: () => void }
+          ) => void;
+        };
+      }).__lenisInstance;
+
+      if (reducedMotion) {
+        fallbackTimer = window.setTimeout(finish, 250);
+        if (lenis) lenis.scrollTo(clampedTarget, { immediate: true, onComplete: finish });
+        else {
+          window.scrollTo({ top: clampedTarget, left: 0, behavior: 'instant' });
+          finish();
+        }
+        return;
+      }
+
+      if (lenis) {
+        lenis.scrollTo(clampedTarget, {
+          duration: 1.4,
+          easing: smoothstep,
+          lock: true,
+          onComplete: finish,
+        });
+        fallbackTimer = window.setTimeout(finish, 2200);
+        return;
+      }
+
+      const startY = window.scrollY;
+      const distance = clampedTarget - startY;
+      if (Math.abs(distance) < 1) {
+        finish();
+        return;
+      }
+
+      let startTime: number | null = null;
+      const animate = (time: number) => {
+        if (startTime === null) startTime = time;
+        const progress = Math.min((time - startTime) / 1400, 1);
+        window.scrollTo({ top: startY + distance * smoothstep(progress), left: 0, behavior: 'instant' });
+        if (progress >= 1) finish();
+        else animationFrame = window.requestAnimationFrame(animate);
+      };
+      animationFrame = window.requestAnimationFrame(animate);
+      fallbackTimer = window.setTimeout(finish, 2200);
+    };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      startScroll();
+      return;
+    }
+
+    setSkipTransitionVisible(true);
+    setSkipTransitionCovered(false);
+    window.requestAnimationFrame(() => setSkipTransitionCovered(true));
+    coverTimer = window.setTimeout(startScroll, 520);
+  };
+
+  const handleSkipToMagazine = () => {
+    if (!magazineRef.current || !skipAvailable || skipInProgressRef.current) return;
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 72;
+    const targetY = window.scrollY + magazineRef.current.getBoundingClientRect().top - headerHeight - 12;
+    runCoveredScroll(targetY, () => {
       deckControlModeRef.current = 'magazine';
       setDeckControlMode('magazine');
       skipAvailableRef.current = false;
       setSkipAvailable(false);
       magazineRef.current?.focus({ preventScroll: true });
-    };
-
-    const lenis = (window as Window & {
-      __lenisInstance?: {
-        scrollTo: (target: number, options: { duration: number; onComplete: () => void }) => void;
-      };
-    }).__lenisInstance;
-
-    if (lenis) {
-      lenis.scrollTo(targetY, { duration: 0.85, onComplete: finishSkip });
-      fallbackTimer = window.setTimeout(finishSkip, 1800);
-      return;
-    }
-
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
-    window.addEventListener('scrollend', finishSkip, { once: true });
-    fallbackTimer = window.setTimeout(finishSkip, 2200);
+    });
   };
 
   const handleControlClick = () => {
@@ -872,21 +1124,10 @@ export default function Home() {
       return;
     }
 
-    if (activeControlMode !== 'hidden') {
-      const lenis = (window as Window & {
-        __lenisInstance?: {
-          scrollTo: (target: number, options: { duration?: number; immediate?: boolean }) => void;
-        };
-      }).__lenisInstance;
-      if (lenis) {
-        lenis.scrollTo(0, prefersReducedMotion ? { immediate: true } : { duration: 1.2 });
-      } else {
-        window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-      }
-    }
+    if (activeControlMode !== 'hidden') runCoveredScroll(0);
   };
 
-  const activeControlMode: DeckControlMode = useStaticDeck
+  const activeControlMode: DeckControlMode = isMagazineOnly || useStaticDeck
     ? showScrollToTop && isFirstMagazineFeatureVisible ? 'magazine' : 'hidden'
     : deckControlMode === 'magazine' && !isFirstMagazineFeatureVisible ? 'hidden' : deckControlMode;
   const controlHidden = activeControlMode === 'hidden';
@@ -941,255 +1182,75 @@ export default function Home() {
   };
 
   /* ── Interactive Click / Depth of Field Handling ── */
-  const handleCardClick = async (cardId: string) => {
-    if (suppressCardClickRef.current) {
-      suppressCardClickRef.current = false;
+  const handleCardClick = (cardId: string) => {
+    if (sceneRef.current?.dataset.deckStage !== 'fan' || activeFocusedCard) return;
+
+    const clickedIndex = cards.findIndex((card) => card.id === cardId);
+    setMobileCardIndex(clickedIndex);
+    if (raisedCardId !== cardId) {
+      setRaisedCardId(cardId);
+      setMobileCardFlipped(false);
       return;
     }
 
-    if (useStaticDeck) {
-      setMobileCardFlipped((flipped) => !flipped);
-      return;
-    }
-
-    if (isMobileViewport() && isFanned && activeFocusedCard !== cardId) {
-      const clickedIndex = cards.findIndex((card) => card.id === cardId);
-      if (clickedIndex !== mobileCardIndex) {
-        void moveMobileFan(clickedIndex);
-        return;
-      }
-    }
-
-    if (!isFanned && activeFocusedCard && activeFocusedCard !== cardId) return;
-
-    const gsapMod = await import('gsap');
-    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
-
-    if (!isFanned && !activeFocusedCard) {
-      scrollTriggerRef.current?.disable(false);
-    }
-
-    if (activeFocusedCard === cardId) {
-      if (isMobile && isFanned) {
-        void moveMobileFan(mobileCardIndex);
-        return;
-      }
-      if (!isFanned) {
-        setActiveFocusedCard(null);
-        scrollTriggerRef.current?.enable();
-        return;
-      }
-      const orig = fannedCoordsRef.current[cardId];
-      if (orig) {
-        gsap.to(`#${cardId}`, {
-          x: orig.x,
-          y: orig.y,
-          z: orig.z,
-          rotationZ: orig.rotationZ,
-          scale: orig.scale,
-          zIndex: orig.zIndex,
-          duration: 0.9,
-          ease: 'power3.out',
-        });
-      }
-
-      setActiveFocusedCard(null);
-      if (!isFanned) scrollTriggerRef.current?.enable();
-    } else {
-      if (activeFocusedCard && fannedCoordsRef.current[activeFocusedCard]) {
-        const prevOrig = fannedCoordsRef.current[activeFocusedCard];
-        gsap.to(`#${activeFocusedCard}`, {
-          x: prevOrig.x,
-          y: prevOrig.y,
-          z: prevOrig.z,
-          rotationZ: prevOrig.rotationZ,
-          scale: prevOrig.scale,
-          zIndex: prevOrig.zIndex,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-      }
-
-      if (!isFanned) {
-        gsap.to(`#${cardId}`, {
-          rotationX: 166,
-          rotationY: 0,
-          duration: 0.65,
-          ease: 'power2.out',
-        });
-      }
-
-      const zoomPose = getCardZoomPose(cardId, isMobile ? 1.08 : 1.28);
-      gsap.to(`#${cardId}`, {
-        x: 0,
-        y: zoomPose.y,
-        z: 180,
-        rotationZ: 0,
-        scale: zoomPose.scale,
-        zIndex: 200,
-          duration: 1.05,
-        ease: 'power3.out',
-      });
-
-      setActiveFocusedCard(cardId);
-    }
+    setActiveFocusedCard(cardId);
+    scrollTriggerRef.current?.disable(false);
+    if (cardFlipTimerRef.current !== null) window.clearTimeout(cardFlipTimerRef.current);
+    cardFlipTimerRef.current = window.setTimeout(() => {
+      setMobileCardFlipped(true);
+      cardFlipTimerRef.current = null;
+    }, 380);
   };
 
-  const dismissFocus = async () => {
-    if (!activeFocusedCard) return;
-
-    if (isFanned && isMobileViewport()) {
-      void moveMobileFan(mobileCardIndex);
-      return;
+  const dismissFocus = () => {
+    if (!activeFocusedCard && !raisedCardId) return;
+    if (cardFlipTimerRef.current !== null) {
+      window.clearTimeout(cardFlipTimerRef.current);
+      cardFlipTimerRef.current = null;
     }
-
-    if (!isFanned) {
-      setActiveFocusedCard(null);
-      scrollTriggerRef.current?.enable();
-      return;
-    }
-
-    const gsapMod = await import('gsap');
-    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-
-    const orig = fannedCoordsRef.current[activeFocusedCard];
-    if (orig) {
-      gsap.to(`#${activeFocusedCard}`, {
-        x: orig.x,
-        y: orig.y,
-        z: orig.z,
-        rotationZ: orig.rotationZ,
-        scale: orig.scale,
-        zIndex: orig.zIndex,
-        duration: 0.9,
-        ease: 'power3.out',
-      });
-    }
-
     setActiveFocusedCard(null);
-    if (!isFanned) scrollTriggerRef.current?.enable();
+    setRaisedCardId(null);
+    setMobileCardFlipped(false);
+    sceneRef.current!.dataset.deckStage = 'fan';
+    setDeckStage('fan');
+    isFannedRef.current = true;
+    setIsFanned(true);
+    const trigger = scrollTriggerRef.current;
+    window.requestAnimationFrame(() => {
+      trigger?.enable();
+      trigger?.update();
+    });
   };
 
-  const moveMobileFan = useCallback(async (nextIndex: number) => {
+  const moveMobileFan = useCallback((nextIndex: number) => {
     const boundedIndex = Math.max(0, Math.min(cards.length - 1, nextIndex));
     setMobileCardIndex(boundedIndex);
-    setActiveFocusedCard(null);
+    setRaisedCardId(cards[boundedIndex].id);
     setMobileCardFlipped(false);
-    if (useStaticDeck || !isMobileViewport()) return;
-    const gsapMod = await import('gsap');
-    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    const cardWidth = Math.min(window.innerWidth * 0.76, 320);
-    const availableHeight = window.innerHeight * 0.64;
-    const focusedScale = Math.max(0.52, Math.min(0.76, availableHeight / (cardWidth * 16 / 9)));
-
-    cards.forEach((card, index) => {
-      const distance = index - boundedIndex;
-      const absDistance = Math.abs(distance);
-      gsap.to(`#${card.id}`, {
-        x: `${distance * 56}vw`,
-        y: Math.min(absDistance, 2) * 10,
-        z: 80 - absDistance * 65,
-        rotationY: Math.max(-28, Math.min(28, distance * -12)),
-        rotationZ: 0,
-        scale: Math.max(0.42, focusedScale - absDistance * 0.12),
-        zIndex: cards.length - absDistance,
-        pointerEvents: absDistance <= 1 ? 'auto' : 'none',
-        duration: 0.65,
-        ease: 'power3.out',
-      });
-    });
-  }, [useStaticDeck]);
-
-  const handleCardPointerDown = (event: React.PointerEvent<HTMLDivElement>, cardId: string) => {
-    if (event.pointerType !== 'touch' || !isFanned || activeFocusedCard) return;
-    if (isMobileViewport()) event.currentTarget.setPointerCapture(event.pointerId);
-    touchStartRef.current = { x: event.clientX, y: event.clientY, cardId };
-  };
-
-  const handleCardPointerUp = (event: React.PointerEvent<HTMLDivElement>, cardId: string) => {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    if (!start || start.cardId !== cardId || !isMobileViewport()) return;
-    const deltaX = event.clientX - start.x;
-    const deltaY = event.clientY - start.y;
-    if (Math.abs(deltaX) < 42 || Math.abs(deltaX) < Math.abs(deltaY) * 1.15) return;
-    suppressCardClickRef.current = true;
-    window.setTimeout(() => { suppressCardClickRef.current = false; }, 350);
-    void moveMobileFan(mobileCardIndex + (deltaX < 0 ? 1 : -1));
-  };
-
-  const handleCardPointerMove = async (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType !== 'touch' || !touchStartRef.current || !isFanned || activeFocusedCard || isDeckHandoffRef.current) return;
-    const cardEl = event.currentTarget;
-    const rect = cardEl.getBoundingClientRect();
-    const xRatio = (event.clientX - rect.left) / rect.width - 0.5;
-    const yRatio = (event.clientY - rect.top) / rect.height - 0.5;
-    const gsapMod = await import('gsap');
-    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    gsap.to(cardEl, {
-      rotationX: 166 - yRatio * 8,
-      rotationY: xRatio * 10,
-      duration: 0.18,
-      overwrite: true,
-    });
-  };
-
-  /* ── Dynamic 3D Depth & Tilt Effect on Mouse Move ── */
-  const handleCardMouseMove = async (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobileViewport() || !isFanned || useStaticDeck || isDeckHandoffRef.current) return;
-    const cardEl = e.currentTarget;
-
-    const rect = cardEl.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const xPct = x / rect.width - 0.5;
-    const yPct = y / rect.height - 0.5;
-
-    const tiltX = -yPct * 8;
-    const tiltY = xPct * 10;
-
-    const gsapMod = await import('gsap');
-    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    gsap.to(cardEl, {
-      rotationX: 166 + tiltX,
-      rotationY: tiltY,
-      duration: 0.2,
-      ease: 'power1.out',
-    });
-  };
-
-  const handleCardMouseLeave = async (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobileViewport() || !isFanned || useStaticDeck || isDeckHandoffRef.current) return;
-    const cardEl = e.currentTarget;
-
-    const gsapMod = await import('gsap');
-    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    gsap.to(cardEl, {
-      rotationX: 166,
-      rotationY: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-    });
-  };
-
-  useEffect(() => {
-    if (!isFanned || useStaticDeck || !isMobileViewport()) return;
-    void moveMobileFan(0);
-  }, [isFanned, useStaticDeck, moveMobileFan]);
+  }, []);
 
   return (
-      <div ref={containerRef} className="w-full bg-[#FBFBFA] text-white overflow-x-hidden select-none">
+      <div
+        id="home-page"
+        ref={containerRef}
+        data-performance-mode={performanceMode}
+        data-deck-scroll={!prefersReducedMotion}
+        data-mobile-scroll={isMobileDeck && !prefersReducedMotion}
+        className="w-full bg-[#FBFBFA] text-white overflow-x-hidden select-none"
+      >
       {/* ═══════════════ 3D PINNED DECK SCENE ═══════════════ */}
       <div
         id="scene-container"
         ref={sceneRef}
-        data-fanned={isFanned}
+        data-fanned={isFanned || (shouldRenderDeck && isMobileDeck)}
+        data-deck-stage={deckStage}
+        data-expanded-card={activeFocusedCard !== null}
+        data-mobile-scroll={isMobileDeck && !prefersReducedMotion}
+        data-magazine-only={isMagazineOnly || !performanceReady}
         className="w-full h-[100dvh] min-h-[100svh] relative bg-[#FBFBFA] overflow-hidden"
         onClick={(e) => {
           if (
-            activeFocusedCard &&
+            (activeFocusedCard || raisedCardId) &&
             e.target instanceof HTMLElement &&
             !e.target.closest('.deck-card')
           ) {
@@ -1197,47 +1258,50 @@ export default function Home() {
           }
         }}
       >
-        {/* Blurred card imagery stays behind the hero and deck during the pinned reveal. */}
-        <div id="deck-backdrop" aria-hidden="true">
-          {cards.map((card, index) => (
-            <div key={`${card.id}-backdrop`} className="deck-backdrop-image">
-              <Image
-                src={card.image}
-                alt=""
-                fill
-                sizes="100vw"
-                quality={45}
-                priority={index === 0}
-              />
+        {shouldRenderDeck && (
+          <>
+            {/* Blurred card imagery stays behind the hero and deck during the pinned reveal. */}
+            <div id="deck-backdrop" aria-hidden="true">
+              {cards.map((card, index) => (
+                <div key={`${card.id}-backdrop`} className="deck-backdrop-image">
+                  <Image
+                    src={card.image}
+                    alt=""
+                    fill
+                    sizes="100vw"
+                    quality={45}
+                    priority={index === 0}
+                  />
+                </div>
+              ))}
+              <div className="deck-backdrop-shade" />
             </div>
-          ))}
-          <div className="deck-backdrop-shade" />
-        </div>
 
-        {/* Particle Glow Overlay */}
-        <div className="absolute inset-0 pointer-events-none z-0 hidden opacity-40 sm:block">
-          {[...Array(30)].map((_, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full bg-[#E4B03A]/30 blur-[1px]"
-              style={{
-                width: `${(i % 3) + 2}px`,
-                height: `${(i % 3) + 2}px`,
-                top: `${(i * 17) % 100}%`,
-                left: `${(i * 23) % 100}%`,
-              }}
-            />
-          ))}
-        </div>
+            <div className="absolute inset-0 pointer-events-none z-0 hidden opacity-40 sm:block">
+              {[...Array(30)].map((_, i) => (
+                <span
+                  key={i}
+                  className="absolute rounded-full bg-[#E4B03A]/30 blur-[1px]"
+                  style={{
+                    width: `${(i % 3) + 2}px`,
+                    height: `${(i % 3) + 2}px`,
+                    top: `${(i * 17) % 100}%`,
+                    left: `${(i * 23) % 100}%`,
+                  }}
+                />
+              ))}
+            </div>
 
-        {/* Ambient Radial Spotlight */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(228,176,58,0.12)_0%,transparent_75%)] pointer-events-none z-0" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(228,176,58,0.12)_0%,transparent_75%)] pointer-events-none z-0" />
+          </>
+        )}
 
         {/* ── HERO TEXT (Top-anchored so logo emblem is 100% visible below sticky header) ── */}
         <div
           id="welcome-title"
           className="scene-element !top-0 !left-1/2 w-[95vw] max-w-5xl text-center z-0 px-3 sm:px-4 pt-20 sm:pt-24 md:pt-28"
         >
+          <div id="welcome-title-content" className="origin-top">
           <div className="hero-intro-item relative w-28 h-16 sm:w-40 sm:h-24 md:w-48 md:h-28 mx-auto mb-3">
             <Image
               src="/assets/branding/carnival-logo-transparent.png"
@@ -1277,15 +1341,16 @@ export default function Home() {
               <div className="w-1 h-2 rounded-full bg-[#E4B03A]" />
             </div>
           </div>
+          </div>
         </div>
 
         {/* ── THE 3D DECK CONTAINER ── */}
-        <div
+        {shouldRenderDeck && <div
           id="deck-container"
           data-static-deck={useStaticDeck}
           className="absolute inset-0 z-10 pointer-events-none"
         >
-          {cards.map((card) => (
+          {cards.map((card, index) => (
             <div
               key={card.id}
               id={card.id}
@@ -1294,22 +1359,22 @@ export default function Home() {
                 Portrait cards on mobile; landscape cards on desktop.
               */
               className={`deck-card bg-gradient-to-br ${card.coverBg} w-[76vw] max-w-[320px] aspect-[9/16] md:w-[78vw] md:max-w-[880px] md:aspect-video lg:w-[80vw] lg:max-w-[960px] pointer-events-auto`}
-              data-mobile-active={mobileCardIndex === Number(card.number) - 1}
-              onMouseMove={handleCardMouseMove}
-              onMouseLeave={handleCardMouseLeave}
-              onPointerDown={(event) => handleCardPointerDown(event, card.id)}
-              onPointerMove={handleCardPointerMove}
-              onPointerUp={(event) => handleCardPointerUp(event, card.id)}
-              onPointerCancel={() => { touchStartRef.current = null; }}
-              onClick={() => {
-                if (useStaticDeck) {
-                  setMobileCardFlipped((flipped) => !flipped);
-                  return;
-                }
-                handleCardClick(card.id);
-              }}
+              data-deck-index={index}
+              data-raised={raisedCardId === card.id}
+              data-expanded={activeFocusedCard === card.id}
+              data-flipped={mobileCardFlipped && activeFocusedCard === card.id}
+              onClick={() => handleCardClick(card.id)}
+                          style={{
+                            '--fan-x': `${(index - (cards.length - 1) / 2) * (isMobileDeck ? 7.2 : 6.8)}vw`,
+                            '--fan-y': `${Math.pow((index - (cards.length - 1) / 2) / ((cards.length - 1) / 2), 2) * (isMobileDeck ? 24 : 42)}px`,
+                            '--fan-rotation': `${(index - (cards.length - 1) / 2) * (isMobileDeck ? 2.8 : 3.8)}deg`,
+                            '--fan-scale': isMobileDeck ? 0.58 : 0.4,
+                            '--stack-y': `${index * 1.2}px`,
+                            '--stack-z': `${cards.length - index}`,
+                            '--fan-z': `${Math.round(100 - Math.abs(index - (cards.length - 1) / 2) * 10) + (index <= (cards.length - 1) / 2 ? 1 : 0)}`,
+                          } as CSSProperties}
             >
-              <div className="card-inner" data-mobile-flipped={mobileCardFlipped}>
+              <div className="card-inner" data-mobile-flipped={mobileCardFlipped && activeFocusedCard === card.id}>
                 {/* ════ FRONT COVER (Face Down State) ════ */}
                 <div
                   className={`card-face card-face-front bg-gradient-to-br ${card.coverBg} border-2 border-[#E4B03A]/45 shadow-2xl flex flex-col justify-between p-3 sm:p-8 md:p-10 text-white relative rounded-[1.5rem]`}
@@ -1364,19 +1429,6 @@ export default function Home() {
                       <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.2em] text-[#E4B03A] bg-[#0A1A10]/90 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#E4B03A]/40 shadow-md">
                         {card.eyebrow}
                       </span>
-                      {activeFocusedCard === card.id && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            dismissFocus();
-                          }}
-                          className="p-1.5 rounded-full bg-[#030A05]/90 text-white hover:text-[#E4B03A] border border-white/20 transition-colors"
-                          aria-label="Close focused card"
-                          title="Close full view"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
                     </div>
                   </div>
 
@@ -1410,9 +1462,21 @@ export default function Home() {
               </div>
             </div>
           ))}
-        </div>
+        </div>}
 
-        <nav className="mobile-deck-controls" data-visible={isFanned && !useStaticDeck} aria-label="Carnival highlights">
+        {activeFocusedCard && (
+          <button
+            type="button"
+            onClick={dismissFocus}
+            className="deck-card-close"
+            aria-label="Close selected card"
+            title="Close selected card"
+          >
+            <X aria-hidden="true" />
+          </button>
+        )}
+
+        {shouldRenderDeck && <nav className="mobile-deck-controls" data-visible={isFanned && !activeFocusedCard} aria-label="Carnival highlights">
           <button
             type="button"
             aria-label="Previous highlight"
@@ -1432,7 +1496,7 @@ export default function Home() {
           >
             <ChevronRight aria-hidden="true" />
           </button>
-        </nav>
+        </nav>}
 
       </div>
 
@@ -1515,7 +1579,7 @@ export default function Home() {
 
       <div
         aria-hidden="true"
-        className={`pointer-events-none fixed inset-0 z-[100] bg-[#FBFBFA] transition-opacity duration-500 ease-out ${skipTransitionVisible ? (skipTransitionCovered ? 'opacity-100' : 'opacity-0') : 'opacity-0'}`}
+        className={`pointer-events-none fixed inset-0 z-[100] bg-[#FBFBFA] transition-opacity duration-500 ease-in-out ${skipTransitionVisible ? (skipTransitionCovered ? 'opacity-100' : 'opacity-0') : 'opacity-0'}`}
       />
 
       <div className="pointer-events-none fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-1/2 z-[70] -translate-x-1/2 md:bottom-[calc(1.25rem+env(safe-area-inset-bottom))]">
@@ -1526,7 +1590,7 @@ export default function Home() {
           title={controlLabel}
           aria-hidden={controlHidden}
           tabIndex={controlHidden ? -1 : 0}
-          disabled={controlHidden || (controlIsSkip && skipInProgress)}
+          disabled={controlHidden || skipInProgress}
           animate={{
             opacity: controlHidden ? 0 : 1,
             scale: controlHidden ? 0.78 : 1,

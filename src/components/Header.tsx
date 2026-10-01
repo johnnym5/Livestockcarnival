@@ -15,11 +15,13 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      const keepHomeHeaderFull = pathname === '/' && window.matchMedia('(max-width: 767px)').matches;
+      setIsScrolled(!keepHomeHeaderFull && window.scrollY > 10);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [pathname]);
 
   const navLinks = [
     { name: 'Home', href: '/' },

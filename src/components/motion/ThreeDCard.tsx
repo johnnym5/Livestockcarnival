@@ -27,6 +27,7 @@ export default function ThreeDCard({
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const supportsTilt = !prefersReducedMotion && typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches;
   const glareX = useMotionValue(50);
   const glareY = useMotionValue(50);
   const glareBackground = useMotionTemplate`radial-gradient(circle 320px at ${glareX}% ${glareY}%, ${glowColor}, transparent 70%)`;
@@ -39,10 +40,7 @@ export default function ThreeDCard({
   const z = useSpring(0, springConfig);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches)) {
-      return;
-    }
+    if (!cardRef.current || !supportsTilt) return;
     const rect = cardRef.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
@@ -66,14 +64,19 @@ export default function ThreeDCard({
   };
 
   const handleMouseEnter = () => {
-    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches)) {
-      return;
-    }
+    if (!supportsTilt) return;
     setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
+    if (!supportsTilt) {
+      rotateX.set(0);
+      rotateY.set(0);
+      scale.set(1);
+      z.set(0);
+      return;
+    }
     rotateX.set(0);
     rotateY.set(0);
     scale.set(1);
@@ -92,7 +95,7 @@ export default function ThreeDCard({
 
   return (
     <div
-      style={{ perspective: 1000 }}
+      style={{ perspective: supportsTilt ? 1000 : 'none' }}
       className="w-full h-full"
     >
       <motion.div
@@ -102,11 +105,13 @@ export default function ThreeDCard({
         onMouseLeave={handleMouseLeave}
         onClick={onClick}
         style={{
-          rotateX,
-          rotateY,
-          scale,
-          z,
-          transformStyle: 'preserve-3d',
+          rotateX: supportsTilt ? rotateX : 0,
+          rotateY: supportsTilt ? rotateY : 0,
+          scale: supportsTilt ? scale : 1,
+          z: supportsTilt ? z : 0,
+          transformStyle: supportsTilt ? 'preserve-3d' : 'flat',
+          willChange: supportsTilt ? 'transform' : 'auto',
+          touchAction: 'manipulation',
         }}
         className={`relative rounded-2xl overflow-hidden transition-colors duration-300 ${variantStyles} ${className} ${
           onClick ? 'cursor-pointer' : ''

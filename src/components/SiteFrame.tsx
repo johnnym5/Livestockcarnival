@@ -1,12 +1,17 @@
 'use client';
 
 import { ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
-import LiveChatWidget from '@/components/LiveChatWidget';
 import SmoothScroll from '@/components/SmoothScroll';
 import InitialLoadOverlay from '@/components/InitialLoadOverlay';
+
+const LiveChatWidget = dynamic(() => import('@/components/LiveChatWidget'), {
+  ssr: false,
+  loading: () => null,
+});
 
 export default function SiteFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();

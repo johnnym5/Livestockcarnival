@@ -32,6 +32,7 @@ export default function ThreeDImage({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const supportsTilt = !prefersReducedMotion && typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches;
   const glareX = useMotionValue(50);
   const glareY = useMotionValue(50);
   const glareBackground = useMotionTemplate`radial-gradient(circle 280px at ${glareX}% ${glareY}%, ${glowColor}, transparent 70%)`;
@@ -42,10 +43,7 @@ export default function ThreeDImage({
   const scale = useSpring(1, springConfig);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    if (prefersReducedMotion || (typeof window !== 'undefined' && !window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches)) {
-      return;
-    }
+    if (!containerRef.current || !supportsTilt) return;
     const rect = containerRef.current.getBoundingClientRect();
     const xPct = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
     const yPct = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
@@ -66,13 +64,13 @@ export default function ThreeDImage({
   };
 
   const handleMouseEnter = () => {
-    if (prefersReducedMotion || !window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 768px)').matches) return;
+    if (!supportsTilt) return;
     setIsHovered(true);
   };
 
   return (
     <div
-      style={{ perspective: 1000 }}
+      style={{ perspective: supportsTilt ? 1000 : 'none' }}
       className={`relative ${containerClassName}`}
     >
       <motion.div
@@ -81,10 +79,12 @@ export default function ThreeDImage({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         style={{
-          rotateX,
-          rotateY,
-          scale,
-          transformStyle: 'preserve-3d',
+          rotateX: supportsTilt ? rotateX : 0,
+          rotateY: supportsTilt ? rotateY : 0,
+          scale: supportsTilt ? scale : 1,
+          transformStyle: supportsTilt ? 'preserve-3d' : 'flat',
+          willChange: supportsTilt ? 'transform' : 'auto',
+          touchAction: 'manipulation',
         }}
         className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-amber-500/20 group cursor-pointer"
       >

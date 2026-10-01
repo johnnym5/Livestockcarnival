@@ -13,7 +13,11 @@ export default function SmoothScroll({
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    if (!enabled || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const isFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lowPowerDevice = typeof navigator !== 'undefined' && navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+
+    if (!enabled || !isFinePointer || prefersReducedMotion || lowPowerDevice) return;
 
     // Disable native browser scroll restoration so page always starts at top
     if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
