@@ -115,7 +115,7 @@ export default function MediaPostsFeed() {
       {isLoading ? (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2" aria-label="Loading published stories">
           {[0, 1].map((item) => (
-            <div key={item} className="h-72 animate-pulse rounded-2xl border border-slate-200 bg-white" />
+            <div key={item} className="h-72 site-skeleton animate-pulse rounded-2xl border border-slate-200 bg-white" />
           ))}
         </div>
       ) : loadFailed ? (

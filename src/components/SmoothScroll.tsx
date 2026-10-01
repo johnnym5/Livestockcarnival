@@ -6,9 +6,11 @@ import Lenis from 'lenis';
 export default function SmoothScroll({
   children,
   enabled = true,
+  duration = 0.85,
 }: {
   children: ReactNode;
   enabled?: boolean;
+  duration?: number;
 }) {
   const lenisRef = useRef<Lenis | null>(null);
 
@@ -26,7 +28,7 @@ export default function SmoothScroll({
     window.scrollTo(0, 0);
 
     const lenis = new Lenis({
-      duration: 0.85,
+      duration,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
@@ -50,7 +52,7 @@ export default function SmoothScroll({
       delete (window as any).__lenisInstance;
       lenis.destroy();
     };
-  }, [enabled]);
+  }, [enabled, duration]);
 
   return <>{children}</>;
 }

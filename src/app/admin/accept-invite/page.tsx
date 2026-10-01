@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Check, Eye, EyeOff, KeyRound, LoaderCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { getCmsProfile } from '@/lib/cms';
 
 export default function AcceptEditorialInvitePage() {
   const router = useRouter();
@@ -69,7 +70,9 @@ export default function AcceptEditorialInvitePage() {
       setIsSaving(false);
       return;
     }
-    router.replace('/admin');
+    const { data: { user } } = await supabase.auth.getUser();
+    const profile = user ? await getCmsProfile(user.id) : null;
+    router.replace(profile?.role === 'super_admin' ? '/admin' : '/editor');
   };
 
   return (

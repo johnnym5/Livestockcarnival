@@ -29,7 +29,7 @@ export interface CmsProfile {
   created_at: string;
 }
 
-export type CmsStaff = CmsProfile;
+export type CmsStaff = CmsProfile & { permissions: string[] };
 
 export interface MediaPost {
   id: string;

@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
       try {
         const profile = await getCmsProfile(session.user.id);
         if (active && profile) {
-          router.replace('/admin');
+          router.replace(profile.role === 'super_admin' ? '/admin' : '/editor');
           return;
         }
         if (active && !profile) {
@@ -76,7 +76,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.replace('/admin');
+      router.replace(profile.role === 'super_admin' ? '/admin' : '/editor');
     } catch {
       await supabase.auth.signOut();
       setError('We could not verify this account. Please try again.');

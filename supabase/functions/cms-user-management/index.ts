@@ -4,6 +4,17 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
 const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const appUrl = Deno.env.get('SITE_URL') ?? 'https://livestockcarnival.ng';
+const permissionKeys = new Set([
+  'stories', 'galleries', 'media_storage', 'homepage_cards', 'page_magazine',
+  'page_schedule', 'page_livestock', 'page_fashion', 'animation_settings', 'live_chat',
+]);
+
+const parsePermissions = (input: unknown): string[] | null => {
+  if (!Array.isArray(input)) return null;
+  const values = [...new Set(input.filter((value): value is string => typeof value === 'string'))];
+  if (values.length < 1 || values.some((value) => !permissionKeys.has(value))) return null;
+  return values;
+};
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -51,7 +62,7 @@ Deno.serve(async (request: Request) => {
     return jsonResponse(403, { error: 'Super-admin access is required for user management.' });
   }
 
-  let body: { action?: string; email?: string; display_name?: string; user_id?: string };
+  let body: { action?: string; email?: string; display_name?: string; user_id?: string; permissions?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -65,10 +76,17 @@ Deno.serve(async (request: Request) => {
       .order('created_at', { ascending: false });
 
     if (error) return jsonResponse(500, { error: 'Unable to load editorial accounts.' });
-    return jsonResponse(200, { users: data ?? [] });
+    const { data: grants, error: grantsError } = await adminClient.from('cms_user_permissions').select('user_id,permission_key');
+    if (grantsError) return jsonResponse(500, { error: 'Unable to load editor permissions.' });
+    const permissionsByUser = new Map<string, string[]>();
+    for (const grant of grants ?? []) permissionsByUser.set(grant.user_id, [...(permissionsByUser.get(grant.user_id) ?? []), grant.permission_key]);
+    return jsonResponse(200, { users: (data ?? []).map((staff) => ({ ...staff, permissions: permissionsByUser.get(staff.user_id) ?? [] })) });
   }
 
   if (body.action === 'invite') {
+    const permissions = parsePermissions(body.permissions);
+    if (!permissions) return jsonResponse(400, { error: 'Select at least one valid access area for this editor.' });
+    if (!body.display_name?.trim()) return jsonResponse(400, { error: 'Enter the staff member’s name.' });
     const email = body.email?.trim().toLowerCase();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return jsonResponse(400, { error: 'Enter a valid email address.' });
@@ -98,7 +116,25 @@ Deno.serve(async (request: Request) => {
       return jsonResponse(500, { error: 'Invitation could not be registered. Please try again.' });
     }
 
+    const { error: permissionsError } = await adminClient.rpc('cms_replace_editor_permissions', {
+      actor_id: userResult.user.id, target_user_id: invitation.user.id, requested_permissions: permissions,
+    });
+    if (permissionsError) {
+      await adminClient.auth.admin.deleteUser(invitation.user.id);
+      return jsonResponse(500, { error: 'The editor access could not be saved. Please try again.' });
+    }
+
     return jsonResponse(201, { invited: true, email });
+  }
+
+  if (body.action === 'update_permissions') {
+    const permissions = parsePermissions(body.permissions);
+    if (!body.user_id || !permissions) return jsonResponse(400, { error: 'Select at least one valid access area.' });
+    const { error: replaceError } = await adminClient.rpc('cms_replace_editor_permissions', {
+      actor_id: userResult.user.id, target_user_id: body.user_id, requested_permissions: permissions,
+    });
+    if (replaceError) return jsonResponse(400, { error: replaceError.message || 'Could not update editor access.' });
+    return jsonResponse(200, { updated: true, permissions });
   }
 
   if (body.action === 'remove') {

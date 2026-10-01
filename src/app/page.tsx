@@ -1,1196 +1,144 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { ArrowRight, CalendarDays } from 'lucide-react';
 import ScrollReveal from '@/components/ScrollReveal';
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { ArrowDown, ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import HomepageCarousel from '@/components/homepage/HomepageCarousel';
 import { supabase } from '@/lib/supabase/client';
-
-/* ─── 10 Highlight Cards Connecting to All 10 Major Site Pages ─────────── */
-export interface CardData {
-  id: string;
-  number: string;
-  eyebrow: string;
-  title: string;
-  body: string;
-  image: string;
-  link: string;
-  cta: string;
-  pageTitle: string;
-  coverBg: string;
-  accentColor: string;
-}
-
-type DeckControlMode = 'hidden' | 'skip' | 'top' | 'magazine';
-type NetworkInformation = { effectiveType?: string; saveData?: boolean };
-type PerformanceNavigator = Navigator & {
-  deviceMemory?: number;
-  connection?: NetworkInformation;
-};
-
-const smoothstep = (progress: number) => progress * progress * (3 - 2 * progress);
-
-const defaultCards: CardData[] = [
-  {
-    id: 'card-1',
-    number: '01',
-    eyebrow: 'EXHIBITION · CHAMPIONSHIP LIVESTOCK',
-    title: 'Elite Breeds & Championship Pavilion',
-    body: 'Explore Nigeria’s premier White Fulani bulls, Sokoto Gudali, Azawak Camels, Red Sokoto Goats, Balami Sheep, and high-yield indigenous poultry.',
-    image: '/assets/livestock/showcase-spectrum-hero.jpg',
-    link: '/livestock',
-    cta: 'EXPLORE ALL LIVESTOCK BREEDS',
-    pageTitle: 'LIVESTOCK & CHAMPIONSHIP BREEDS',
-    coverBg: 'from-[#062412] via-[#0D4020] to-[#031209]',
-    accentColor: '#E4B03A',
-  },
-  {
-    id: 'card-2',
-    number: '02',
-    eyebrow: 'RUNWAY · CULTURAL ARTS & PAGEANTRY',
-    title: 'Livestock Cultural Fashion & Pageant',
-    body: "Nigeria's first livestock fashion runway where prize cattle and camels are draped in hand-woven Aso-Oke, featuring cultural dancers and the Queen/King NLC Pageant.",
-    image: '/assets/attractions/cultural-fashion-runway.jpg',
-    link: '/fashion-parade',
-    cta: 'EXPLORE CULTURAL FASHION SHOWCASE',
-    pageTitle: 'CULTURAL FASHION & PAGEANTRY',
-    coverBg: 'from-[#2A2006] via-[#4A380A] to-[#141003]',
-    accentColor: '#FBBF24',
-  },
-  {
-    id: 'card-3',
-    number: '03',
-    eyebrow: 'NAVIGATION · ABUJA NATIONAL GROUNDS',
-    title: 'Interactive 3D Venue Map & Zone Guide',
-    body: 'Navigate Old Parade Ground, Abuja: Equestrian Durbar Fields, Suya Village, Live Auction Arenas, Exhibition Pavilions, VIP Lounges, and Parking Hubs.',
-    image: '/assets/venue-map/old-parade-ground-map-clean.jpg',
-    link: '/venue-map',
-    cta: 'OPEN INTERACTIVE VENUE MAP',
-    pageTitle: 'INTERACTIVE VENUE MAP',
-    coverBg: 'from-[#120A3A] via-[#20125C] to-[#0B0624]',
-    accentColor: '#A78BFA',
-  },
-  {
-    id: 'card-4',
-    number: '04',
-    eyebrow: 'ENTERTAINMENT · LIVE STAGE & ARTS',
-    title: 'Grand Concerts & 36-State Cultural Festival',
-    body: 'Nightly headline music concerts, traditional masquerades, 36-state cultural dance troupes, kids petting zoo, and family entertainment arenas.',
-    image: '/assets/home/story-live-concert-stage.jpg',
-    link: '/attractions',
-    cta: 'VIEW CARNIVAL ATTRACTIONS',
-    pageTitle: 'CARNIVAL ATTRACTIONS & STAGES',
-    coverBg: 'from-[#0E2014] via-[#1A3824] to-[#08120B]',
-    accentColor: '#34D399',
-  },
-  {
-    id: 'card-5',
-    number: '05',
-    eyebrow: 'DAY 1 · ROYAL CAVALRY & EQUESTRIAN',
-    title: 'Royal Horse Cavalry & Durbar Parade',
-    body: 'Witness over 200 ceremonial war stallions, traditional Northern horsemen, camel pageantry and royal racing displays in a breathtaking celebration of national heritage.',
-    image: '/assets/home/story-equestrian-durbar-parade.jpg',
-    link: '/schedule',
-    cta: 'VIEW DURBAR SCHEDULE',
-    pageTitle: 'ROYAL DURBAR & PROGRAM SCHEDULE',
-    coverBg: 'from-[#062412] via-[#0D4020] to-[#031209]',
-    accentColor: '#E4B03A',
-  },
-  {
-    id: 'card-6',
-    number: '06',
-    eyebrow: 'GASTRONOMY · SUYA VILLAGE & FOOD FEST',
-    title: 'Open-Flame Suya Village & Artisanal Feast',
-    body: "Nigeria's largest outdoor open-flame grilling arena featuring master Suya chefs, artisanal Kilishi, gourmet catfish BBQ, organic spice markets, and family festival dining.",
-    image: '/assets/home/story-suya-grill-fire.jpg',
-    link: '/attractions#suya-village',
-    cta: 'DISCOVER CULINARY VILLAGE',
-    pageTitle: 'OPEN-FLAME SUYA VILLAGE',
-    coverBg: 'from-[#3A0A0A] via-[#5C1212] to-[#240606]',
-    accentColor: '#F87171',
-  },
-  {
-    id: 'card-7',
-    number: '07',
-    eyebrow: 'TECHNOLOGY · NHESICS REGISTRY',
-    title: 'National Herd Health, Security & Traceability',
-    body: 'Discover the FGN digital herd management framework: RFID microchip tagging, real-time epidemic monitoring, biometric cattle passports, and ranch security.',
-    image: '/assets/home/story-digital-rfid-livestock-tag.jpg',
-    link: '/nhesics',
-    cta: 'EXPLORE NHESICS SYSTEM',
-    pageTitle: 'DIGITAL RFID HERD REGISTRY',
-    coverBg: 'from-[#062A28] via-[#0D4845] to-[#031817]',
-    accentColor: '#2DD4BF',
-  },
-  {
-    id: 'card-8',
-    number: '08',
-    eyebrow: 'BROADCAST · MEDIA & GALLERY',
-    title: 'Media Gallery, Live Broadcasts & Newsroom',
-    body: 'Access official press releases, high-definition photo galleries, video highlights, live stream feeds, and media accreditation resources.',
-    image: '/assets/home/story-live-concert-stage.jpg',
-    link: '/media',
-    cta: 'VISIT MEDIA & GALLERY PAGE',
-    pageTitle: 'MEDIA & LIVE BROADCASTS',
-    coverBg: 'from-[#0E2014] via-[#1A3824] to-[#08120B]',
-    accentColor: '#34D399',
-  },
-  {
-    id: 'card-9',
-    number: '09',
-    eyebrow: 'ACCREDITATION · VIP & PRESS PASSES',
-    title: 'Official Accreditation & Pass Registration',
-    body: 'Register for fast-track VIP entrance badges, international delegation clearance, press credentials, and official carnival passes.',
-    image: '/assets/home/story-carnival-entrance-gate.jpg',
-    link: '/accreditation',
-    cta: 'APPLY FOR ACCREDITATION',
-    pageTitle: 'OFFICIAL ACCREDITATION',
-    coverBg: 'from-[#240A28] via-[#3E1245] to-[#150618]',
-    accentColor: '#E879F9',
-  },
-  {
-    id: 'card-10',
-    number: '10',
-    eyebrow: 'INITIATIVE · RENEWED HOPE VISION',
-    title: 'About the Carnival & Agricultural Heritage',
-    body: "Learn about the Federal Ministry of Livestock Development's master plan to modernize agribusiness, transform pastoral livelihoods, and drive national growth.",
-    image: '/assets/home/story-modern-ranch-pasture.jpg',
-    link: '/about',
-    cta: 'READ INITIATIVE VISION',
-    pageTitle: 'ABOUT THE CARNIVAL VISION',
-    coverBg: 'from-[#211904] via-[#3D2E08] to-[#120E02]',
-    accentColor: '#FACC15',
-  },
-];
-
-function mapCmsCard(row: Record<string, unknown>): CardData {
-  return {
-    id: String(row.id), number: String(row.number ?? ''), eyebrow: String(row.eyebrow ?? ''),
-    title: String(row.title ?? ''), body: String(row.body ?? ''), image: String(row.image ?? ''),
-    link: String(row.link ?? '/'), cta: String(row.cta ?? 'EXPLORE'), pageTitle: String(row.page_title ?? ''),
-    coverBg: String(row.cover_bg ?? 'from-[#062412] via-[#0D4020] to-[#031209]'), accentColor: String(row.accent_color ?? '#E4B03A'),
-  };
-}
+import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
+import { DEFAULT_HOMEPAGE_CARDS, mapCmsCard, type CardData } from '@/lib/homepageCards';
+import { useSiteAnimation } from '@/components/SiteAnimationContext';
 
 function MagazineFeature({ card, index }: { card: CardData; index: number }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const prefersReducedMotion = useReducedMotion();
-  const isInView = useInView(sectionRef, { once: false, amount: 0.05 });
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start 92%', 'end 8%'],
-  });
-  const opacity = useTransform(scrollYProgress, [0, 0.24, 0.72, 1], [0, 1, 1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.28, 0.72, 1], [0.96, 1, 1, 0.96]);
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.28, 0.62, 0.95, 1], [0, 0.35, 1, 1, 0]);
-  const imageScale = useTransform(scrollYProgress, [0, 0.58, 1], [0.96, 1, 1.035]);
-  const categoryOpacity = useTransform(scrollYProgress, [0, 0.12, 0.2, 0.9, 1], [0, 0, 1, 1, 0]);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.21, 0.3, 0.91, 1], [0, 0, 1, 1, 0]);
-  const bodyOpacity = useTransform(scrollYProgress, [0, 0.3, 0.4, 0.92, 1], [0, 0, 1, 1, 0]);
-  const ctaOpacity = useTransform(scrollYProgress, [0, 0.39, 0.5, 0.94, 1], [0, 0, 1, 1, 0]);
-  const categoryY = useTransform(scrollYProgress, [0.1, 0.2, 0.9, 1], [18, 0, 0, -10]);
-  const titleY = useTransform(scrollYProgress, [0.2, 0.3, 0.91, 1], [20, 0, 0, -10]);
-  const bodyY = useTransform(scrollYProgress, [0.3, 0.4, 0.92, 1], [20, 0, 0, -10]);
-  const ctaY = useTransform(scrollYProgress, [0.39, 0.5, 0.94, 1], [18, 0, 0, -8]);
   const imageFirst = index % 2 === 0;
 
   return (
-    <motion.article
-      ref={sectionRef}
-      id={index === 0 ? 'magazine-first-feature' : undefined}
-      style={prefersReducedMotion ? undefined : { opacity, scale }}
-      aria-hidden={!isInView && !prefersReducedMotion}
-      inert={!isInView && !prefersReducedMotion}
-      className="magazine-feature relative grid min-h-[18rem] aspect-[4/3] md:aspect-video md:min-h-0 grid-cols-[40%_60%] overflow-hidden rounded-xl border border-[#D9DDDA] bg-[#E5E7E6] shadow-[0_18px_55px_rgba(17,24,39,0.10)]"
-    >
-      <div className={`relative min-w-0 overflow-hidden ${imageFirst ? 'order-1' : 'order-2'}`}>
-        <motion.div className="absolute inset-0" style={prefersReducedMotion ? undefined : { opacity: imageOpacity, scale: imageScale }}>
-          <Image
-            src={card.image}
-            alt={card.title}
-            fill
-            sizes="(max-width: 767px) 42vw, 50vw"
-            className="object-cover"
-          />
-        </motion.div>
-        <div
-          aria-hidden="true"
-          className={`absolute inset-0 ${imageFirst ? 'bg-gradient-to-r' : 'bg-gradient-to-l'} from-transparent via-[#E5E7E6]/25 to-[#E5E7E6]`}
-        />
-      </div>
-
-      <div className={`relative z-10 flex min-w-0 flex-col justify-center bg-[#E5E7E6] px-3 py-5 sm:px-6 md:px-10 md:py-12 lg:px-14 ${imageFirst ? 'order-2' : 'order-1'}`}>
-        <motion.p
-          style={prefersReducedMotion ? undefined : { opacity: categoryOpacity, y: categoryY }}
-          className="mb-2 text-[8px] font-extrabold uppercase tracking-[0.12em] text-[#8D6B1B] sm:mb-4 sm:text-[10px] md:text-xs md:tracking-[0.22em]"
-        >
-          {card.eyebrow}
-        </motion.p>
-        <motion.h3
-          style={prefersReducedMotion ? undefined : { opacity: titleOpacity, y: titleY }}
-          className="text-sm font-black leading-tight text-[#111827] sm:text-xl md:text-3xl lg:text-4xl"
-        >
-          {card.title}
-        </motion.h3>
-        <motion.p
-          style={prefersReducedMotion ? undefined : { opacity: bodyOpacity, y: bodyY }}
-          className="mt-2 text-[10px] leading-snug text-[#354354] sm:mt-4 sm:text-sm sm:leading-relaxed md:text-base lg:text-lg"
-        >
-          {card.body}
-        </motion.p>
-        <motion.div style={prefersReducedMotion ? undefined : { opacity: ctaOpacity, y: ctaY }}>
-          <Link
-            href={card.link}
-            className="mt-3 inline-flex min-h-9 max-w-full items-center gap-1.5 self-start text-[8px] font-extrabold uppercase tracking-[0.08em] text-[#1E4D38] hover:text-[#8D6B1B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1E4D38] sm:mt-6 sm:min-h-11 sm:gap-2 sm:text-[10px] sm:tracking-[0.14em] md:text-xs"
-          >
-            <span>{card.cta}</span>
-            <ArrowRight aria-hidden="true" className="h-3 w-3 shrink-0 sm:h-4 sm:w-4" />
+    <ScrollReveal direction={index % 2 === 0 ? 'left' : 'right'} duration={0.65} once>
+      <article className="group grid min-h-[330px] overflow-hidden rounded-[1.5rem] border border-[#E0E3DC] bg-white shadow-[0_18px_55px_rgba(17,24,39,0.08)] transition-shadow duration-300 hover:shadow-[0_24px_70px_rgba(17,24,39,0.14)] md:min-h-[380px] md:grid-cols-2">
+        <div className={`relative min-h-[220px] overflow-hidden bg-[#E5E7E6] md:min-h-full ${imageFirst ? 'md:order-1' : 'md:order-2'}`}>
+          <Image src={card.image} alt={card.title} fill sizes="(max-width: 767px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#07150D]/35 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-white/15" />
+          <span className="absolute bottom-4 left-4 rounded-full border border-white/55 bg-[#07150D]/45 px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-white backdrop-blur-sm">{card.number}</span>
+        </div>
+        <div className={`flex flex-col justify-center px-6 py-8 sm:px-9 md:px-12 md:py-12 lg:px-16 ${imageFirst ? 'md:order-2' : 'md:order-1'}`}>
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#8D6B1B] sm:text-xs">{card.eyebrow}</p>
+          <h3 className="mt-3 text-2xl font-black leading-tight text-[#111827] sm:text-3xl lg:text-4xl">{card.title}</h3>
+          <p className="mt-4 text-sm leading-relaxed text-[#4B5563] sm:text-base">{card.body}</p>
+          <Link href={card.link} className="mt-6 inline-flex min-h-11 items-center gap-2 self-start text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#1E4D38] transition-colors hover:text-[#8D6B1B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1E4D38] sm:text-xs">
+            {card.cta}<ArrowRight aria-hidden="true" size={16} />
           </Link>
-        </motion.div>
-      </div>
-    </motion.article>
+        </div>
+      </article>
+    </ScrollReveal>
   );
 }
 
 export default function Home() {
-  const [cards, setCards] = useState<CardData[]>(defaultCards);
-  const [cardsReady, setCardsReady] = useState(false);
-  const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<HTMLDivElement>(null);
-  const magazineRef = useRef<HTMLElement>(null);
-  const isNavigatingRef = useRef(false);
-  const skipAvailableRef = useRef(false);
-  const skipInProgressRef = useRef(false);
-  const deckControlModeRef = useRef<DeckControlMode>('hidden');
-  const [isFanned, setIsFanned] = useState(false);
-  const isFannedRef = useRef(false);
-  const [activeFocusedCard, setActiveFocusedCard] = useState<string | null>(null);
-  const [raisedCardId, setRaisedCardId] = useState<string | null>(null);
-  const [mobileCardIndex, setMobileCardIndex] = useState(0);
-  const [mobileCardFlipped, setMobileCardFlipped] = useState(false);
-  const [deckStage, setDeckStage] = useState<'intro' | 'spreading' | 'fan' | 'handoff' | 'closing' | 'magazine' | 'static'>('intro');
-  const [useStaticDeck, setUseStaticDeck] = useState(false);
-  const [performanceReady, setPerformanceReady] = useState(false);
-  const [isMagazineOnly, setIsMagazineOnly] = useState(false);
-  const [skipAvailable, setSkipAvailable] = useState(false);
-  const [deckControlMode, setDeckControlMode] = useState<DeckControlMode>('hidden');
-  const [skipInProgress, setSkipInProgress] = useState(false);
-  const [skipTransitionVisible, setSkipTransitionVisible] = useState(false);
-  const [skipTransitionCovered, setSkipTransitionCovered] = useState(false);
-  const [showScrollToTop, setShowScrollToTop] = useState(false);
-  const [isFirstMagazineFeatureVisible, setIsFirstMagazineFeatureVisible] = useState(false);
-  const cardFlipTimerRef = useRef<number | null>(null);
-  const savedPageScrollRef = useRef<number | null>(null);
-  const scrollTriggerRef = useRef<{
-    disable: (revert?: boolean) => void;
-    enable: () => void;
-    refresh: () => void;
-    update: () => void;
-  } | null>(null);
-
-  const [isMobileViewport, setIsMobileViewport] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
-  const isMobileDeck = performanceReady && isMobileViewport;
-  // The performance fallback takes precedence over every deck presentation,
-  // including the lightweight mobile carousel.
-  const shouldRenderDeck = performanceReady;
-  const performanceMode = !performanceReady ? 'checking' : isMagazineOnly ? 'magazine' : 'cinematic';
-
-  useLayoutEffect(() => {
-    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, []);
+  const [cards, setCards] = useState<CardData[]>(DEFAULT_HOMEPAGE_CARDS);
+  const [magazineContent, setMagazineContent] = useState(DEFAULT_SITE_CONTENT.magazine);
+  const [contentReady, setContentReady] = useState(false);
+  const siteAnimation = useSiteAnimation();
 
   useEffect(() => {
     let active = true;
-    void (async () => {
-      try {
-        const { data, error } = await supabase.from('homepage_cards').select('*').eq('status', 'published').eq('enabled', true).order('position');
-        if (active && !error && data && data.length >= 3 && data.length <= 10) {
-          setCards(data.map((row) => mapCmsCard(row as Record<string, unknown>)));
-        }
-      } catch {
-        // Keep the bundled cards when the CMS is unreachable.
-      } finally {
-        if (active) setCardsReady(true);
+
+    const loadContent = async () => {
+      const [cardsResult, magazineResult] = await Promise.all([
+        supabase.from('homepage_cards').select('*').eq('enabled', true).eq('published', true).order('position', { ascending: true }),
+        supabase.from('site_page_content').select('content').eq('page_key', 'magazine').eq('published', true).maybeSingle(),
+      ]);
+      if (!active) return;
+
+      const rows = cardsResult.data;
+      if (!cardsResult.error && rows && rows.length >= 3 && rows.length <= 10) {
+        setCards(rows.map((row) => mapCmsCard(row as Record<string, unknown>)));
       }
-    })();
-    return () => { active = false; };
-  }, []);
-
-  useEffect(() => {
-    const media = window.matchMedia('(max-width: 767px)');
-    const update = () => setIsMobileViewport(media.matches);
-    update();
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, []);
-
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      const performanceNavigator = navigator as PerformanceNavigator;
-      const connection = performanceNavigator.connection;
-      const lowDevice =
-        (typeof performanceNavigator.deviceMemory === 'number' && performanceNavigator.deviceMemory <= 4) ||
-        (typeof performanceNavigator.hardwareConcurrency === 'number' && performanceNavigator.hardwareConcurrency <= 4);
-      const lowNetwork =
-        connection?.saveData === true ||
-        ['slow-2g', '2g', '3g'].includes(connection?.effectiveType?.toLowerCase() ?? '') ||
-        navigator.onLine === false;
-      const useMagazineOnly = lowDevice || lowNetwork;
-      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      setIsMagazineOnly(useMagazineOnly);
-      setUseStaticDeck(useMagazineOnly || reducedMotion);
-      setPerformanceReady(true);
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, []);
-
-  useEffect(() => {
-    const updateScrollToTopVisibility = () => {
-      setShowScrollToTop(window.scrollY > window.innerHeight * 0.65);
+      const magazine = magazineResult.data?.content;
+      if (!magazineResult.error && magazine && typeof magazine === 'object') {
+        setMagazineContent({ ...DEFAULT_SITE_CONTENT.magazine, ...(magazine as Record<string, unknown>) });
+      }
+      setContentReady(true);
+      window.dispatchEvent(new Event('homepage:scene-ready'));
     };
-    updateScrollToTopVisibility();
-    window.addEventListener('scroll', updateScrollToTopVisibility, { passive: true });
-    window.addEventListener('resize', updateScrollToTopVisibility);
+
+    void loadContent();
+    const fallback = window.setTimeout(() => {
+      if (active) {
+        setContentReady(true);
+        window.dispatchEvent(new Event('homepage:scene-ready'));
+      }
+    }, 4500);
+
     return () => {
-      window.removeEventListener('scroll', updateScrollToTopVisibility);
-      window.removeEventListener('resize', updateScrollToTopVisibility);
+      active = false;
+      window.clearTimeout(fallback);
     };
   }, []);
-
-  useEffect(() => {
-    const firstFeature = document.getElementById('magazine-first-feature');
-    if (!firstFeature) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsFirstMagazineFeatureVisible(entry.isIntersecting),
-      { threshold: 0.08 }
-    );
-    observer.observe(firstFeature);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!performanceReady || !cardsReady) return;
-
-    const sceneEl = sceneRef.current;
-    if (!sceneEl) return;
-    const header = document.querySelector<HTMLElement>('header');
-    let cancelled = false;
-    let ctx: { revert: () => void } | null = null;
-    const signalSceneReady = () => window.dispatchEvent(new Event('homepage:scene-ready'));
-    const setStage = (stage: typeof deckStage) => {
-      if (sceneEl.dataset.deckStage === stage) return;
-      sceneEl.dataset.deckStage = stage;
-      setDeckStage(stage);
-    };
-
-    // Low-capability devices get the readable magazine layout without a pinned 3D scene.
-    if (isMagazineOnly) {
-      sceneEl.classList.add('scene-ready');
-      sceneEl.dataset.deckStage = 'static';
-      const staticFrame = window.requestAnimationFrame(() => setDeckStage('static'));
-      signalSceneReady();
-      return () => {
-        window.cancelAnimationFrame(staticFrame);
-        sceneEl.classList.remove('scene-ready');
-        delete sceneEl.dataset.deckStage;
-      };
-    }
-
-    // Reduced-motion users get a simple, keyboard-friendly card carousel.
-    if (prefersReducedMotion) {
-      sceneEl.classList.add('scene-ready');
-      sceneEl.dataset.deckStage = 'static';
-      const staticFrame = window.requestAnimationFrame(() => {
-        setDeckStage('static');
-        isFannedRef.current = true;
-        setIsFanned(true);
-      });
-      signalSceneReady();
-      return () => {
-        window.cancelAnimationFrame(staticFrame);
-        sceneEl.classList.remove('scene-ready');
-        delete sceneEl.dataset.deckStage;
-        isFannedRef.current = false;
-        setIsFanned(false);
-      };
-    }
-
-    const initAnimation = async () => {
-      const gsapModule = await import('gsap');
-      const gsap = gsapModule.gsap || gsapModule.default || gsapModule;
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
-      gsap.registerPlugin(ScrollTrigger);
-      if (cancelled) return;
-
-      const mobile = isMobileDeck;
-      const cardElements = Array.from(sceneEl.querySelectorAll<HTMLElement>('.deck-card'));
-      const fanScale = mobile ? 0.58 : 0.4;
-      const spreadWidth = mobile ? 54 : 68;
-      const hero = sceneEl.querySelector<HTMLElement>('#welcome-title');
-      const prompt = sceneEl.querySelector<HTMLElement>('#pick-card-prompt');
-      const deck = sceneEl.querySelector<HTMLElement>('#deck-container');
-      if (!hero || !prompt || !deck || cardElements.length === 0) return;
-
-      ctx = gsap.context(() => {
-        sceneEl.dataset.deckStage = 'intro';
-        sceneEl.style.zIndex = 'auto';
-        gsap.set(hero, { xPercent: -50, transformOrigin: '50% 0%', opacity: 1, scale: 1, filter: 'blur(0px)' });
-        gsap.set(prompt, { xPercent: -50, autoAlpha: 0, y: 12, scale: 0.94, filter: 'blur(2px)' });
-        gsap.set(deck, { transformOrigin: '50% 50%', scale: 1, opacity: 1, filter: 'blur(0px)' });
-        gsap.set(cardElements, {
-          xPercent: -50,
-          yPercent: -50,
-          x: 0,
-          y: () => window.innerHeight * 0.82,
-          z: 0,
-          rotationX: 0,
-          rotationY: 0,
-          rotationZ: 0,
-          scale: fanScale,
-          opacity: 0,
-          pointerEvents: 'none',
-        });
-
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: sceneEl,
-            start: 'top top',
-            end: () => `+=${window.innerHeight * 2.35}`,
-            scrub: true,
-            pin: true,
-            pinSpacing: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        // The hero remains legible while the stack enters and recedes only as the fan opens.
-        timeline.to(cardElements, { y: 0, opacity: 1, duration: 0.32, ease: 'none' }, 0);
-        timeline.to(hero, { opacity: 0.68, scale: 0.94, duration: 0.85, ease: 'none' }, 0);
-        timeline.to(hero, { opacity: 0.16, scale: 0.88, filter: 'blur(1.1px)', duration: 0.75, ease: 'none' }, 1.12);
-
-        cardElements.forEach((card, index) => {
-          const normalized = cardElements.length <= 1 ? 0 : (index / (cardElements.length - 1)) * 2 - 1;
-          const x = normalized * spreadWidth / 2;
-          const y = Math.pow(Math.abs(normalized), 2) * (mobile ? 18 : 38) - (mobile ? 8 : 14);
-          const rotation = normalized * (mobile ? 2.8 : 17);
-          timeline.to(card, {
-            x: `${x}vw`,
-            y,
-            z: index * 3,
-            rotationY: mobile ? 0 : 166,
-            rotationZ: rotation,
-            scale: fanScale,
-            zIndex: index + 1,
-            pointerEvents: 'auto',
-            duration: 0.82,
-            ease: 'power2.out',
-          }, 0.28);
-        });
-
-        timeline.to(prompt, {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          filter: 'blur(0px)',
-          duration: 0.42,
-          ease: 'power1.out',
-        }, 0.5);
-
-        // Animate one composed deck surface instead of running expensive blur on every card.
-        timeline.to(deck, {
-          scale: 0.88,
-          opacity: 0.78,
-          filter: `blur(${mobile ? 0.9 : 2}px)`,
-          duration: 0.88,
-          ease: 'none',
-        }, 1.38);
-        timeline.to(cardElements, {
-          scale: fanScale * 0.82,
-          opacity: 0.74,
-          duration: 0.88,
-          ease: 'none',
-        }, 1.38);
-        timeline.to(prompt, {
-          autoAlpha: 0.38,
-          scale: 0.72,
-          filter: `blur(${mobile ? 1 : 1.6}px)`,
-          duration: 0.88,
-          ease: 'none',
-        }, 1.38);
-        timeline.to({}, { duration: 2.26 }, 0);
-
-        const updateStage = () => {
-          const time = timeline.time();
-          const stage = time < 0.28 ? 'intro' : time < 1.08 ? 'spreading' : time < 1.38 ? 'fan' : time < 2.26 ? 'handoff' : 'magazine';
-          setStage(stage);
-          const fanned = stage === 'fan';
-          if (isFannedRef.current !== fanned) {
-            isFannedRef.current = fanned;
-            setIsFanned(fanned);
-          }
-          const scrolled = time >= 0.28;
-          const zIndex = scrolled ? '60' : 'auto';
-          if (sceneEl.style.zIndex !== zIndex) sceneEl.style.zIndex = zIndex;
-          if (header?.classList.contains('mobile-scroll-underlay') !== (mobile && scrolled)) {
-            header?.classList.toggle('mobile-scroll-underlay', mobile && scrolled);
-          }
-          const nextControlMode: DeckControlMode = time < 0.28 ? 'hidden' : time < 1.38 ? 'skip' : time < 2.26 ? 'top' : 'magazine';
-          if (deckControlModeRef.current !== nextControlMode) {
-            deckControlModeRef.current = nextControlMode;
-            setDeckControlMode(nextControlMode);
-          }
-          const canSkip = nextControlMode === 'skip';
-          if (skipAvailableRef.current !== canSkip) {
-            skipAvailableRef.current = canSkip;
-            setSkipAvailable(canSkip);
-          }
-        };
-        timeline.eventCallback('onUpdate', updateStage);
-        timeline.eventCallback('onComplete', () => {
-          setStage('magazine');
-          isFannedRef.current = false;
-          setIsFanned(false);
-          deckControlModeRef.current = 'magazine';
-          setDeckControlMode('magazine');
-          skipAvailableRef.current = false;
-          setSkipAvailable(false);
-        });
-        timeline.eventCallback('onReverseComplete', () => {
-          setStage('intro');
-          isFannedRef.current = false;
-          setIsFanned(false);
-          deckControlModeRef.current = 'hidden';
-          setDeckControlMode('hidden');
-          skipAvailableRef.current = false;
-          setSkipAvailable(false);
-          header?.classList.remove('mobile-scroll-underlay');
-          sceneEl.style.zIndex = 'auto';
-        });
-
-        scrollTriggerRef.current = timeline.scrollTrigger ?? null;
-        sceneEl.classList.add('scene-ready');
-        ScrollTrigger.refresh();
-        signalSceneReady();
-      }, sceneEl);
-    };
-
-    void initAnimation();
-    return () => {
-      cancelled = true;
-      ctx?.revert();
-      scrollTriggerRef.current = null;
-      header?.classList.remove('mobile-scroll-underlay');
-      sceneEl.classList.remove('scene-ready');
-      sceneEl.style.removeProperty('z-index');
-      delete sceneEl.dataset.deckStage;
-      isFannedRef.current = false;
-    };
-  }, [performanceReady, cardsReady, isMagazineOnly, prefersReducedMotion, isMobileDeck]);
-  const runCoveredScroll = (targetY: number, afterScroll?: () => void) => {
-    if (skipInProgressRef.current) return;
-
-    skipInProgressRef.current = true;
-    setSkipInProgress(true);
-    let finished = false;
-    let coverTimer = 0;
-    let fallbackTimer = 0;
-    let animationFrame = 0;
-    const finish = () => {
-      if (finished) return;
-      finished = true;
-      window.clearTimeout(coverTimer);
-      window.clearTimeout(fallbackTimer);
-      window.cancelAnimationFrame(animationFrame);
-      setSkipTransitionVisible(false);
-      setSkipTransitionCovered(false);
-      skipInProgressRef.current = false;
-      setSkipInProgress(false);
-      afterScroll?.();
-    };
-
-    const startScroll = () => {
-      const clampedTarget = Math.max(0, Math.min(targetY, document.documentElement.scrollHeight - window.innerHeight));
-      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const lenis = (window as Window & {
-        __lenisInstance?: {
-          scrollTo: (
-            target: number,
-            options: { duration?: number; easing?: (progress: number) => number; immediate?: boolean; lock?: boolean; onComplete?: () => void }
-          ) => void;
-        };
-      }).__lenisInstance;
-
-      if (reducedMotion) {
-        fallbackTimer = window.setTimeout(finish, 250);
-        if (lenis) lenis.scrollTo(clampedTarget, { immediate: true, onComplete: finish });
-        else {
-          window.scrollTo({ top: clampedTarget, left: 0, behavior: 'instant' });
-          finish();
-        }
-        return;
-      }
-
-      if (lenis) {
-        lenis.scrollTo(clampedTarget, {
-          duration: 1.4,
-          easing: smoothstep,
-          lock: true,
-          onComplete: finish,
-        });
-        fallbackTimer = window.setTimeout(finish, 2200);
-        return;
-      }
-
-      const startY = window.scrollY;
-      const distance = clampedTarget - startY;
-      if (Math.abs(distance) < 1) {
-        finish();
-        return;
-      }
-
-      let startTime: number | null = null;
-      const animate = (time: number) => {
-        if (startTime === null) startTime = time;
-        const progress = Math.min((time - startTime) / 1400, 1);
-        window.scrollTo({ top: startY + distance * smoothstep(progress), left: 0, behavior: 'instant' });
-        if (progress >= 1) finish();
-        else animationFrame = window.requestAnimationFrame(animate);
-      };
-      animationFrame = window.requestAnimationFrame(animate);
-      fallbackTimer = window.setTimeout(finish, 2200);
-    };
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      startScroll();
-      return;
-    }
-
-    setSkipTransitionVisible(true);
-    setSkipTransitionCovered(false);
-    window.requestAnimationFrame(() => setSkipTransitionCovered(true));
-    coverTimer = window.setTimeout(startScroll, 520);
-  };
-
-  const handleSkipToMagazine = () => {
-    if (!magazineRef.current || !skipAvailable || skipInProgressRef.current) return;
-    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 72;
-    const targetY = window.scrollY + magazineRef.current.getBoundingClientRect().top - headerHeight - 12;
-    runCoveredScroll(targetY, () => {
-      deckControlModeRef.current = 'magazine';
-      setDeckControlMode('magazine');
-      skipAvailableRef.current = false;
-      setSkipAvailable(false);
-      magazineRef.current?.focus({ preventScroll: true });
-    });
-  };
-
-  const handleControlClick = () => {
-    if (activeControlMode === 'skip') {
-      handleSkipToMagazine();
-      return;
-    }
-
-    if (activeControlMode !== 'hidden') runCoveredScroll(0);
-  };
-
-  const activeControlMode: DeckControlMode = isMagazineOnly || useStaticDeck
-    ? showScrollToTop && isFirstMagazineFeatureVisible ? 'magazine' : 'hidden'
-    : deckControlMode === 'magazine' && !isFirstMagazineFeatureVisible ? 'hidden' : deckControlMode;
-  const controlHidden = activeControlMode === 'hidden';
-  const controlIsSkip = activeControlMode === 'skip';
-  const controlLabel = controlIsSkip ? 'Skip 3D cards and view highlights' : 'Go to top';
-
-  const getCardZoomPose = (cardId: string, preferredScale: number) => {
-    const cardElement = document.getElementById(cardId);
-    if (!cardElement) return { scale: 1, y: 0 };
-
-    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 64;
-    const availableHeight = window.innerHeight - headerHeight - 40;
-    const availableWidth = window.innerWidth - 32;
-    const scale = Math.max(
-      0.6,
-      Math.min(preferredScale, availableHeight / cardElement.offsetHeight, availableWidth / cardElement.offsetWidth)
-    );
-    const y = Math.max(0, headerHeight + 20 + (scale * cardElement.offsetHeight - window.innerHeight) / 2);
-
-    return { scale, y };
-  };
-
-  const navigateToCardPage = async (card: CardData) => {
-    if (isNavigatingRef.current) return;
-    isNavigatingRef.current = true;
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.matchMedia('(max-width: 767px)').matches;
-    const duration = reducedMotion ? 0.12 : 1.35;
-    const zoomPose = getCardZoomPose(card.id, isMobile ? 0.92 : 1.42);
-    const gsapMod = await import('gsap');
-    const gsap = gsapMod.gsap || gsapMod.default || gsapMod;
-    const timeline = gsap.timeline({
-      defaults: { ease: 'power3.inOut' },
-      onComplete: () => router.push(card.link),
-    });
-
-    timeline.to(`#${card.id}`, {
-      x: 0,
-      y: zoomPose.y,
-      z: 320,
-      rotationZ: 0,
-      scale: zoomPose.scale,
-      zIndex: 1000,
-      duration,
-    });
-    timeline.to(
-      sceneRef.current,
-      { opacity: 0, duration: reducedMotion ? 0.12 : 0.45, ease: 'power2.in' },
-      '-=0.25'
-    );
-  };
-
-  /* ── Interactive Click / Depth of Field Handling ── */
-  const handleCardClick = (cardId: string) => {
-    const stage = sceneRef.current?.dataset.deckStage;
-    if ((stage !== 'fan' && stage !== 'static') || activeFocusedCard) return;
-
-    const clickedIndex = cards.findIndex((card) => card.id === cardId);
-    setMobileCardIndex(clickedIndex);
-    if (raisedCardId !== cardId) {
-      setRaisedCardId(cardId);
-      setMobileCardFlipped(false);
-      return;
-    }
-
-    setActiveFocusedCard(cardId);
-    savedPageScrollRef.current = window.scrollY;
-    scrollTriggerRef.current?.disable(false);
-    if (cardFlipTimerRef.current !== null) window.clearTimeout(cardFlipTimerRef.current);
-    cardFlipTimerRef.current = window.setTimeout(() => {
-      setMobileCardFlipped(true);
-      cardFlipTimerRef.current = null;
-    }, 380);
-  };
-
-  const dismissFocus = () => {
-    if (!activeFocusedCard && !raisedCardId) return;
-    if (cardFlipTimerRef.current !== null) {
-      window.clearTimeout(cardFlipTimerRef.current);
-      cardFlipTimerRef.current = null;
-    }
-    setActiveFocusedCard(null);
-    setRaisedCardId(null);
-    setMobileCardFlipped(false);
-    const trigger = scrollTriggerRef.current;
-    window.requestAnimationFrame(() => {
-      if (trigger) {
-        trigger.enable();
-        if (savedPageScrollRef.current !== null) {
-          window.scrollTo({ top: savedPageScrollRef.current, left: 0, behavior: 'instant' });
-        }
-        trigger.update();
-      }
-      savedPageScrollRef.current = null;
-    });
-  };
-
-  const moveMobileFan = useCallback((nextIndex: number) => {
-    const boundedIndex = Math.max(0, Math.min(cards.length - 1, nextIndex));
-    setMobileCardIndex(boundedIndex);
-    setRaisedCardId(cards[boundedIndex].id);
-    setMobileCardFlipped(false);
-  }, [cards]);
 
   return (
-      <div
-        id="home-page"
-        ref={containerRef}
-        data-performance-mode={performanceMode}
-        data-deck-scroll={!prefersReducedMotion && !isMagazineOnly}
-        data-mobile-scroll={isMobileDeck && !prefersReducedMotion && !isMagazineOnly}
-        className="w-full bg-[#FBFBFA] text-white overflow-x-hidden select-none"
-      >
-      {/* ═══════════════ 3D PINNED DECK SCENE ═══════════════ */}
-      <div
-        id="scene-container"
-        ref={sceneRef}
-        data-fanned={isFanned || (shouldRenderDeck && isMobileDeck)}
-        data-deck-stage={deckStage}
-        data-expanded-card={activeFocusedCard !== null}
-        data-mobile-scroll={isMobileDeck && !prefersReducedMotion && !isMagazineOnly}
-        data-magazine-only={isMagazineOnly || !performanceReady}
-        className="w-full h-[100dvh] min-h-[100svh] relative bg-[#FBFBFA] overflow-hidden"
-        onClick={(e) => {
-          if (
-            (activeFocusedCard || raisedCardId) &&
-            e.target instanceof HTMLElement &&
-            !e.target.closest('.deck-card')
-          ) {
-            dismissFocus();
-          }
-        }}
-      >
-        {shouldRenderDeck && (
-          <>
-            <div className="absolute inset-0 pointer-events-none z-0 hidden opacity-40 sm:block">
-              {[...Array(30)].map((_, i) => (
-                <span
-                  key={i}
-                  className="absolute rounded-full bg-[#E4B03A]/30 blur-[1px]"
-                  style={{
-                    width: `${(i % 3) + 2}px`,
-                    height: `${(i % 3) + 2}px`,
-                    top: `${(i * 17) % 100}%`,
-                    left: `${(i * 23) % 100}%`,
-                  }}
-                />
-              ))}
-            </div>
-
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(228,176,58,0.12)_0%,transparent_75%)] pointer-events-none z-0" />
-          </>
-        )}
-
-        <div id="pick-card-prompt" aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[16%] z-[130] w-[94vw] text-center text-3xl font-black uppercase tracking-tight sm:text-5xl md:text-7xl">
-          <span className="prompt-depth text-[#111111]">PICK A CARD AND </span><span className="prompt-depth text-[#E4B03A]">EXPLORE!</span>
+    <div id="home-page" data-home-ready={contentReady ? 'true' : 'false'} className="min-h-screen overflow-hidden bg-[#FBFBFA] text-[#111827]">
+      <section className="homepage-hero relative px-4 pb-6 pt-16 sm:px-7 sm:pb-12 sm:pt-32 lg:px-10 lg:pb-16 lg:pt-36">
+        <div aria-hidden="true" className="homepage-hero-glow" />
+        <div className="relative mx-auto max-w-[1440px] text-center">
+          <ScrollReveal direction="up" duration={0.55} once>
+            <Image src="/assets/branding/carnival-logo-transparent.png" alt="Livestock Carnival" width={174} height={132} priority className="mx-auto h-[68px] w-auto object-contain sm:h-[96px]" />
+            <p className="mx-auto mt-3 flex max-w-3xl items-center justify-center gap-3 text-[9px] font-extrabold uppercase tracking-[0.15em] text-[#8D6B1B] sm:text-xs sm:tracking-[0.22em]">
+              <span className="hidden h-px w-10 bg-[#D7C58D] sm:block" />Federal Republic of Nigeria <span aria-hidden="true">·</span> Official Carnival &amp; Expo<span className="hidden h-px w-10 bg-[#D7C58D] sm:block" />
+            </p>
+            <h1 className="mx-auto mt-4 max-w-5xl text-[clamp(2.2rem,7vw,6.25rem)] font-black leading-[0.98] tracking-[-0.055em] text-[#111827]">
+              Welcome to the <span className="text-[#D9A928]">National Livestock Carnival</span>
+            </h1>
+            <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-[#4B5563] sm:text-base md:text-lg">
+              Explore championship livestock, Nigerian culture, live performances, festival food and the carnival grounds.
+              <span className="hidden sm:inline"> Scroll through the highlights to discover what’s waiting for you.</span>
+            </p>
+          </ScrollReveal>
         </div>
+      </section>
 
-        {/* ── HERO TEXT (Top-anchored so logo emblem is 100% visible below sticky header) ── */}
-        <div
-          id="welcome-title"
-          className="scene-element !top-0 !left-1/2 w-[95vw] max-w-5xl text-center z-0 px-3 sm:px-4 pt-20 sm:pt-24 md:pt-28"
-        >
-          <div id="welcome-title-content" className="origin-top">
-          <div className="hero-intro-item relative w-28 h-16 sm:w-40 sm:h-24 md:w-48 md:h-28 mx-auto mb-3">
-            <Image
-              src="/assets/branding/carnival-logo-transparent.png"
-              alt="Livestock Carnival Emblem"
-              fill
-              priority
-              sizes="(max-width: 640px) 112px, (max-width: 768px) 160px, 192px"
-              className="object-contain drop-shadow-[0_12px_30px_rgba(228,176,58,0.4)]"
-            />
-          </div>
-
-          {/* Eyebrow */}
-          <div className="hero-intro-item flex items-center justify-center gap-2 sm:gap-3 mb-3">
-            <span className="w-6 sm:w-12 h-px bg-[#8D6B1B]/70" />
-            <span className="font-extrabold uppercase text-[9px] sm:text-xs tracking-[0.22em] text-[#8D6B1B]">
-              FEDERAL REPUBLIC OF NIGERIA · OFFICIAL CARNIVAL &amp; EXPO
-            </span>
-            <span className="w-6 sm:w-12 h-px bg-[#8D6B1B]/70" />
-          </div>
-
-          {/* Main Headline (Dark on white initially, light on black as cards rise) */}
-          <h1 className="hero-intro-item text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-[#111827] leading-[1.02] tracking-tight mb-3 sm:mb-4">
-            Welcome to the <span className="text-[#E4B03A]">National Livestock Carnival</span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="hero-intro-item text-xs sm:text-base md:text-lg text-[#4B5563] max-w-4xl mx-auto font-medium leading-relaxed mb-4 sm:mb-6">
-            Explore championship livestock, Nigerian culture, live performances, festival food and the carnival grounds. Scroll through the cards to discover what&apos;s waiting for you.
-          </p>
-
-          {/* Scroll cue */}
-          <div className="hero-intro-item mt-6 sm:mt-8 flex flex-col items-center gap-1.5 animate-pulse">
-            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.25em] text-[#8D6B1B]/90">
-              Scroll Down to Explore
-            </span>
-            <div className="w-3.5 sm:w-4 h-6 sm:h-7 rounded-full border-2 border-[#E4B03A]/50 flex items-start justify-center p-1">
-              <div className="w-1 h-2 rounded-full bg-[#E4B03A]" />
-            </div>
-          </div>
-          </div>
-        </div>
-
-        {/* ── THE 3D DECK CONTAINER ── */}
-        {shouldRenderDeck && <div
-          id="deck-container"
-          data-static-deck={useStaticDeck}
-          className="absolute inset-0 z-10 pointer-events-none"
-        >
-          {cards.map((card, index) => (
-            <div
-              key={card.id}
-              id={card.id}
-              /*
-                EXPANSIVE CANVAS CARD DIMENSIONS:
-                Portrait cards on mobile; landscape cards on desktop.
-              */
-              className={`deck-card bg-gradient-to-br ${card.coverBg} w-[76vw] max-w-[320px] aspect-[9/16] md:w-[78vw] md:max-w-[880px] md:aspect-video lg:w-[80vw] lg:max-w-[960px] pointer-events-auto`}
-              data-deck-index={index}
-              data-mobile-active={index === mobileCardIndex}
-              data-raised={raisedCardId === card.id}
-              data-expanded={activeFocusedCard === card.id}
-              data-flipped={mobileCardFlipped && activeFocusedCard === card.id}
-              onClick={() => handleCardClick(card.id)}
-                          style={{
-                            '--fan-x': `${(cards.length <= 1 ? 0 : (index / (cards.length - 1) * 2 - 1)) * (isMobileDeck ? 27 : 34)}vw`,
-                            '--fan-y': `${Math.pow(cards.length <= 1 ? 0 : index / (cards.length - 1) * 2 - 1, 2) * (isMobileDeck ? 18 : 38) - (isMobileDeck ? 8 : 14)}px`,
-                            '--fan-rotation': `${(cards.length <= 1 ? 0 : index / (cards.length - 1) * 2 - 1) * (isMobileDeck ? 2.8 : 17)}deg`,
-                            '--fan-rotation-y': `${isMobileDeck ? 0 : 166}deg`,
-                            '--fan-scale': isMobileDeck ? 0.58 : 0.4,
-                            '--stack-y': `${index * 1.2}px`,
-                            '--stack-z': `${cards.length - index}`,
-                            '--fan-z': `${cards.length - index}`,
-                          } as CSSProperties}
-            >
-              <div className="card-inner" data-mobile-flipped={mobileCardFlipped && activeFocusedCard === card.id}>
-                {/* ════ FRONT COVER (Face Down State) ════ */}
-                <div
-                  className={`card-face card-face-front bg-gradient-to-br ${card.coverBg} border-2 border-[#E4B03A]/45 shadow-2xl flex flex-col justify-between p-3 sm:p-8 md:p-10 text-white relative rounded-[1.5rem]`}
-                >
-                  {/* Decorative Pattern Overlay */}
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06)_0%,transparent_70%)] pointer-events-none rounded-[1.5rem]" />
-
-                  {/* Center Official Site Logo & Page Title */}
-                  <div className="flex-1 flex flex-col items-center justify-center relative z-10 my-auto text-center">
-              <div className="relative w-[7.5rem] h-[5rem] sm:w-[15rem] sm:h-[10rem] md:w-[17.5rem] md:h-[11.25rem] mb-2 sm:mb-4">
-                      <Image
-                        src="/assets/branding/carnival-logo-transparent.png"
-                        alt="National Livestock Carnival Logo"
-                        fill
-                        sizes="(max-width: 640px) 144px, (max-width: 768px) 192px, 224px"
-                        className="object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.7)]"
-                      />
-                    </div>
-                    <span
-                      className="font-black text-[15px] sm:text-[22px] md:text-[25px] tracking-[0.1em] sm:tracking-[0.22em] uppercase max-w-[440px] leading-tight"
-                      style={{ color: card.accentColor }}
-                    >
-                      {card.pageTitle}
-                    </span>
-                  </div>
-
-                  {/* Clean Cover Footer */}
-                  <div className="border-t border-white/15 pt-3 sm:pt-4 flex items-center justify-center relative z-10">
-                    <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.22em] text-white/90">
-                      LIVESTOCK CARNIVAL 2026
-                    </span>
-                  </div>
-                </div>
-
-                {/* ════ REVEALED CONTENT (Face Up State - Unique Card Color Theme) ════ */}
-                <div
-                  className={`card-face card-face-back bg-gradient-to-br ${card.coverBg} border-2 border-[#E4B03A]/45 shadow-[0_35px_100px_-15px_rgba(0,0,0,0.95)] flex flex-col justify-between rounded-[1.5rem]`}
-                >
-                  {/* Top Image Banner Section (52% height) */}
-                  <div className="relative w-full h-[52%] rounded-t-[1.5rem] shrink-0">
-                    <Image
-                      src={card.image}
-                      alt={card.title}
-                      fill
-                      className="object-cover object-center rounded-t-[1.5rem]"
-                      sizes="(max-width: 640px) 90vw, (max-width: 1024px) 1000px, 1280px"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent rounded-t-[1.5rem]" />
-
-                    {/* Floating Pill Eyebrow Badge on top left of image */}
-                    <div className="absolute bottom-3 sm:bottom-4 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between">
-                      <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-[0.2em] text-[#E4B03A] bg-[#0A1A10]/90 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#E4B03A]/40 shadow-md">
-                        {card.eyebrow}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Bottom Dark Content Panel (48% height) */}
-                  <div className="p-5 sm:p-7 md:p-10 bg-[#08150B] flex-1 flex flex-col justify-between rounded-b-[1.5rem]">
-                    <div>
-                      <h3 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight tracking-tight mb-2 sm:mb-3">
-                        {card.title}
-                      </h3>
-                      <p className="text-xs sm:text-base md:text-lg text-gray-300/90 leading-relaxed max-w-4xl mb-4 sm:mb-6">
-                        {card.body}
-                      </p>
-                    </div>
-
-                    <div className="pt-2 sm:pt-0 relative z-30">
-                      <Link
-                        href={card.link}
-                        className="inline-flex items-center gap-2.5 px-6 sm:px-8 py-3 sm:py-3.5 rounded-xl bg-[#E4B03A] text-[#0A1A10] text-xs sm:text-sm font-extrabold uppercase tracking-[0.14em] sm:tracking-[0.16em] shadow-button transition-all group hover:bg-[#D4A030] hover:-translate-y-0.5 cursor-pointer pointer-events-auto relative z-30 opacity-100"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          navigateToCardPage(card);
-                        }}
-                      >
-                        <span>{card.cta}</span>
-                        <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>}
-
-        {activeFocusedCard && (
-          <button
-            type="button"
-            onClick={dismissFocus}
-            className="deck-card-close"
-            aria-label="Close selected card"
-            title="Close selected card"
-          >
-            <X aria-hidden="true" />
-          </button>
-        )}
-
-        {shouldRenderDeck && <nav className="mobile-deck-controls" data-visible={isFanned && !activeFocusedCard} aria-label="Carnival highlights">
-          <button
-            type="button"
-            aria-label="Previous highlight"
-            onClick={() => void moveMobileFan(mobileCardIndex - 1)}
-            disabled={mobileCardIndex === 0}
-          >
-            <ChevronLeft aria-hidden="true" />
-          </button>
-          <span aria-live="polite">
-            {String(mobileCardIndex + 1).padStart(2, '0')} / {String(cards.length).padStart(2, '0')}
-          </span>
-          <button
-            type="button"
-            aria-label="Next highlight"
-            onClick={() => void moveMobileFan(mobileCardIndex + 1)}
-            disabled={mobileCardIndex === cards.length - 1}
-          >
-            <ChevronRight aria-hidden="true" />
-          </button>
-        </nav>}
-
-      </div>
+      {siteAnimation.cardDeckEnabled && (
+        <section aria-label="Carnival highlights" className="homepage-carousel-section pb-16 sm:pb-20 lg:pb-24">
+          <HomepageCarousel cards={cards} />
+        </section>
+      )}
 
       <section
-        ref={magazineRef}
         id="magazine-highlights"
-        tabIndex={-1}
         aria-labelledby="magazine-highlights-title"
-        className="magazine-highlights-section bg-[#FBFBFA] text-[#111827] border-t border-[#E4B03A]/35"
+        style={{ backgroundColor: String(magazineContent.backgroundColor), borderColor: `${String(magazineContent.accentColor)}55` }}
+        className="border-t text-[#111827]"
       >
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24">
-          <ScrollReveal direction="up" duration={0.8} once>
-            <div className="mb-10 max-w-3xl sm:mb-14">
-              <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.22em] text-[#8D6B1B]">
-                Explore the carnival
-              </p>
-              <h2 id="magazine-highlights-title" className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
-                Ten ways to experience the celebration
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#4B5563] sm:text-base">
-                From championship breeds and cultural pageantry to live music, food, and the festival grounds, find the experiences you want to explore.
-              </p>
+          <ScrollReveal direction="up" duration={0.6} once>
+            <div className="mb-9 max-w-3xl sm:mb-12">
+              <p style={{ color: String(magazineContent.accentColor) }} className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.22em] sm:text-xs">{String(magazineContent.eyebrow)}</p>
+              <h2 id="magazine-highlights-title" className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{String(magazineContent.title)}</h2>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#4B5563] sm:text-base">{String(magazineContent.intro)}</p>
             </div>
           </ScrollReveal>
-
           <div className="flex flex-col gap-6 sm:gap-8 lg:gap-10">
-            {cards.map((card, index) => (
-              <MagazineFeature key={`magazine-${card.id}`} card={card} index={index} />
-            ))}
+            {cards.map((card, index) => <MagazineFeature key={`magazine-${card.id}`} card={card} index={index} />)}
           </div>
         </div>
       </section>
 
-      {/* Closing CTA follows the magazine highlights. */}
-      <section className="closing-cta-section w-full py-20 sm:py-24 bg-[#08150B] text-white relative overflow-hidden border-t border-[#E4B03A]/30">
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E4B03A]/50 to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(228,176,58,0.08)_0%,transparent_70%)] pointer-events-none" />
-
-        <div className="relative max-w-5xl mx-auto px-6 sm:px-10 text-center z-10 flex flex-col items-center">
-          <span className="font-extrabold uppercase mb-4 inline-flex items-center gap-3 text-xs tracking-[0.26em] text-[#E4B03A]">
-            <span className="w-8 h-px bg-[#E4B03A]/60" />
-            21 – 23 NOVEMBER 2026 · ABUJA NATIONAL GROUNDS
-            <span className="w-8 h-px bg-[#E4B03A]/60" />
+      <section className="relative w-full overflow-hidden border-t border-[#E4B03A]/30 bg-[#08150B] py-16 text-white sm:py-20 lg:py-24">
+        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(228,176,58,0.09)_0%,transparent_70%)]" />
+        <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-6 text-center sm:px-10">
+          <span className="mb-4 inline-flex items-center gap-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#E4B03A] sm:text-xs sm:tracking-[0.26em]">
+            <span className="h-px w-6 bg-[#E4B03A]/60 sm:w-8" />21 – 23 November 2026 · Abuja National Grounds<span className="h-px w-6 bg-[#E4B03A]/60 sm:w-8" />
           </span>
-
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight max-w-3xl mb-5 tracking-tight">
-            Join the Grand Celebration of Culture, Agribusiness &amp; Heritage
-          </h2>
-
-          <p className="text-sm sm:text-base text-gray-300 max-w-2xl mb-8 leading-relaxed">
-            Complimentary gate passes are available for all delegates, visitors, and families. Secure your passes and explore vendor booth bookings.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-            <a
-              href="https://pass.livestockcarnival.ng"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto px-8 py-3.5 bg-[#E4B03A] hover:bg-[#D4A030] text-[#030A05] text-xs sm:text-sm font-extrabold uppercase tracking-[0.16em] rounded-xl transition-all shadow-button hover:-translate-y-0.5"
-            >
-              Claim Free Gate Pass &rarr;
-            </a>
-            <a
-              href="https://vendors.livestockcarnival.ng"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto px-8 py-3.5 bg-transparent hover:bg-white/10 text-white text-xs sm:text-sm font-bold uppercase tracking-[0.16em] rounded-xl border border-white/25 transition-all hover:-translate-y-0.5"
-            >
-              Exhibitor &amp; Vendor Booking
-            </a>
-            <Link
-              href="/schedule"
-              className="w-full sm:w-auto px-8 py-3.5 bg-white/5 hover:bg-white/12 text-gray-200 text-xs sm:text-sm font-bold uppercase tracking-[0.16em] rounded-xl border border-white/12 transition-all hover:-translate-y-0.5"
-            >
-              View 3-Day Program
-            </Link>
+          <h2 className="mb-5 max-w-3xl text-2xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl">Join the Grand Celebration of Culture, Agribusiness &amp; Heritage</h2>
+          <p className="mb-8 max-w-2xl text-sm leading-relaxed text-gray-300 sm:text-base">Complimentary gate passes are available for all delegates, visitors, and families. Secure your passes and explore vendor booth bookings.</p>
+          <div className="flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row sm:gap-4">
+            <a href="https://pass.livestockcarnival.ng" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#E4B03A] px-6 text-xs font-extrabold uppercase tracking-[0.12em] text-[#030A05] transition hover:bg-[#D4A030] sm:w-auto sm:px-8 sm:text-sm">Claim Free Gate Pass<ArrowRight aria-hidden="true" size={16} /></a>
+            <a href="https://vendors.livestockcarnival.ng" target="_blank" rel="noopener noreferrer" className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/25 bg-transparent px-6 text-xs font-bold uppercase tracking-[0.12em] text-white transition hover:bg-white/10 sm:w-auto sm:px-8 sm:text-sm">Exhibitor &amp; Vendor Booking</a>
+            <Link href="/schedule" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 text-xs font-bold uppercase tracking-[0.12em] text-gray-200 transition hover:bg-white/10 sm:w-auto sm:px-8 sm:text-sm"><CalendarDays aria-hidden="true" size={16} />View 3-Day Program</Link>
           </div>
         </div>
       </section>
-
-      <div
-        aria-hidden="true"
-        className={`pointer-events-none fixed inset-0 z-[100] bg-[#FBFBFA] transition-opacity duration-500 ease-in-out ${skipTransitionVisible ? (skipTransitionCovered ? 'opacity-100' : 'opacity-0') : 'opacity-0'}`}
-      />
-
-      <div className="pointer-events-none fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-1/2 z-[70] -translate-x-1/2 md:bottom-[calc(1.25rem+env(safe-area-inset-bottom))]">
-        <motion.button
-          type="button"
-          id="deck-navigation-control"
-          aria-label={controlLabel}
-          title={controlLabel}
-          aria-hidden={controlHidden}
-          tabIndex={controlHidden ? -1 : 0}
-          disabled={controlHidden || skipInProgress}
-          animate={{
-            opacity: controlHidden ? 0 : 1,
-            scale: controlHidden ? 0.78 : 1,
-            width: controlHidden || controlIsSkip ? 40 : activeControlMode === 'top' ? 120 : 136,
-          }}
-          transition={{
-            duration: prefersReducedMotion ? 0 : 0.75,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          onClick={handleControlClick}
-          className={`pointer-events-auto flex h-10 items-center justify-center gap-2 overflow-hidden rounded-full border px-2 text-[#1E4D38] shadow-[0_8px_30px_rgba(3,10,5,0.16)] backdrop-blur-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#E4B03A] ${activeControlMode === 'magazine' ? 'border-white/80 bg-white/60' : 'border-white/80 bg-white/55'}`}
-        >
-          <motion.span
-            initial={false}
-            animate={{ rotate: controlIsSkip ? 0 : 180, opacity: controlHidden ? 0 : 1 }}
-            transition={{ duration: prefersReducedMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="flex shrink-0"
-          >
-            <ArrowDown aria-hidden="true" className="h-4 w-4" strokeWidth={2.5} />
-          </motion.span>
-          {(activeControlMode === 'top' || activeControlMode === 'magazine') && (
-            <motion.span
-              initial={prefersReducedMotion ? false : { opacity: 0, x: -4 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: prefersReducedMotion ? 0 : 0.45, delay: prefersReducedMotion ? 0 : 0.12 }}
-              className="whitespace-nowrap text-xs font-bold"
-            >
-              Go to top
-            </motion.span>
-          )}
-        </motion.button>
-      </div>
     </div>
   );
 }

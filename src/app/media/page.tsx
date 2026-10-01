@@ -50,7 +50,7 @@ export default function MediaCenterPage() {
                 <span className="text-xs font-bold uppercase tracking-wider text-[#8D6B1B]">Newsroom</span>
               </div>
             </ScrollReveal>
-            <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-slate-100" />}>
+            <Suspense fallback={<div className="h-48 site-skeleton animate-pulse rounded-2xl bg-slate-100" />}>
               <MediaPostsFeed />
             </Suspense>
           </section>
@@ -61,7 +61,7 @@ export default function MediaCenterPage() {
                 <span className="text-xs font-bold uppercase tracking-wider text-[#8D6B1B]">Gallery</span>
               </div>
             </ScrollReveal>
-            <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-slate-100" />}>
+            <Suspense fallback={<div className="h-48 site-skeleton animate-pulse rounded-2xl bg-slate-100" />}>
               <MediaGalleryFeed />
             </Suspense>
           </section>

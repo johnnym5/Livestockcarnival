@@ -70,7 +70,7 @@ export default function MediaGalleryFeed() {
       {isLoading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4" aria-label="Loading published galleries">
           {Array.from({ length: 4 }, (_, index) => (
-            <div key={index} className="aspect-[4/3] animate-pulse rounded-xl bg-[#E9EEE8]" />
+            <div key={index} className="aspect-[4/3] site-skeleton animate-pulse rounded-xl bg-[#E9EEE8]" />
           ))}
         </div>
       ) : loadFailed ? (

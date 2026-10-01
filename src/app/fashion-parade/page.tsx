@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Award,
   Calendar,
   MapPin,
   Ticket,
@@ -46,6 +45,8 @@ import {
 } from 'lucide-react';
 import ThreeDImage from '@/components/motion/ThreeDImage';
 import ScrollReveal from '@/components/ScrollReveal';
+import { DEFAULT_FASHION_BREEDS, FashionBreed } from '@/data/fashionBreeds';
+import { supabase } from '@/lib/supabase/client';
 
 // ── Subtle 500ms editorial transition ──
 const editorialTransition = {
@@ -53,121 +54,30 @@ const editorialTransition = {
   ease: [0.16, 1, 0.3, 1] as const,
 };
 
-// ── Breed Directory Dataset ──
-interface BreedItem {
-  id: string;
-  name: string;
-  category: string;
-  origin: 'Local/Nigerian' | 'West African' | 'Exotic';
-  purpose: 'Dairy' | 'Meat' | 'Traction' | 'Exhibition';
-  traits: string;
-  economic: string;
-  image: string;
-}
-
-const breedDirectory: BreedItem[] = [
-  {
-    id: 'bunaji',
-    name: 'White Fulani (Bunaji)',
-    category: 'Cattle & Equines',
-    origin: 'Local/Nigerian',
-    purpose: 'Dairy',
-    traits:
-      'Lyre-shaped horns, pure white coat providing high solar reflectance, heat tolerance, and endemic disease resistance.',
-    economic:
-      'Represents approximately 37% of Nigeria\'s national cattle herd. Major domestic producer of fresh milk, beef, and artisanal leather.',
-    image: '/assets/fashion-parade/handler-walking-white-bull-runway.jpg',
-  },
-  {
-    id: 'gudali',
-    name: 'Sokoto Gudali',
-    category: 'Cattle & Equines',
-    origin: 'Local/Nigerian',
-    purpose: 'Meat',
-    traits:
-      'Deep, fleshy conformation, short horns or polled, calm disposition, and rapid weight conversion on savanna pastures.',
-    economic:
-      'Premier commercial beef breed anchoring Northern livestock trading rings and organized live-weight auctions.',
-    image: '/assets/fashion-parade/handler-beside-sokoto-gudali.jpg',
-  },
-  {
-    id: 'dromedary',
-    name: 'Sahelian Dromedary',
-    category: 'Camels',
-    origin: 'Local/Nigerian',
-    purpose: 'Traction',
-    traits:
-      'Single-hump desert conformation, broad padded footpads for desert mobility, exceptional water conservation physiology.',
-    economic:
-      'Crucial for Northern cross-border caravans, cultural Durbar pageantry, and nutrient-dense camel dairy production.',
-    image: '/assets/fashion-parade/handler-leading-saddled-camel.jpg',
-  },
-  {
-    id: 'wad-goat',
-    name: 'West African Dwarf Goat',
-    category: 'Small Ruminants',
-    origin: 'Local/Nigerian',
-    purpose: 'Meat',
-    traits:
-      'Compact hardy stature (30–50cm), high prolificacy with frequent twin births, and natural trypanotolerance against tsetse flies.',
-    economic:
-      'The foundational livestock asset of southern Nigeria, driving rural household food security and ceremonial wealth.',
-    image: '/assets/fashion-parade/goat-handler-traditional-attire.jpg',
-  },
-  {
-    id: 'balami-sheep',
-    name: 'Balami Giant Ram',
-    category: 'Small Ruminants',
-    origin: 'West African',
-    purpose: 'Exhibition',
-    traits:
-      'Convex Roman nose, pure white fleece, tall frame exceeding 100kg live weight, and magnificent spiraled horn conformation.',
-    economic:
-      'The sovereign champion of national festival markets, highly sought-after for ceremonial displays and stud enhancement.',
-    image: '/assets/fashion-parade/balami-ram-and-goat-shed.jpg',
-  },
-  {
-    id: 'moorbeta-chicken',
-    name: 'MoorBeta Indigenous Chicken',
-    category: 'Poultry',
-    origin: 'Local/Nigerian',
-    purpose: 'Meat',
-    traits:
-      'Hardy dual-purpose scavenger ecotype, lustrous plumage, alert temperament, and strong natural disease resistance.',
-    economic:
-      'Essential for backyard village poultry systems, delivering organic poultry meat and farm-fresh heirloom eggs.',
-    image: '/assets/fashion-parade/guinea-fowl-chickens-aviary.jpg',
-  },
-  {
-    id: 'giant-snail',
-    name: 'Giant African Snail (Archachatina)',
-    category: 'Micro-Livestock & Farm Displays',
-    origin: 'Local/Nigerian',
-    purpose: 'Meat',
-    traits:
-      'Massive helical shell, high protein conversion efficiency, odorless husbandry, thriving in shaded humid micro-biomes.',
-    economic:
-      'Rapidly expanding high-margin enterprise supplying fine-dining hospitality and pharmaceutical-grade mucin extracts.',
-    image: '/assets/fashion-parade/catfish-and-snails-display.jpg',
-  },
-  {
-    id: 'ostrich',
-    name: 'Sahelian Red-Neck Ostrich',
-    category: 'Exotic Displays',
-    origin: 'Exotic',
-    purpose: 'Exhibition',
-    traits:
-      'Largest living flightless avian, swift terrestrial speeds up to 70 km/h, and dense climate-resistant feather coverage.',
-    economic:
-      'High-value conservation genetics, ecological education, and sustainable eco-tourism exhibition draw.',
-    image: '/assets/fashion-parade/ostrich-standing-grassland.jpg',
-  },
-];
-
 export default function FashionParadePage() {
+  const [breedDirectory, setBreedDirectory] = useState<FashionBreed[]>(DEFAULT_FASHION_BREEDS);
+  const [pageCopy, setPageCopy] = useState({
+    title: 'National Livestock Carnival: Livestock Cultural Fashion Parade',
+    tagline: 'Where Agriculture Meets Fashion',
+    description: "Celebrating Nigeria's breeds and cultural heritage as a symbol of national renewal. Our Livestock. Our Culture. Our Heritage.",
+  });
   const [originFilter, setOriginFilter] = useState<string>('all');
   const [purposeFilter, setPurposeFilter] = useState<string>('all');
-  const [selectedBreed, setSelectedBreed] = useState<BreedItem>(breedDirectory[0]);
+  const [selectedBreed, setSelectedBreed] = useState<FashionBreed>(DEFAULT_FASHION_BREEDS[0]);
+
+  useEffect(() => {
+    let active = true;
+    void supabase.from('site_page_content').select('content').eq('page_key', 'fashion').eq('status', 'published').maybeSingle().then(({ data }) => {
+      if (!active || !data?.content || typeof data.content !== 'object') return;
+      const content = data.content as { pageCopy?: typeof pageCopy; breeds?: FashionBreed[] };
+      if (content.pageCopy) setPageCopy((current) => ({ ...current, ...content.pageCopy }));
+      if (Array.isArray(content.breeds) && content.breeds.length) {
+        setBreedDirectory(content.breeds);
+        setSelectedBreed(content.breeds[0]);
+      }
+    });
+    return () => { active = false; };
+  }, []);
 
   const filteredBreeds = breedDirectory.filter((b) => {
     const matchesOrigin = originFilter === 'all' || b.origin === originFilter;
@@ -197,10 +107,7 @@ export default function FashionParadePage() {
                 transition={{ ...editorialTransition, delay: 0.1 }}
                 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#0F4A2F] tracking-tight leading-[1.1] mb-6 font-serif"
               >
-                National Livestock Carnival: <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0F4A2F] via-[#1B6543] to-[#0F4A2F]">
-                  Livestock Cultural Fashion Parade
-                </span>
+                {pageCopy.title}
               </motion.h1>
 
               {/* Subtitle & Motto */}
@@ -210,7 +117,7 @@ export default function FashionParadePage() {
                 transition={{ ...editorialTransition, delay: 0.2 }}
                 className="text-lg sm:text-2xl font-bold text-[#1F2937] leading-snug mb-3 uppercase tracking-wide"
               >
-                &ldquo;Where Agriculture Meets Fashion&rdquo;
+                &ldquo;{pageCopy.tagline}&rdquo;
               </motion.p>
               <motion.p
                 initial={{ opacity: 0, y: 15 }}
@@ -218,8 +125,7 @@ export default function FashionParadePage() {
                 transition={{ ...editorialTransition, delay: 0.25 }}
                 className="text-sm sm:text-base md:text-lg text-[#4B5563] max-w-lg leading-relaxed mb-10"
               >
-                Celebrating Nigeria&apos;s breeds and cultural heritage as a symbol of national renewal.
-                Our Livestock. Our Culture. Our Heritage.
+                {pageCopy.description}
               </motion.p>
 
               {/* Meta Badges Strip */}

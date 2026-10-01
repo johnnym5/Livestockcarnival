@@ -4,6 +4,7 @@ import { motion, MotionProps } from 'framer-motion';
 import { useInView, useReducedMotion } from 'framer-motion';
 import { ReactNode, ElementType, useRef } from 'react';
 import { dramaticEase } from '@/lib/motion';
+import { useSiteAnimation } from '@/components/SiteAnimationContext';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'zoom' | 'zoom-out' | 'fade' | 'clip';
 
@@ -57,6 +58,7 @@ export default function ScrollReveal({
     margin: '-6% 0px -6% 0px',
   });
   const prefersReducedMotion = useReducedMotion();
+  const siteAnimation = useSiteAnimation();
   const MotionTag = motion[Tag as keyof typeof motion] as React.ComponentType<
     MotionProps & {
       className?: string;
@@ -77,7 +79,7 @@ export default function ScrollReveal({
       aria-hidden={!isVisible}
       inert={!isVisible}
       transition={{
-        duration,
+        duration: siteAnimation.scrollRevealDuration ?? duration,
         ease: dramaticEase,
         delay: isVisible ? delay : 0,
       }}

@@ -1,6 +1,7 @@
 import LivestockGrid from '@/components/LivestockGrid';
-import { Crown, Shield, Compass } from 'lucide-react';
+import { Shield, Compass } from 'lucide-react';
 import ThreeDCard from '@/components/motion/ThreeDCard';
+import EditablePageIntro from '@/components/EditablePageIntro';
 
 export const metadata = {
   title: 'Golden Camel & Champion Livestock Catalog | Livestock Carnival',
@@ -23,24 +24,8 @@ export default function LivestockPage() {
           <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#1E4D38] via-[#163B2B] to-[#111827] text-white p-8 sm:p-12 space-y-6 [transform-style:preserve-3d]">
             <div className="absolute top-0 right-0 w-96 h-96 bg-[#D4AF37]/10 blur-3xl rounded-full pointer-events-none" />
 
-            <div
-              style={{ transform: 'translateZ(35px)' }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#D8EADF] border border-[#B8D8C5] text-[#1E4D38] text-xs font-extrabold uppercase tracking-widest shadow-sm"
-            >
-              <Crown className="w-3.5 h-3.5 text-[#1E4D38]" />
-              Golden Camel &amp; Livestock Registry
-            </div>
-
-            <div
-              style={{ transform: 'translateZ(25px)' }}
-              className="max-w-3xl space-y-4"
-            >
-              <h1 className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-[#D8EADF] to-[#FEF3D6] tracking-tight leading-tight">
-                Championship Herds &amp; Royal Cavalry
-              </h1>
-              <p className="text-slate-200 text-sm sm:text-base leading-relaxed">
-                Explore official verified records of premier dromedaries, royal Durbar steeds, and certified Zebu cattle from leading livestock breeders and Emirates across Nigeria.
-              </p>
+            <div style={{ transform: 'translateZ(25px)' }} className="max-w-3xl space-y-4 text-white">
+              <EditablePageIntro page="livestock" className="[&_h1]:bg-gradient-to-r [&_h1]:from-white [&_h1]:via-[#D8EADF] [&_h1]:to-[#FEF3D6] [&_h1]:bg-clip-text [&_h1]:text-transparent [&_p]:text-slate-200" />
             </div>
 
             <div

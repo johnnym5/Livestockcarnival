@@ -1,45 +1,36 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { MapPin, Download, Calendar, Filter, CheckCircle2, Clock } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { MapPin, Calendar, Filter, CheckCircle2, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CARNIVAL_PROGRAM, DayProgram, TimeBlock } from '@/data/carnivalProgram';
 import { generateICS } from '@/lib/ics';
-
-const TRACK_FILTERS = [
-  { id: 'all', label: 'All Events', trackMatch: 'All' },
-  { id: 'ceremony', label: 'Ceremonies & Protocols', trackMatch: 'Ceremony' },
-  { id: 'livestock', label: 'Livestock & Breed Judging', trackMatch: 'Livestock' },
-  { id: 'agribusiness', label: 'Agribusiness & B2B', trackMatch: 'Agribusiness' },
-  { id: 'entertainment', label: 'Entertainment & Concerts', trackMatch: 'Entertainment' },
-];
-
-const DAY_TAB_ITEMS = [
-  {
-    key: 'day1',
-    dayNum: 1,
-    shortLabel: 'Day 1 — Fri, 21 Nov',
-    subTitle: 'Grand Opening & Heritage Parade',
-  },
-  {
-    key: 'day2',
-    dayNum: 2,
-    shortLabel: 'Day 2 — Sat, 22 Nov',
-    subTitle: 'Investment Summit & Breed Competitions',
-  },
-  {
-    key: 'day3',
-    dayNum: 3,
-    shortLabel: 'Day 3 — Sun, 23 Nov',
-    subTitle: 'B2B Matchmaking & Grand Finale',
-  },
-];
+import { supabase } from '@/lib/supabase/client';
 
 export default function ScheduleTab() {
-  const [selectedDayKey, setSelectedDayKey] = useState<'day1' | 'day2' | 'day3'>('day1');
+  const [scheduleDays, setScheduleDays] = useState<Record<string, DayProgram>>(CARNIVAL_PROGRAM);
+  const [selectedDayKey, setSelectedDayKey] = useState<string>('day1');
   const [selectedTrack, setSelectedTrack] = useState<string>('All');
 
-  const currentDayProgram: DayProgram = CARNIVAL_PROGRAM[selectedDayKey] || CARNIVAL_PROGRAM.day1;
+  useEffect(() => {
+    let active = true;
+    void supabase.from('site_page_content').select('content').eq('page_key', 'schedule').eq('status', 'published').maybeSingle().then(({ data }) => {
+      if (!active || !data?.content || typeof data.content !== 'object') return;
+      const days = (data.content as { days?: Record<string, DayProgram> }).days;
+      if (days && Object.keys(days).length) {
+        setScheduleDays(days);
+        setSelectedDayKey(Object.keys(days)[0]);
+      }
+    });
+    return () => { active = false; };
+  }, []);
+
+  const dayTabs = Object.entries(scheduleDays).map(([key, day]) => ({ key, shortLabel: `Day ${day.dayNumber} — ${day.dateString}`, subTitle: day.title }));
+  const trackFilters = useMemo(() => {
+    const tracks = Array.from(new Set(Object.values(scheduleDays).flatMap((day) => day.timeBlocks.map((block) => block.track))));
+    return [{ id: 'all', label: 'All Events', trackMatch: 'All' }, ...tracks.map((track) => ({ id: track.toLowerCase(), label: `${track} Events`, trackMatch: track }))];
+  }, [scheduleDays]);
+  const currentDayProgram: DayProgram = scheduleDays[selectedDayKey] || Object.values(scheduleDays)[0] || CARNIVAL_PROGRAM.day1;
 
   const filteredTimeBlocks = useMemo(() => {
     if (selectedTrack === 'All') {
@@ -55,13 +46,13 @@ export default function ScheduleTab() {
       {/* Sticky 3-Day Tabs Bar */}
       <div className="sticky top-20 z-30 bg-[#FBFBFA]/90 backdrop-blur-md py-4 mb-8 border-b border-slate-200/80">
         <div className="flex flex-col sm:flex-row justify-center gap-3 max-w-4xl mx-auto">
-          {DAY_TAB_ITEMS.map((tab) => {
+          {dayTabs.map((tab) => {
             const isSelected = selectedDayKey === tab.key;
             return (
               <button
                 key={tab.key}
                 onClick={() => {
-                  setSelectedDayKey(tab.key as 'day1' | 'day2' | 'day3');
+                  setSelectedDayKey(tab.key);
                   setSelectedTrack('All');
                 }}
                 className={`flex-1 px-5 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex flex-col items-center justify-center text-center relative ${
@@ -113,7 +104,7 @@ export default function ScheduleTab() {
             <span className="text-xs font-bold text-[#4B5563] flex items-center gap-1.5 mr-2 uppercase tracking-wider">
               <Filter className="w-3.5 h-3.5" /> Filter Track:
             </span>
-            {TRACK_FILTERS.map((tf) => {
+            {trackFilters.map((tf) => {
               const isActive = selectedTrack === tf.trackMatch;
               return (
                 <button

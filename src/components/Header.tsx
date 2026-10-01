@@ -34,6 +34,7 @@ export default function Header() {
     { name: 'Media', href: '/media' },
     { name: 'Venue Map', href: '/venue-map' },
     { name: 'Contact', href: '/contact' },
+    { name: 'Staff login', href: '/admin/login' },
   ];
 
   return (

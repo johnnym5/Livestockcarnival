@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import BrandLoadingContent from '@/components/BrandLoadingContent';
 
-export default function InitialLoadOverlay({ isHomePage = false }: { isHomePage?: boolean }) {
+export default function InitialLoadOverlay({ isHomePage = false, duration = 3 }: { isHomePage?: boolean; duration?: number }) {
   const [ready, setReady] = useState(false);
   const readyRef = useRef(false);
 
@@ -18,16 +18,16 @@ export default function InitialLoadOverlay({ isHomePage = false }: { isHomePage?
     };
 
     if (isHomePage) {
-      const watchScene = () => {
-        const scene = document.getElementById('scene-container');
-        if (scene?.classList.contains('scene-ready')) {
+      const watchHomepage = () => {
+        const homepage = document.getElementById('home-page');
+        if (homepage?.dataset.homeReady === 'true') {
           dismiss();
           observer?.disconnect();
         }
       };
-      observer = new MutationObserver(watchScene);
-      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'], subtree: true });
-      watchScene();
+      observer = new MutationObserver(watchHomepage);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-home-ready'], subtree: true });
+      watchHomepage();
       window.addEventListener('homepage:scene-ready', dismiss);
       fallbackTimer = window.setTimeout(dismiss, 8000);
     } else if (document.readyState === 'complete') {
@@ -48,7 +48,8 @@ export default function InitialLoadOverlay({ isHomePage = false }: { isHomePage?
   return (
     <div
       aria-hidden={ready}
-      className={`fixed inset-0 z-[120] flex items-center justify-center ${isHomePage ? 'bg-white' : 'bg-[#111827]'} transition-opacity ${isHomePage ? 'duration-[5000ms]' : 'duration-1000'} ease-in-out motion-reduce:transition-none ${ready ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+      style={isHomePage ? { transitionDuration: `${duration}s` } : undefined}
+      className={`fixed inset-0 z-[120] flex items-center justify-center ${isHomePage ? 'bg-white' : 'bg-[#111827]'} transition-opacity ${isHomePage ? '' : 'duration-1000'} ease-in-out motion-reduce:transition-none ${ready ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
     >
       {!isHomePage && <div className="initial-load-content"><BrandLoadingContent /></div>}
     </div>

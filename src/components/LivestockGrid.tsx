@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
 import { Shield, Tag, Filter, Info, X, ImageOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,6 +54,13 @@ export default function LivestockGrid() {
       setLoading(true);
 
       try {
+        const { data: pageData } = await supabase.from('site_page_content').select('content').eq('page_key', 'livestock').eq('status', 'published').maybeSingle();
+        const entries = pageData?.content && typeof pageData.content === 'object' ? (pageData.content as { entries?: LivestockItem[] }).entries : undefined;
+        if (Array.isArray(entries) && entries.length) {
+          setItems(entries.map((record, index) => ({ ...record, id: record.id || `cms-livestock-${index}`, fallback_url: record.fallback_url || record.image_url || '/assets/livestock_spectrum_hero.jpg' })));
+          setLoading(false);
+          return;
+        }
         const { data, error } = await supabase
           .from('livestock')
           .select('*')
@@ -137,7 +145,7 @@ export default function LivestockGrid() {
           {[1, 2, 3, 4, 5, 6].map((idx) => (
             <div
               key={idx}
-              className="bg-white border border-slate-200/80 rounded-2xl p-4 animate-pulse space-y-4 shadow-card"
+              className="bg-white border border-slate-200/80 rounded-2xl p-4 site-skeleton animate-pulse space-y-4 shadow-card"
             >
               <div className="h-56 bg-slate-100 rounded-xl" />
               <div className="h-4 bg-slate-200 rounded w-3/4" />
@@ -184,8 +192,11 @@ export default function LivestockGrid() {
                         </span>
                       </div>
                     ) : (
-                      <img
+                      <Image
                         src={imageSrc}
+                        width={900}
+                        height={600}
+                        unoptimized
                         alt={item.name}
                         onError={() => handleImageError(item)}
                         className="w-full h-full object-cover transition-transform duration-700 hover:scale-106"
@@ -286,8 +297,11 @@ export default function LivestockGrid() {
               </button>
 
               <div className="relative h-64 w-full rounded-2xl overflow-hidden bg-slate-100">
-                <img
+                <Image
                   src={getImageSrc(activeModalItem)}
+                  width={900}
+                  height={600}
+                  unoptimized
                   alt={activeModalItem.name}
                   className="w-full h-full object-cover"
                 />
