@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Bell, BellOff } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 
-type PushState = 'checking' | 'unsupported' | 'unsubscribed' | 'subscribed' | 'blocked';
+type PushState = 'checking' | 'unsupported' | 'prompt' | 'unsubscribed' | 'subscribed' | 'blocked';
 
 function decodeVapidKey(value: string): ArrayBuffer {
   const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
@@ -27,22 +27,34 @@ export default function PushOptIn() {
       try {
         const registration = await navigator.serviceWorker.getRegistration('/');
         const subscription = await registration?.pushManager.getSubscription();
-        if (active) setState(subscription ? 'subscribed' : Notification.permission === 'denied' ? 'blocked' : 'unsubscribed');
+        if (!active) return;
+        if (subscription) setState('subscribed');
+        else if (Notification.permission === 'denied') setState('blocked');
+        else if (Notification.permission === 'default') setState('prompt');
+        else setState('unsubscribed');
       } catch {
-        if (active) setState('unsubscribed');
+        if (active) setState(Notification.permission === 'denied' ? 'blocked' : Notification.permission === 'default' ? 'prompt' : 'unsubscribed');
       }
     };
     void check();
-    return () => { active = false; };
+    const refreshPermission = () => { if (document.visibilityState === 'visible') void check(); };
+    document.addEventListener('visibilitychange', refreshPermission);
+    window.addEventListener('focus', refreshPermission);
+    return () => {
+      active = false;
+      document.removeEventListener('visibilitychange', refreshPermission);
+      window.removeEventListener('focus', refreshPermission);
+    };
   }, []);
 
   const subscribe = async () => {
     setBusy(true); setNotice('');
     try {
       // Request permission directly from this click to satisfy browser gesture requirements.
-      const permissionPromise = Notification.requestPermission();
-      const permission = await permissionPromise;
-      if (permission !== 'granted') { setState(permission === 'denied' ? 'blocked' : 'unsubscribed'); return; }
+      const permission = Notification.permission === 'granted'
+        ? 'granted'
+        : await Notification.requestPermission();
+      if (permission !== 'granted') { setState(permission === 'denied' ? 'blocked' : 'prompt'); return; }
       const registration = await navigator.serviceWorker.register('/push-sw.js', { scope: '/' });
       const { data, error } = await supabase.functions.invoke('push-notifications', { body: { action: 'public_key' } });
       if (error || typeof data?.public_key !== 'string') throw new Error('Notifications are not configured yet.');
@@ -79,7 +91,7 @@ export default function PushOptIn() {
     <section aria-label="Browser notification settings" className="border-t border-[#E4B03A]/25 bg-[#F7F4E9] px-5 py-8 text-[#19251C] sm:px-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="max-w-2xl"><p className="flex items-center gap-2 text-sm font-extrabold"><Bell className="h-4 w-4 text-[#8D6B1B]" /> Official carnival browser updates</p><p className="mt-1 text-xs leading-5 text-[#5D685F]">If you subscribe, this site stores your browser push address and sends official event announcements. You can unsubscribe here or in your browser settings. See our <Link href="/privacy" className="font-semibold text-[#1E4D38] underline">Privacy Policy</Link>.</p>{isIos && <p className="mt-2 text-xs font-semibold text-[#8D6B1B]">On iPhone or iPad, add this site to your Home Screen and open it from the new icon before subscribing.</p>}{notice && <p role="status" className="mt-2 text-xs font-semibold text-[#1E4D38]">{notice}</p>}</div>
-        {state === 'unsupported' ? <p className="text-xs text-[#667168]">This browser does not support push notifications. You can still check announcements on our website.</p> : state === 'blocked' ? <p className="text-xs text-[#667168]">Notifications are blocked in your browser settings.</p> : isIos ? <p className="text-xs font-semibold text-[#8D6B1B]">Add to Home Screen to enable</p> : <button type="button" disabled={busy} onClick={() => void (state === 'subscribed' ? unsubscribe() : subscribe())} className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-[#1E4D38] px-4 text-xs font-bold text-[#1E4D38] transition hover:bg-[#E6EFE8] disabled:opacity-60 sm:self-auto">{state === 'subscribed' ? <BellOff className="h-4 w-4" /> : <Bell className="h-4 w-4" />}{busy ? 'Working…' : state === 'subscribed' ? 'Unsubscribe' : 'Get updates'}</button>}
+        {state === 'unsupported' ? <p className="text-xs text-[#667168]">This browser does not support push notifications. You can still check announcements on our website.</p> : state === 'blocked' ? <p className="max-w-xs text-xs leading-5 text-[#667168]">Notifications are blocked for this site. Allow them in your browser’s site settings, then return here and reload.</p> : isIos ? <p className="text-xs font-semibold text-[#8D6B1B]">Add to Home Screen to enable</p> : <div className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end"><button type="button" disabled={busy} onClick={() => void (state === 'subscribed' ? unsubscribe() : subscribe())} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-[#1E4D38] px-4 text-xs font-bold text-[#1E4D38] transition hover:bg-[#E6EFE8] disabled:opacity-60">{state === 'subscribed' ? <BellOff className="h-4 w-4" /> : <Bell className="h-4 w-4" />}{busy ? 'Working…' : state === 'subscribed' ? 'Unsubscribe' : state === 'prompt' ? 'Allow notifications' : 'Activate updates'}</button>{state === 'prompt' && <span className="max-w-56 text-[10px] leading-4 text-[#758078]">Your browser will ask for permission when you tap.</span>}{state === 'unsubscribed' && <span className="max-w-56 text-right text-[10px] leading-4 text-[#758078]">Browser permission is allowed; tap to activate updates.</span>}</div>}
       </div>
     </section>
   );
