@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { Bell, BellOff, X } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -22,11 +23,16 @@ export default function PushOptIn() {
   const [showPrompt, setShowPrompt] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [promptDelayElapsed, setPromptDelayElapsed] = useState(false);
+  const [portalReady, setPortalReady] = useState(false);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
+    const portalFrame = window.requestAnimationFrame(() => setPortalReady(true));
     const timer = window.setTimeout(() => setPromptDelayElapsed(true), 10_000);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.cancelAnimationFrame(portalFrame);
+      window.clearTimeout(timer);
+    };
   }, []);
 
   const canShowPrompt = () => {
@@ -147,21 +153,24 @@ export default function PushOptIn() {
 
   return (
     <>
-    <AnimatePresence>
-      {showDialog && <motion.div key="push-opt-in-backdrop" className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-[#302b22]/35 px-4 py-8 backdrop-blur-[5px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0.01 : 0.7 }}>
-        <motion.aside role="dialog" aria-modal="true" aria-labelledby="push-opt-in-title" className="relative my-auto w-full max-w-lg overflow-hidden rounded-[28px] border border-white/70 bg-[#f4eddd]/85 p-6 text-[#19251C] shadow-[0_28px_100px_rgba(36,30,20,.28)] backdrop-blur-2xl sm:p-8" initial={{ opacity: 0, y: reduceMotion ? 0 : -72, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: reduceMotion ? 0 : -24, scale: 0.98 }} transition={{ duration: reduceMotion ? 0.01 : 0.95, ease: [0.22, 1, 0.36, 1] }}>
-          <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-[#E4B03A]/20 blur-3xl" />
-          <button type="button" aria-label="Close notification prompt" onClick={closeDialog} className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full border border-[#776b53]/15 bg-white/35 text-[#465247] transition hover:bg-white/70"><X className="h-4 w-4" /></button>
-          <div className="relative">
-            <p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#8D6B1B]">Stay in the celebration</p>
-            <h2 id="push-opt-in-title" className="mt-2 pr-10 text-2xl font-black tracking-tight sm:text-3xl">{isSubscribedDialog ? 'You’re subscribed' : isBlockedDialog ? 'Notifications are blocked' : isUnsupportedDialog ? 'Notifications unavailable' : showInstallPrompt ? 'Get updates on your iPhone' : 'Get official carnival updates'}</h2>
-            {showInstallPrompt ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">To receive notifications on iPhone or iPad, use Share → Add to Home Screen, then open this site from its Home Screen icon.</p><button type="button" onClick={closeDialog} className="mt-6 min-h-11 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white">Got it</button></> : isSubscribedDialog ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">This browser is set to receive event announcements and newly published story alerts.</p><button type="button" disabled={busy} onClick={() => void unsubscribe()} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#1E4D38]/25 bg-white/45 px-5 text-xs font-bold text-[#1E4D38] disabled:opacity-60"><BellOff className="h-4 w-4" />{busy ? 'Working…' : 'Unsubscribe'}</button></> : isBlockedDialog ? <p className="mt-3 text-sm leading-6 text-[#5D685F]">Notifications are blocked for this site. Allow them in your browser’s site settings, then return here and reload.</p> : isUnsupportedDialog ? <p className="mt-3 text-sm leading-6 text-[#5D685F]">This browser does not support push notifications. You can still check announcements and new stories on our website.</p> : <><p className="mt-3 text-sm leading-6 text-[#5D685F]">{state === 'prompt' ? 'Get important event announcements and new story alerts on this device. You can unsubscribe at any time.' : 'Browser permission is already allowed. Activate notifications to receive event announcements and new story alerts.'}</p><div className="mt-6 flex flex-wrap items-center gap-2"><button type="button" disabled={busy} onClick={() => { closeDialog(); void subscribe(); }} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#143c2b] disabled:opacity-60"><Bell className="h-4 w-4" />{busy ? 'Working…' : state === 'prompt' ? 'Allow notifications' : 'Activate updates'}</button><button type="button" onClick={closeDialog} className="min-h-11 rounded-xl px-4 text-xs font-semibold text-[#667168] transition hover:bg-white/50">Not now</button></div></>}
-          </div>
-        </motion.aside>
-      </motion.div>}
-    </AnimatePresence>
+    {portalReady && createPortal(<>
+      <AnimatePresence>
+        {showDialog && <motion.div key="push-opt-in-backdrop" className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto bg-[#302b22]/35 px-4 py-8 backdrop-blur-[5px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0.01 : 0.7 }}>
+          <motion.aside role="dialog" aria-modal="true" aria-labelledby="push-opt-in-title" className="relative my-auto w-full max-w-lg overflow-hidden rounded-[28px] border border-white/70 bg-[#f4eddd]/85 p-6 text-[#19251C] shadow-[0_28px_100px_rgba(36,30,20,.28)] backdrop-blur-2xl sm:p-8" initial={{ opacity: 0, y: reduceMotion ? 0 : -72, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: reduceMotion ? 0 : -24, scale: 0.98 }} transition={{ duration: reduceMotion ? 0.01 : 0.95, ease: [0.22, 1, 0.36, 1] }}>
+            <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full bg-[#E4B03A]/20 blur-3xl" />
+            <button type="button" aria-label="Close notification prompt" onClick={closeDialog} className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full border border-[#776b53]/15 bg-white/35 text-[#465247] transition hover:bg-white/70"><X className="h-4 w-4" /></button>
+            <div className="relative">
+              <p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#8D6B1B]">Stay in the celebration</p>
+              <h2 id="push-opt-in-title" className="mt-2 pr-10 text-2xl font-black tracking-tight sm:text-3xl">{isSubscribedDialog ? 'You’re subscribed' : isBlockedDialog ? 'Notifications are blocked' : isUnsupportedDialog ? 'Notifications unavailable' : showInstallPrompt ? 'Get updates on your iPhone' : 'Get official carnival updates'}</h2>
+              {showInstallPrompt ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">To receive notifications on iPhone or iPad, use Share → Add to Home Screen, then open this site from its Home Screen icon.</p><button type="button" onClick={closeDialog} className="mt-6 min-h-11 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white">Got it</button></> : isSubscribedDialog ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">This browser is set to receive event announcements and newly published story alerts.</p><button type="button" disabled={busy} onClick={() => void unsubscribe()} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#1E4D38]/25 bg-white/45 px-5 text-xs font-bold text-[#1E4D38] disabled:opacity-60"><BellOff className="h-4 w-4" />{busy ? 'Working…' : 'Unsubscribe'}</button></> : isBlockedDialog ? <p className="mt-3 text-sm leading-6 text-[#5D685F]">Notifications are blocked for this site. Allow them in your browser’s site settings, then return here and reload.</p> : isUnsupportedDialog ? <p className="mt-3 text-sm leading-6 text-[#5D685F]">This browser does not support push notifications. You can still check announcements and new stories on our website.</p> : <><p className="mt-3 text-sm leading-6 text-[#5D685F]">{state === 'prompt' ? 'Get important event announcements and new story alerts on this device. You can unsubscribe at any time.' : 'Browser permission is already allowed. Activate notifications to receive event announcements and new story alerts.'}</p><div className="mt-6 flex flex-wrap items-center gap-2"><button type="button" disabled={busy} onClick={() => { closeDialog(); void subscribe(); }} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#143c2b] disabled:opacity-60"><Bell className="h-4 w-4" />{busy ? 'Working…' : state === 'prompt' ? 'Allow notifications' : 'Activate updates'}</button><button type="button" onClick={closeDialog} className="min-h-11 rounded-xl px-4 text-xs font-semibold text-[#667168] transition hover:bg-white/50">Not now</button></div></>}
+            </div>
+          </motion.aside>
+        </motion.div>}
+      </AnimatePresence>
+      <button type="button" onClick={() => setManualOpen(true)} aria-label="Open notification settings" title="Notification settings" className="fixed bottom-6 left-5 z-[98] inline-flex min-h-12 items-center gap-2 rounded-full border border-[#E4B03A]/70 bg-[#f4eddd]/90 px-4 text-xs font-extrabold text-[#1E4D38] shadow-[0_8px_28px_rgba(29,37,30,.22)] backdrop-blur-xl transition hover:bg-[#fffaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E4D38] focus-visible:ring-offset-2"><Bell className="h-4 w-4" />Notifications</button>
+    </>, document.body)}
     <section aria-label="Browser notification settings" className="border-t border-[#E4B03A]/10 bg-[#F7F4E9]/70 px-5 py-2 text-[#19251C] sm:px-8">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3"><p className="text-[10px] text-[#758078]">{notice || (state === 'subscribed' ? 'You’re subscribed to official carnival updates.' : 'Choose whether to receive official carnival notifications.')} <Link href="/privacy" className="font-semibold text-[#1E4D38] underline">Privacy Policy</Link></p><button type="button" onClick={() => setManualOpen(true)} className="shrink-0 rounded-lg px-2 py-1.5 text-[10px] font-semibold text-[#1E4D38] underline decoration-[#1E4D38]/40 underline-offset-2 hover:bg-white/50">Notification settings</button></div>
+      <div className="mx-auto max-w-7xl text-[10px] text-[#758078]">{notice || (state === 'subscribed' ? 'You’re subscribed to official carnival updates.' : 'Choose whether to receive official carnival notifications.')} <Link href="/privacy" className="font-semibold text-[#1E4D38] underline">Privacy Policy</Link></div>
     </section>
     </>
   );
