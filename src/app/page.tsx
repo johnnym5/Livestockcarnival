@@ -24,7 +24,7 @@ function MagazineFeature({ card, index }: { card: CardData; index: number }) {
   return (
     <motion.article
       ref={featureRef}
-      className="group relative isolate mx-auto aspect-[4/3] min-h-[470px] w-full max-w-[1440px] overflow-hidden rounded-[1.5rem] border border-[#D8C48A]/70 bg-[#07150D] shadow-[0_22px_65px_rgba(17,24,39,0.15)] md:aspect-[16/9] md:min-h-[500px] lg:max-h-[760px]"
+      className="group relative isolate mx-auto aspect-[4/3] min-h-[470px] w-full max-w-[1440px] overflow-hidden rounded-[1.5rem] border border-[#D8C48A]/70 bg-[#07150D] shadow-[0_28px_80px_rgba(17,24,39,0.22),0_8px_22px_rgba(17,24,39,0.1)] md:aspect-[16/9] md:min-h-[500px] lg:max-h-[760px]"
       aria-label={`Magazine feature ${index + 1}: ${card.title}`}
     >
       <motion.div className="absolute inset-0" style={reducedMotion ? undefined : { opacity: imageOpacity }}>
@@ -45,9 +45,9 @@ function MagazineFeature({ card, index }: { card: CardData; index: number }) {
           }}
         />
         <motion.div className="absolute inset-x-0 bottom-0 mx-auto flex h-full max-w-[1240px] flex-col justify-end px-6 pb-7 pt-20 sm:px-10 sm:pb-10 sm:pt-24 lg:px-12" style={reducedMotion ? undefined : { opacity: contentOpacity, y: contentY }}>
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#F2C349] sm:text-xs">{card.eyebrow}</p>
-          <h3 className="mt-3 max-w-5xl text-3xl font-black leading-[1.02] text-white sm:text-4xl md:text-5xl lg:text-6xl">{card.title}</h3>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-white/85 sm:mt-4 sm:text-base lg:text-lg">{card.body}</p>
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#F2C349] [text-shadow:0_2px_8px_rgba(0,0,0,0.55)] sm:text-xs">{card.eyebrow}</p>
+          <h3 className="mt-3 max-w-5xl text-3xl font-black leading-[1.02] text-white [text-shadow:0_2px_2px_rgba(0,0,0,0.32),0_8px_24px_rgba(0,0,0,0.48)] sm:text-4xl md:text-5xl lg:text-6xl">{card.title}</h3>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.55)] sm:mt-4 sm:text-base lg:text-lg">{card.body}</p>
           <Link href={card.link} className="mt-5 inline-flex min-h-11 items-center gap-2 self-start text-[10px] font-extrabold uppercase tracking-[0.12em] text-white transition-colors hover:text-[#F2C349] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:mt-6 sm:text-xs">
             {card.cta}<ArrowRight aria-hidden="true" size={16} />
           </Link>
@@ -62,6 +62,8 @@ export default function Home() {
   const [magazineContent, setMagazineContent] = useState(DEFAULT_SITE_CONTENT.magazine);
   const [contentReady, setContentReady] = useState(false);
   const siteAnimation = useSiteAnimation();
+  const reducedMotion = useReducedMotion();
+  const magazineOverlapsDeck = siteAnimation.cardDeckEnabled && !reducedMotion;
 
   useEffect(() => {
     let active = true;
@@ -117,9 +119,9 @@ export default function Home() {
         id="magazine-highlights"
         aria-labelledby="magazine-highlights-title"
         style={{ backgroundColor: String(magazineContent.backgroundColor), borderColor: `${String(magazineContent.accentColor)}55` }}
-        className="border-t text-[#111827]"
+        className={`border-t text-[#111827] ${magazineOverlapsDeck ? '-mt-[18vh] relative z-10' : ''}`}
       >
-        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24">
+        <div className={`mx-auto max-w-7xl px-5 sm:px-8 lg:px-10 ${siteAnimation.cardDeckEnabled ? 'pt-0 pb-12 sm:pb-16' : 'py-16 sm:py-20 lg:py-24'}`}>
           {!siteAnimation.cardDeckEnabled && <ScrollReveal direction="up" duration={0.6} once>
             <div className="mb-9 max-w-3xl sm:mb-12">
               <p style={{ color: String(magazineContent.accentColor) }} className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.22em] sm:text-xs">{String(magazineContent.eyebrow)}</p>

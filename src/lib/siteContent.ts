@@ -1,6 +1,7 @@
 import { DEFAULT_FASHION_BREEDS } from '@/data/fashionBreeds';
 import { CARNIVAL_PROGRAM } from '@/data/carnivalProgram';
 import { DEFAULT_LIVESTOCK_ENTRIES } from '@/data/livestockCatalog';
+import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES } from '@/data/venueCatalog';
 
 export const DEFAULT_SITE_CONTENT: Record<string, Record<string, unknown>> = {
   magazine: {
@@ -15,6 +16,8 @@ export const DEFAULT_SITE_CONTENT: Record<string, Record<string, unknown>> = {
     title: '3-Day Official Carnival Program',
     intro: '21 – 23 November 2026 • Old Parade Ground, Area 10, Garki, Abuja. Explore the ceremonies, breed judging, business forums, and live performances planned across all three days.',
     days: CARNIVAL_PROGRAM,
+    venues: DEFAULT_VENUES,
+    eventVenues: DEFAULT_EVENT_VENUES,
   },
   livestock: {
     badge: 'Golden Camel & Livestock Registry',

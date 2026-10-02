@@ -99,9 +99,10 @@ function DeckCard({
         animate={{ scale: raised ? 1.045 : 1, y: raised ? -24 : 0 }}
         transition={{ duration: 0.24, ease: 'easeOut' }}
         className="homepage-deck-card"
-        style={{ background: coverGradient(card.coverBg), borderColor: card.accentColor, boxShadow: `0 14px 35px ${card.accentColor}33` }}
+        style={{ background: coverGradient(card.coverBg), borderColor: card.accentColor, boxShadow: `inset 0 1px 0 rgba(255,255,255,.14), 0 16px 36px rgba(10,20,12,.22), 0 14px 35px ${card.accentColor}33` }}
       >
         <Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={118} height={90} className="homepage-deck-logo" />
+        <span className="homepage-deck-card-label">{card.pageTitle || card.title}</span>
         <span className="homepage-deck-number" style={{ color: card.accentColor }}>{card.number}</span>
       </motion.button>
     </motion.div>
@@ -113,12 +114,16 @@ function OpenCard({
   rect,
   duration,
   expandedScale,
+  mobile,
+  onClosing,
   onClose,
 }: {
   card: CardData;
   rect: DOMRect;
   duration: number;
   expandedScale: number;
+  mobile: boolean;
+  onClosing: () => void;
   onClose: () => void;
 }) {
   const [closing, setClosing] = useState(false);
@@ -138,6 +143,7 @@ function OpenCard({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
+        onClosing();
         setClosing(true);
       }
       if (event.key === 'Tab') {
@@ -155,12 +161,13 @@ function OpenCard({
       window.scrollTo({ top: scrollY, behavior: 'instant' });
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [onClosing]);
 
   const start = { left: rect.left, top: rect.top, width: rect.width, height: rect.height, borderRadius: 18 };
-  const expandedWidth = window.innerWidth * expandedScale;
-  const expandedHeight = window.innerHeight * expandedScale;
-  const full = { left: (window.innerWidth - expandedWidth) / 2, top: (window.innerHeight - expandedHeight) / 2, width: expandedWidth, height: expandedHeight, borderRadius: 0 };
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+  const expandedWidth = Math.min(window.innerWidth * (mobile ? 0.92 : 0.86), window.innerWidth * expandedScale);
+  const expandedHeight = Math.min(viewportHeight * (mobile ? 0.82 : 0.86), viewportHeight * expandedScale);
+  const full = { left: (window.innerWidth - expandedWidth) / 2, top: Math.max(12, (window.innerHeight - expandedHeight) / 2), width: expandedWidth, height: expandedHeight, borderRadius: 20 };
 
   return createPortal((
     <div className="homepage-deck-modal-layer" role="presentation">
@@ -173,14 +180,15 @@ function OpenCard({
         className="homepage-deck-open-card"
         initial={start}
         animate={closing ? start : full}
-        transition={{ duration: safeDuration, ease: [0.22, 1, 0.36, 1] }}
-        onAnimationComplete={() => { if (closing) onClose(); }}
+        transition={{ duration: closing && mobile ? Math.min(safeDuration, 0.22) : safeDuration, ease: [0.22, 1, 0.36, 1] }}
+        onAnimationComplete={(definition) => { if (closing && definition === start) onClose(); }}
         style={{ perspective: 1600 }}
       >
-        <motion.div className="homepage-deck-open-inner" initial={{ rotateY: 0 }} animate={{ rotateY: closing ? 0 : 180 }} transition={{ duration: safeDuration, ease: [0.3, 0.05, 0.2, 1] }}>
+        <motion.div className="homepage-deck-open-inner" initial={{ rotateY: 0 }} animate={{ rotateY: closing ? 0 : 180 }} transition={{ duration: closing && mobile ? Math.min(safeDuration, 0.22) : safeDuration, ease: [0.3, 0.05, 0.2, 1] }}>
           <div className="homepage-deck-open-face homepage-deck-open-front" style={{ background: coverGradient(card.coverBg), borderColor: card.accentColor }}>
             <Image src="/assets/branding/carnival-logo-transparent.png" alt="Livestock Carnival" width={220} height={166} className="homepage-deck-open-logo" />
-            <span style={{ color: card.accentColor }}>{card.number}</span>
+            <span className="homepage-deck-open-title">{card.pageTitle || card.title}</span>
+            <span className="homepage-deck-open-number" style={{ color: card.accentColor }}>{card.number}</span>
           </div>
           <div className="homepage-deck-open-face homepage-deck-open-back" style={{ borderColor: card.accentColor }}>
             <div className="homepage-deck-open-image">
@@ -196,7 +204,7 @@ function OpenCard({
                 {card.cta}<ArrowRight aria-hidden="true" size={16} />
               </Link>
             </div>
-            <button ref={closeButtonRef} type="button" onClick={() => setClosing(true)} aria-label="Close card" className="homepage-deck-close"><X aria-hidden="true" size={22} /></button>
+            <button ref={closeButtonRef} type="button" onClick={() => { onClosing(); setClosing(true); }} aria-label="Close card" className="homepage-deck-close"><X aria-hidden="true" size={22} /></button>
           </div>
         </motion.div>
       </motion.div>
@@ -214,6 +222,7 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
   const [openedCard, setOpenedCard] = useState<{ card: CardData; rect: DOMRect } | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [lowPowerDevice, setLowPowerDevice] = useState(false);
+  const [isClosingCard, setIsClosingCard] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(1024);
   const reducedMotion = useReducedMotion();
   // Older phones often report four or fewer logical cores. That is not a
@@ -263,10 +272,7 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
 
   const heroScale = useTransform(scrollYProgress, [0, settings.heroShrinkEnd], [isMobile ? settings.heroScaleOpeningMobile : settings.heroScaleOpeningDesktop, isMobile ? settings.heroScaleCoveredMobile : settings.heroScaleCoveredDesktop]);
   const heroOpacity = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress], [1, 1, 0.12]);
-  const mobileHeroBlurLimit = lowPowerDevice ? 1 : 3;
-  const heroBlur = useTransform(scrollYProgress, [0, settings.heroShrinkEnd], [0, isMobile ? Math.min(mobileHeroBlurLimit, settings.heroBlur) : settings.heroBlur]);
   const promptOpacity = useTransform(scrollYProgress, [settings.promptStartProgress, settings.promptEndProgress, settings.fanHoldEndProgress, settings.magazineEndProgress], [0, 1, 1, 0]);
-  const promptBlur = useTransform(scrollYProgress, [settings.promptStartProgress, settings.promptEndProgress, settings.fanHoldEndProgress, settings.magazineEndProgress], [5, 0, 0, isMobile || lowPowerDevice ? 1 : 2]);
   const promptScale = useTransform(scrollYProgress, [settings.promptStartProgress, settings.promptEndProgress, settings.fanHoldEndProgress, settings.magazineEndProgress], [0.88, 1, 1, 0.75]);
   const cueOpacity = useTransform(scrollYProgress, [0, settings.fanStartProgress * 0.45, settings.fanStartProgress], [1, 0.75, 0]);
   const stackOffset = settings.stackStartY * viewportHeight * (isMobile ? 0.7 : 1);
@@ -274,12 +280,8 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
   const deckY = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress, settings.fanHoldEndProgress, settings.magazineEndProgress], [stackOffset, stackOffset, -fanVerticalLift, -fanVerticalLift, stackOffset]);
   const restackStart = settings.fanHoldEndProgress + (settings.magazineEndProgress - settings.fanHoldEndProgress) * settings.magazineRestackAt;
   const deckScale = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress, restackStart, settings.magazineEndProgress], [isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop, isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop, isMobile ? settings.fanScaleMobile : settings.fanScaleDesktop, (isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop) * settings.magazineScale, (isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop) * settings.magazineScale]);
-  const deckBlur = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [0, isMobile || lowPowerDevice ? settings.magazineBlurMobile : settings.magazineBlurDesktop]);
   const magazineY = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [viewportHeight, 0]);
   const magazineOpacity = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.fanHoldEndProgress + 0.04], [0, 1]);
-  const heroFilter = useTransform(heroBlur, (value) => `blur(${value}px)`);
-  const promptFilter = useTransform(promptBlur, (value) => `blur(${value}px)`);
-  const deckFilter = useTransform(deckBlur, (value) => `blur(${value}px)`);
   const deckOpacity = useTransform(scrollYProgress, [settings.magazineEndProgress - 0.04, settings.magazineEndProgress], [1, 0]);
   const heroInitial = simplifyMotion ? false : 'hidden';
   const revealOrders = [
@@ -304,6 +306,7 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
   };
 
   const selectCard = (card: CardData) => {
+    if (isClosingCard) return;
     if (raisedCard !== card.id) {
       setRaisedCard(card.id);
       return;
@@ -318,7 +321,10 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
     setOpenedCard(null);
     setRaisedCard(null);
     requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo({ top: openingScrollRef.current, behavior: 'instant' })));
-    requestAnimationFrame(() => cardButtonsRef.current.get(openedCard?.card.id ?? '')?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      setIsClosingCard(false);
+      cardButtonsRef.current.get(openedCard?.card.id ?? '')?.focus({ preventScroll: true });
+    }));
   };
 
   const hero = (
@@ -327,7 +333,7 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
       initial={heroInitial}
       animate={simplifyMotion || revealed ? 'visible' : 'hidden'}
       className="homepage-deck-hero-inner"
-      style={!simplifyMotion && enabled ? { scale: heroScale, opacity: heroOpacity, filter: heroFilter } : undefined}
+      style={!simplifyMotion && enabled ? { scale: heroScale, opacity: heroOpacity } : undefined}
     >
       <motion.div variants={heroStep('logo')} className="homepage-deck-logo-wrap"><Image src="/assets/branding/carnival-logo-transparent.png" alt="Livestock Carnival" width={220} height={166} priority className="h-[72px] w-auto object-contain sm:h-[108px]" /></motion.div>
       <motion.p variants={heroStep('eyebrow')} className="homepage-deck-eyebrow"><span />Federal Republic of Nigeria <i aria-hidden="true">·</i> Official Carnival &amp; Expo<span /></motion.p>
@@ -353,8 +359,8 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
     >
       <div className="homepage-deck-scene">
         <div className="homepage-deck-hero">{hero}</div>
-        {!simplifyMotion && <motion.p className="homepage-deck-prompt" style={{ opacity: promptOpacity, scale: promptScale, filter: promptFilter }} aria-hidden="true"><span>PICK A CARD AND</span> <strong>EXPLORE!</strong></motion.p>}
-        <motion.div className="homepage-deck-fan" style={{ y: simplifyMotion ? 0 : deckY, scale: simplifyMotion ? 1 : deckScale, filter: simplifyMotion ? 'none' : deckFilter, opacity: simplifyMotion ? 1 : deckOpacity }}>
+        {!simplifyMotion && <motion.p className="homepage-deck-prompt" style={{ opacity: promptOpacity, scale: promptScale }} aria-hidden="true"><span>PICK A CARD AND</span> <strong>EXPLORE!</strong></motion.p>}
+        <motion.div className="homepage-deck-fan" style={{ y: simplifyMotion ? 0 : deckY, scale: simplifyMotion ? 1 : deckScale, opacity: simplifyMotion ? 1 : deckOpacity }}>
           <motion.div
             className="homepage-deck-fan-rise"
             initial={simplifyMotion ? false : { y: initialLift, opacity: 0 }}
@@ -377,7 +383,8 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
         </motion.section>
       </div>
       {simplifyMotion && <section className="homepage-deck-static-magazine" style={{ backgroundColor: magazine.backgroundColor, borderColor: `${magazine.accentColor}55` }}><div><p style={{ color: magazine.accentColor }}>{magazine.eyebrow}</p><h2>{magazine.title}</h2><span>{magazine.intro}</span></div></section>}
-      <AnimatePresence>{openedCard && <OpenCard key={openedCard.card.id} card={openedCard.card} rect={openedCard.rect} duration={simplifyMotion ? 0.15 : settings.flipDuration} expandedScale={isMobile ? settings.expandedCardScaleMobile : settings.expandedCardScaleDesktop} onClose={onCardClose} />}</AnimatePresence>
+      {isClosingCard && <div className="homepage-deck-return-shield" aria-hidden="true" />}
+      <AnimatePresence>{openedCard && <OpenCard key={openedCard.card.id} card={openedCard.card} rect={openedCard.rect} duration={simplifyMotion ? 0.15 : settings.flipDuration} expandedScale={isMobile ? settings.expandedCardScaleMobile : settings.expandedCardScaleDesktop} mobile={isMobile} onClosing={() => setIsClosingCard(true)} onClose={onCardClose} />}</AnimatePresence>
     </section>
   );
 }

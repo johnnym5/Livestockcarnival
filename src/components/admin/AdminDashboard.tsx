@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import {
   Check,
@@ -19,6 +20,7 @@ import {
   Images,
   ImagePlus,
   LogOut,
+  MapPin,
   MailPlus,
   MessageSquare,
   Newspaper,
@@ -38,7 +40,9 @@ import SiteContentEditor from '@/components/admin/SiteContentEditor';
 import HomepageAnimationTuner from '@/components/admin/HomepageAnimationTuner';
 import { CMS_PERMISSION_OPTIONS, type CmsPermissionKey } from '@/lib/cmsPermissions';
 
-type AdminView = 'stories' | 'galleries' | 'storage' | 'team' | 'homepage' | 'site-content' | 'animation';
+const VenueCatalogEditor = dynamic(() => import('@/components/admin/VenueCatalogEditor'), { ssr: false });
+
+type AdminView = 'stories' | 'galleries' | 'storage' | 'team' | 'homepage' | 'site-content' | 'venues' | 'animation';
 type StorageBucketName = 'livestock-images' | 'media-assets' | 'credentials';
 
 const BUCKET_OPTIONS: { id: StorageBucketName; label: string; maxMb: number }[] = [
@@ -86,6 +90,47 @@ const formatDate = (date: string | null) => {
 
 type EditablePage = 'magazine' | 'schedule' | 'livestock' | 'fashion';
 const defaultStaffPermissions: CmsPermissionKey[] = ['stories'];
+const validPermissionKeys = new Set<CmsPermissionKey>(CMS_PERMISSION_OPTIONS.map((option) => option.key));
+
+function normalizeStaffUsers(value: unknown): CmsStaff[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((candidate): CmsStaff[] => {
+    if (!candidate || typeof candidate !== 'object') return [];
+    const row = candidate as Record<string, unknown>;
+    if (typeof row.user_id !== 'string' || typeof row.email !== 'string') return [];
+    if (row.role !== 'super_admin' && row.role !== 'editorial') return [];
+    const permissions = Array.isArray(row.permissions)
+      ? [...new Set(row.permissions.filter((key): key is CmsPermissionKey => typeof key === 'string' && validPermissionKeys.has(key as CmsPermissionKey)))]
+      : [];
+
+    return [{
+      user_id: row.user_id,
+      email: row.email,
+      display_name: typeof row.display_name === 'string' ? row.display_name : '',
+      role: row.role,
+      created_at: typeof row.created_at === 'string' ? row.created_at : '',
+      permissions,
+    }];
+  });
+}
+
+async function describeFunctionError(error: unknown, fallback: string): Promise<string> {
+  if (!error || typeof error !== 'object') return fallback;
+  const candidate = error as { message?: unknown; context?: { json?: () => Promise<unknown>; text?: () => Promise<string> } };
+  const message = typeof candidate.message === 'string' ? candidate.message : '';
+  const response = candidate.context;
+  if (response?.json) {
+    try {
+      const payload = await response.json();
+      if (payload && typeof payload === 'object' && 'error' in payload && typeof payload.error === 'string') return payload.error;
+    } catch {
+      // Use the transport error below if the response body is unavailable or not JSON.
+    }
+  }
+  if (message && !/non-2xx|failed to send a request/i.test(message)) return message;
+  return fallback;
+}
 
 export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?: 'admin' | 'editor' }) {
   const router = useRouter();
@@ -217,13 +262,18 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
       })));
       }
 
-      if (cmsProfile.role === 'super_admin') {
-        const { data: staffResult, error: staffError } = await supabase.functions.invoke('cms-user-management', {
-          body: { action: 'list' },
-        });
-        if (!active) return;
-        if (staffError) setError('The editorial team could not be loaded. Confirm the CMS user-management function is deployed.');
-        else setStaff((staffResult?.users ?? []) as CmsStaff[]);
+        if (cmsProfile.role === 'super_admin') {
+          try {
+            const { data: staffResult, error: staffError } = await supabase.functions.invoke('cms-user-management', {
+              body: { action: 'list' },
+            });
+            if (!active) return;
+            if (staffError) setError('The editorial team could not be loaded. Please reload Team Access to try again.');
+            else setStaff(normalizeStaffUsers(staffResult?.users));
+          } catch {
+            if (!active) return;
+            setError('The editorial team could not be loaded. Please reload Team Access to try again.');
+          }
       }
       if (active) setIsLoading(false);
     };
@@ -580,18 +630,32 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
     setInviteEmail('');
     setInviteName('');
     setInvitePermissions(defaultStaffPermissions);
-    const { data: staffResult } = await supabase.functions.invoke('cms-user-management', { body: { action: 'list' } });
-    setStaff((staffResult?.users ?? []) as CmsStaff[]);
+    try {
+      const { data: staffResult, error: staffError } = await supabase.functions.invoke('cms-user-management', { body: { action: 'list' } });
+      if (staffError) setError('Invitation sent, but the team list could not be refreshed. Reload Team Access to try again.');
+      else setStaff(normalizeStaffUsers(staffResult?.users));
+    } catch {
+      setError('Invitation sent, but the team list could not be refreshed. Reload Team Access to try again.');
+    }
     setIsInviting(false);
   };
 
   const saveMemberPermissions = async (member: CmsStaff) => {
-    const nextPermissions = permissionDrafts[member.user_id] ?? member.permissions;
-    const { data, error: updateError } = await supabase.functions.invoke('cms-user-management', { body: { action: 'update_permissions', user_id: member.user_id, permissions: nextPermissions } });
-    if (updateError) { setError(data?.error ?? 'Could not save editor access.'); return; }
-    setStaff((current) => current.map((item) => item.user_id === member.user_id ? { ...item, permissions: nextPermissions } : item));
-    setPermissionDrafts((current) => { const next = { ...current }; delete next[member.user_id]; return next; });
-    setNotice(`Workspace access updated for ${member.email}.`);
+    const nextPermissions = permissionDrafts[member.user_id] ?? member.permissions ?? [];
+    setError('');
+    try {
+      const { data, error: updateError } = await supabase.functions.invoke('cms-user-management', { body: { action: 'update_permissions', user_id: member.user_id, permissions: nextPermissions } });
+      if (updateError) {
+        const serverMessage = typeof data?.error === 'string' ? data.error : await describeFunctionError(updateError, 'Could not save editor access. Check that the CMS user-management function and latest database migrations are deployed.');
+        setError(serverMessage);
+        return;
+      }
+      setStaff((current) => current.map((item) => item.user_id === member.user_id ? { ...item, permissions: nextPermissions } : item));
+      setPermissionDrafts((current) => { const next = { ...current }; delete next[member.user_id]; return next; });
+      setNotice(`Workspace access updated for ${member.email}.`);
+    } catch (saveError) {
+      setError(await describeFunctionError(saveError, 'Could not save editor access. Check your connection and try again.'));
+    }
   };
 
   const handleRemoveStaff = async (member: CmsStaff) => {
@@ -901,14 +965,15 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
     { view: 'storage', label: 'Media Storage', permission: 'media_storage', icon: Folder },
     { view: 'homepage', label: 'Homepage cards', permission: 'homepage_cards', icon: Images },
     { view: 'site-content', label: 'Page content', permission: 'page_magazine', icon: FileText },
+    { view: 'venues', label: 'Schedule & venues', permission: 'page_schedule', icon: MapPin },
     { view: 'animation', label: 'Animation tuner', permission: 'animation_settings', icon: Images },
   ];
   const visibleNavItems = navItems.filter((item) => item.view !== 'site-content' ? allowed(item.permission) : editablePages.length > 0);
 
   return (
     <main className="min-h-screen bg-[#F3F5F2] text-[#17251D] lg:flex">
-      <aside className="flex shrink-0 flex-col bg-[#0B1B11] px-4 py-5 text-white lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:px-5 lg:py-7">
-        <Link href={workspace === 'editor' ? '/editor' : '/admin'} className="mb-8 flex items-center gap-3 px-2">
+      <aside className="flex min-w-0 shrink-0 flex-col bg-[#0B1B11] px-3 py-3 text-white sm:px-4 sm:py-5 lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:px-5 lg:py-7">
+        <Link href={workspace === 'editor' ? '/editor' : '/admin'} className="mb-3 flex items-center gap-3 px-2 lg:mb-8">
           <span className="grid h-10 w-10 place-items-center rounded-xl border border-[#E4B03A]/35 bg-[#E4B03A]/10 text-[#E4B03A]">
             <Newspaper className="h-5 w-5" />
           </span>
@@ -918,15 +983,15 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
           </span>
         </Link>
 
-        <nav className="flex flex-wrap gap-2 lg:flex-col" aria-label={workspace === 'editor' ? 'Editor sections' : 'Admin sections'}>
-          {visibleNavItems.map(({ view, label, icon: Icon }) => <button key={view} type="button" onClick={() => setActiveView(view)} aria-current={activeView === view ? 'page' : undefined} className={`flex min-h-11 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition lg:flex-none ${activeView === view ? 'bg-white/10 text-white' : 'text-white/55 hover:bg-white/5 hover:text-white'}`}><Icon className="h-4 w-4" />{label}</button>)}
-          {allowed('live_chat') && <Link href={workspace === 'editor' ? '/editor/chat' : '/admin/chat'} className="flex min-h-11 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-semibold text-white/55 hover:bg-white/5 hover:text-white transition lg:flex-none"><MessageSquare className="h-4 w-4" /> Live Support Chat</Link>}
+        <nav className="-mx-1 flex max-w-full gap-2 overflow-x-auto pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:pb-0" aria-label={workspace === 'editor' ? 'Editor sections' : 'Admin sections'}>
+          {visibleNavItems.map(({ view, label, icon: Icon }) => <button key={view} type="button" onClick={() => setActiveView(view)} aria-current={activeView === view ? 'page' : undefined} className={`flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 text-xs font-semibold transition lg:min-h-11 lg:shrink lg:gap-3 lg:text-sm ${activeView === view ? 'bg-white/10 text-white' : 'text-white/55 hover:bg-white/5 hover:text-white'}`}><Icon className="h-4 w-4" />{label}</button>)}
+          {allowed('live_chat') && <Link href={workspace === 'editor' ? '/editor/chat' : '/admin/chat'} className="flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 text-xs font-semibold text-white/55 hover:bg-white/5 hover:text-white transition lg:min-h-11 lg:shrink lg:gap-3 lg:text-sm"><MessageSquare className="h-4 w-4" /> Live Support Chat</Link>}
           {profile.role === 'super_admin' && (
             <button
               type="button"
               onClick={() => setActiveView('team')}
               aria-current={activeView === 'team' ? 'page' : undefined}
-              className={`flex min-h-11 flex-1 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition lg:flex-none ${activeView === 'team' ? 'bg-white/10 text-white' : 'text-white/55 hover:bg-white/5 hover:text-white'}`}
+              className={`flex min-h-10 shrink-0 items-center gap-2 rounded-xl px-3 text-xs font-semibold transition lg:min-h-11 lg:shrink lg:gap-3 lg:text-sm ${activeView === 'team' ? 'bg-white/10 text-white' : 'text-white/55 hover:bg-white/5 hover:text-white'}`}
             >
               <Users className="h-4 w-4" /> Team access
             </button>
@@ -952,18 +1017,18 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
       </aside>
 
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between border-b border-[#E3E8E2] bg-[#F3F5F2]/90 px-4 backdrop-blur-xl sm:px-8">
+        <header className="sticky top-0 z-20 flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-[#E3E8E2] bg-[#F3F5F2]/95 px-3 py-2 backdrop-blur-xl sm:flex-nowrap sm:px-8 sm:py-0">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8D6B1B]">{activeView === 'team' ? 'People and permissions' : 'Content management'}</p>
-            <h1 className="mt-0.5 text-lg font-extrabold tracking-tight">{activeView === 'stories' ? 'Media newsroom' : activeView === 'galleries' ? 'Image galleries' : activeView === 'storage' ? 'Media Storage Buckets' : activeView === 'homepage' ? 'Homepage cards' : activeView === 'site-content' ? 'Page content' : activeView === 'animation' ? 'Animation tuner' : 'Editorial team'}</h1>
+            <h1 className="mt-0.5 text-lg font-extrabold tracking-tight">{activeView === 'stories' ? 'Media newsroom' : activeView === 'galleries' ? 'Image galleries' : activeView === 'storage' ? 'Media Storage Buckets' : activeView === 'homepage' ? 'Homepage cards' : activeView === 'site-content' ? 'Page content' : activeView === 'venues' ? 'Schedule & venues' : activeView === 'animation' ? 'Animation tuner' : 'Editorial team'}</h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 max-w-full flex-wrap items-center justify-end gap-2 sm:flex-nowrap sm:gap-3">
             <span className="hidden max-w-48 truncate text-xs font-semibold text-[#5B675F] sm:block">{profile.email}</span>
             <Link
               href="/media"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#DDE4DC] bg-white px-3.5 text-xs font-bold text-[#1E4D38] shadow-sm transition hover:border-[#1E4D38] hover:bg-[#F4F7F3]"
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#DDE4DC] bg-white px-2.5 text-[11px] font-bold text-[#1E4D38] shadow-sm transition hover:border-[#1E4D38] hover:bg-[#F4F7F3] sm:h-10 sm:gap-2 sm:px-3.5 sm:text-xs"
             >
               <ExternalLink className="h-4 w-4" /> View Media Page
             </Link>
@@ -989,6 +1054,8 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
             </section>
           ) : activeView === 'site-content' ? (
             <SiteContentEditor allowedPages={editablePages} onChooseImage={(setImage) => void openMediaPicker('site-content', setImage)} />
+          ) : activeView === 'venues' ? (
+            <VenueCatalogEditor onChooseImage={(setImage) => void openMediaPicker('site-content', setImage)} />
           ) : activeView === 'animation' ? (
             <HomepageAnimationTuner />
           ) : activeView === 'storage' ? (
@@ -1305,18 +1372,18 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
               <div className="divide-y divide-[#EEF1ED]">
                 {staff.map((member) => (
                   <div key={member.user_id} className="p-4 sm:px-6">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold">{member.display_name || member.email}</p>
                       <p className="mt-1 truncate text-xs text-[#758078]">{member.email}</p>
                     </div>
-                    <div className="flex shrink-0 items-center gap-3">
+                    <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-start">
                       <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${member.role === 'super_admin' ? 'bg-[#FFF4D8] text-[#8D6B1B]' : 'bg-[#EEF4EE] text-[#45684E]'}`}>{member.role === 'super_admin' ? 'Super admin' : 'Editorial'}</span>
                       {member.role === 'editorial' && <button type="button" onClick={() => handleRemoveStaff(member)} aria-label={`Remove ${member.email}`} className="grid h-9 w-9 place-items-center rounded-lg border border-[#E8D8D8] text-[#9A4B4B] hover:bg-rose-50"><Trash2 className="h-4 w-4" /></button>}
                     </div>
                     </div>
                     {member.role === 'editorial' && <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{CMS_PERMISSION_OPTIONS.map((option) => {
-                      const current = permissionDrafts[member.user_id] ?? member.permissions;
+                        const current = permissionDrafts[member.user_id] ?? member.permissions ?? [];
                       return <label key={option.key} className="flex cursor-pointer items-start gap-2 rounded-lg border border-[#E7EBE6] bg-[#FBFCFA] p-2.5 text-xs"><input type="checkbox" checked={current.includes(option.key)} onChange={(event) => setPermissionDrafts((drafts) => ({ ...drafts, [member.user_id]: event.target.checked ? [...current, option.key] : current.filter((key) => key !== option.key) }))} className="mt-0.5 accent-[#1E4D38]" /><span><strong className="block">{option.label}</strong><span className="mt-0.5 block text-[10px] leading-4 text-[#758078]">{option.description}</span></span></label>;
                     })}</div>}
                     {member.role === 'editorial' && permissionDrafts[member.user_id] && <div className="mt-3 flex flex-wrap items-center gap-3"><button type="button" onClick={() => void saveMemberPermissions(member)} className="h-9 rounded-lg bg-[#1E4D38] px-3 text-xs font-bold text-white">Save access</button>{permissionDrafts[member.user_id].length === 0 && <span className="text-xs text-[#9A4B4B]">Saving will revoke all workspace access.</span>}</div>}

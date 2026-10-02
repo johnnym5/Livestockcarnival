@@ -1,5 +1,5 @@
-import AdminDashboard from '@/components/admin/AdminDashboard';
+import AdminDashboardClient from '@/components/admin/AdminDashboardClient';
 
 export default function EditorPage() {
-  return <AdminDashboard workspace="editor" />;
+  return <AdminDashboardClient workspace="editor" />;
 }
