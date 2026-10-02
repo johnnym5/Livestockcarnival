@@ -1,0 +1,14 @@
+{
+  "id": "/",
+  "name": "Renewed Hope National Livestock Carnival 2026",
+  "short_name": "Livestock Carnival",
+  "description": "Official carnival programme, venue guide, and event updates.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FBFBFA",
+  "theme_color": "#1E4D38",
+  "icons": [
+    { "src": "/assets/branding/carnival-logo-solid.jpeg", "sizes": "any", "type": "image/jpeg", "purpose": "any maskable" }
+  ]
+}

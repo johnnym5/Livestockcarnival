@@ -215,7 +215,7 @@ export default function ContactPage() {
                 Explore our interactive venue map to find all attraction zones, food courts, and essential facilities.
               </p>
               <Link
-                href="/venue-map"
+                href="/schedule#map"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#E4B03A] text-[#111827] font-bold tracking-wide rounded-xl hover:bg-[#D4A030] transition-all shadow-button hover:-translate-y-0.5"
               >
                 Open Interactive Venue Map

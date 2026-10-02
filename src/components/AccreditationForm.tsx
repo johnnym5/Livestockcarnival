@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Upload, FileCheck, AlertTriangle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 import { z } from 'zod';
 import { fadeInScale, accordionExpand } from '@/lib/motion';
 import { supabase } from '@/lib/supabaseClient';
@@ -96,7 +97,7 @@ export default function AccreditationForm() {
       setIsSubmitting(true);
 
       try {
-        let fileUrl = '';
+        let credentialPath = '';
 
         // 1. Upload PDF credential to Supabase Storage if file exists
         if (file) {
@@ -111,14 +112,8 @@ export default function AccreditationForm() {
               upsert: false,
             });
 
-          if (!uploadError) {
-            const { data: publicUrlData } = supabase.storage
-              .from('credentials')
-              .getPublicUrl(filePath);
-            fileUrl = publicUrlData.publicUrl;
-          } else {
-            console.warn('[Storage Notice] Supabase storage upload note:', uploadError.message);
-          }
+          if (uploadError) throw new Error('Your credential could not be securely uploaded. Please try again.');
+          credentialPath = filePath;
         }
 
         // 2. Insert record into Supabase "accreditations" table
@@ -130,14 +125,15 @@ export default function AccreditationForm() {
               organization: formData.organization,
               nin: formData.nin,
               email: formData.email,
-              file_url: fileUrl,
+              file_path: credentialPath,
               status: 'pending',
               created_at: new Date().toISOString(),
             },
           ]);
 
         if (insertError) {
-          console.warn('[Database Notice] Supabase database insert note:', insertError.message);
+          if (credentialPath) await supabase.storage.from('credentials').remove([credentialPath]);
+          throw new Error('Your application could not be saved. Please try again or contact the secretariat.');
         }
 
         setIsSubmitting(false);
@@ -145,8 +141,7 @@ export default function AccreditationForm() {
       } catch (err) {
         console.error('[Submission Error] Submission handling error:', err);
         setIsSubmitting(false);
-        // Fallback to success UI so user experience remains smooth
-        setIsSuccess(true);
+        setServerError(err instanceof Error ? err.message : 'Your application could not be submitted. Please try again.');
       }
     }
   };
@@ -194,6 +189,7 @@ export default function AccreditationForm() {
           onSubmit={handleSubmit}
           className="bg-white border border-slate-200/80 rounded-2xl p-8 sm:p-12 shadow-card space-y-6"
         >
+          <p className="rounded-xl border border-[#DDE8DC] bg-[#F5F8F3] p-4 text-xs leading-5 text-[#526057]">Your NIN and uploaded credential are used to review this accreditation application. The credential file is private and your application records are removed after review is complete and the event has ended. See the <Link href="/privacy" className="font-semibold text-[#1E4D38] underline">Privacy Policy</Link>.</p>
           {serverError && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />

@@ -25,6 +25,8 @@ export const metadata: Metadata = {
     shortcut: "/assets/branding/carnival-logo-solid.jpeg",
     apple: "/assets/branding/carnival-logo-solid.jpeg",
   },
+  manifest: '/manifest.json',
+  appleWebApp: { capable: true, title: 'Livestock Carnival', statusBarStyle: 'default' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -89,10 +89,10 @@ src/
 | `/nhesics` | National Herd Health, Identification, Security, and traceability concepts, digital herd registry, health/security, investment and value-chain themes. `src/app/nhesics/page.tsx`. |
 | `/fashion-parade` | Livestock fashion and cultural heritage feature, breed directory/filtering, imagery, welfare and parade content. Defaults in `src/data/fashionBreeds.ts`; page copy and breed list can be overridden from Supabase. |
 | `/attractions` | Festival arenas and signature attractions, with livestock types and venue/schedule links. Uses `src/data/attractions.json` and page-local catalog content. |
-| `/schedule` | Three-day program with day and track filters, editorially managed schedule override, and downloadable calendar events. `ScheduleTab.tsx`, `src/data/carnivalProgram.ts`, `src/lib/ics.ts`. |
+| `/schedule` | Three-day program with day and track filters, merged interactive venue map experience, editorially managed schedule override, and downloadable calendar events. `ScheduleVenueExperience.tsx`, `src/data/carnivalProgram.ts`, `src/lib/ics.ts`. |
 | `/livestock` | Livestock catalog with categories and detail UI; reads editable page content first, then database catalog, then local defaults. `LivestockGrid.tsx`, `src/data/livestockCatalog.ts`. |
 | `/media` | Published newsroom posts and image galleries with story/gallery detail and sharing interactions. `MediaPostsFeed.tsx`, `MediaGalleryFeed.tsx`. |
-| `/venue-map` | Interactive Leaflet venue map. `LeafletMap.tsx` is loaded dynamically without SSR. Venue map images and references are in `public/assets/venue-map/`. |
+| `/venue-map` | Redirects to `/schedule#map` (interactive venue map now merged into the Schedule & Map experience). |
 | `/contact` | Contact information, departments, social channels, vendor/pass destinations, and navigation to venue information. |
 | `/accreditation` | Press/media accreditation explanation and submission form. `AccreditationForm.tsx` validates identity/contact fields and a PDF assignment letter. |
 | `/admin/login` | CMS login and role-based redirect. |

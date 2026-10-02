@@ -39,7 +39,7 @@ The **Renewed Hope National Livestock Carnival 2026** is the flagship national c
 ## 2. Key Event Information & Schedule Highlights
 
 - **Event Window:** Saturday, 21 November 2026 – Monday, 23 November 2026
-- **Location & Venue:** Old Parade Ground, Area 10, Garki, Abuja, FCT, Nigeria (`/venue-map`)
+- **Location & Venue:** Old Parade Ground, Area 10, Garki, Abuja, FCT, Nigeria (`/schedule#map`)
 - **Key Tracks & Arenas:**
   - **Main Grand Arena**: Opening Ceremonies, Cultural Fashion Parades, Presidential & Ministerial Addresses.
   - **NHESICS Tech Pavilion**: Live demonstrations of livestock identification, digital health registries, and traceability tech.

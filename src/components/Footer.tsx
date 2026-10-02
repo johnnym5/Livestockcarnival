@@ -56,7 +56,7 @@ export default function Footer() {
               <Link href="/schedule" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
                 Livestock Breed Judging
               </Link>
-              <Link href="/venue-map" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
+              <Link href="/schedule#map" className="text-[#9CA3AF] hover:text-white text-sm transition-colors">
                 Interactive Venue Map
               </Link>
             </nav>
@@ -138,8 +138,8 @@ export default function Footer() {
             <a href="https://instagram.com/livestockcarnival" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               Instagram
             </a>
-            <Link href="/contact" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/accreditation" className="hover:text-white transition-colors">Terms of Accreditation</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Use</Link>
           </div>
         </div>
       </div>

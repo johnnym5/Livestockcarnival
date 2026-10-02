@@ -6,7 +6,7 @@ const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const appUrl = Deno.env.get('SITE_URL') ?? 'https://livestockcarnival.ng';
 const permissionKeys = new Set([
   'stories', 'galleries', 'media_storage', 'homepage_cards', 'page_magazine',
-  'page_schedule', 'page_livestock', 'page_fashion', 'animation_settings', 'live_chat',
+  'page_schedule', 'page_livestock', 'page_fashion', 'animation_settings', 'live_chat', 'push_notifications',
 ]);
 
 const parsePermissions = (input: unknown): string[] | null => {

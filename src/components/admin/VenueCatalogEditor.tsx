@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { MapContainer, TileLayer, CircleMarker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { divIcon } from 'leaflet';
 import { ImagePlus, MapPin, Plus, Save, Trash2 } from 'lucide-react';
 import { CARNIVAL_PROGRAM, type DayProgram } from '@/data/carnivalProgram';
-import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES, type CarnivalVenue } from '@/data/venueCatalog';
+import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES, type CarnivalVenue, venueColor } from '@/data/venueCatalog';
 import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
 import { supabase } from '@/lib/supabase/client';
 import 'leaflet/dist/leaflet.css';
@@ -28,24 +29,29 @@ export default function VenueCatalogEditor({ onChooseImage }: { onChooseImage: (
   const [selectedId, setSelectedId] = useState(DEFAULT_VENUES[0]?.id ?? '');
   const [placing, setPlacing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [message, setMessage] = useState('');
   const selected = content.venues.find((venue) => venue.id === selectedId) ?? null;
   const events = useMemo(() => Object.entries(content.days).flatMap(([dayKey, day]) => day.timeBlocks.map((event) => ({ dayKey, day, event }))), [content.days]);
 
   useEffect(() => {
     let active = true;
-    void supabase.from('site_page_content').select('content').eq('page_key', 'schedule').maybeSingle().then(({ data }) => {
-      if (!active || !data?.content || typeof data.content !== 'object') return;
-      const saved = data.content as JsonRecord;
-      setBaseContent(saved);
-      const defaults = DEFAULT_SITE_CONTENT.schedule as unknown as Content;
-      const next: Content = {
-        days: (saved.days as Content['days']) || defaults.days,
-        venues: (saved.venues as CarnivalVenue[]) || defaults.venues,
-        eventVenues: (saved.eventVenues as Record<string, string[]>) || defaults.eventVenues,
-      };
-      setContent(next);
-      setSelectedId(next.venues[0]?.id ?? '');
+    void supabase.from('site_page_content').select('content').eq('page_key', 'schedule').maybeSingle().then(({ data, error }) => {
+      if (!active) return;
+      if (error) setMessage(`Could not load the saved schedule: ${error.message}`);
+      if (data?.content && typeof data.content === 'object') {
+        const saved = data.content as JsonRecord;
+        setBaseContent(saved);
+        const defaults = DEFAULT_SITE_CONTENT.schedule as unknown as Content;
+        const next: Content = {
+          days: (saved.days as Content['days']) || defaults.days,
+          venues: (saved.venues as CarnivalVenue[]) || defaults.venues,
+          eventVenues: (saved.eventVenues as Record<string, string[]>) || defaults.eventVenues,
+        };
+        setContent(next);
+        setSelectedId(next.venues[0]?.id ?? '');
+      }
+      setLoaded(true);
     });
     return () => { active = false; };
   }, []);
@@ -61,7 +67,7 @@ export default function VenueCatalogEditor({ onChooseImage }: { onChooseImage: (
     return { ...current, eventVenues: { ...current.eventVenues, [eventId]: [...ids] } };
   });
   const save = async () => {
-    if (saving) return;
+    if (saving || !loaded) return;
     if (content.venues.some((venue) => !venue.name.trim() || !venue.zone.trim())) { setMessage('Every venue needs a name and zone before publishing.'); return; }
     setSaving(true);
     const { error } = await supabase.from('site_page_content').upsert({ page_key: 'schedule', content: { ...baseContent, ...content }, status: 'published', updated_at: new Date().toISOString() });
@@ -77,12 +83,22 @@ export default function VenueCatalogEditor({ onChooseImage }: { onChooseImage: (
         <MapContainer center={[9.0428, 7.489]} zoom={17} className="h-full w-full">
           <TileLayer url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}" attribution="&copy; Google Satellite Imagery" maxZoom={20} />
           <PointPicker active={placing} onPick={(latitude, longitude) => { updateSelected({ latitude, longitude }); setPlacing(false); }} />
-          {content.venues.map((venue) => <CircleMarker key={venue.id} center={[venue.latitude, venue.longitude]} radius={venue.id === selectedId ? 12 : 8} pathOptions={{ fillColor: venue.id === selectedId ? '#D4AF37' : '#1E4D38', color: '#fff', weight: 2, fillOpacity: 0.95 }} eventHandlers={{ click: () => { setSelectedId(venue.id); setPlacing(false); } }} />)}
+          {content.venues.map((venue, index) => {
+            const selectedMarker = venue.id === selectedId;
+            const size = selectedMarker ? 36 : 30;
+            const icon = divIcon({
+              className: 'venue-number-marker',
+              html: `<span style="width:${size}px;height:${size}px;background:${venueColor(index)};border:2px solid white;border-radius:50%;box-shadow:0 2px 8px #0008;color:white;display:flex;align-items:center;justify-content:center;font:800 12px/1 Arial,sans-serif">${index + 1}</span>`,
+              iconSize: [size, size],
+              iconAnchor: [size / 2, size / 2],
+            });
+            return <Marker key={venue.id} position={[venue.latitude, venue.longitude]} icon={icon} title={`${index + 1}. ${venue.name}`} eventHandlers={{ click: () => { setSelectedId(venue.id); setPlacing(false); } }} />;
+          })}
         </MapContainer>
         <div className="absolute left-3 top-3 z-[500] flex gap-2"><button type="button" disabled={!selected} onClick={() => setPlacing((value) => !value)} className={`inline-flex h-9 items-center gap-2 rounded-lg px-3 text-xs font-bold shadow ${placing ? 'bg-[#D4AF37] text-[#111827]' : 'bg-white text-[#1E4D38]'}`}><MapPin className="h-4 w-4" />{placing ? 'Click map to place point' : 'Place point on map'}</button></div>
       </div>
       <div className="max-h-[680px] space-y-4 overflow-y-auto p-4 sm:p-5">
-        <div className="flex gap-2 overflow-x-auto pb-1">{content.venues.map((venue) => <button key={venue.id} onClick={() => { setSelectedId(venue.id); setPlacing(false); }} className={`shrink-0 rounded-md border px-3 py-2 text-xs font-bold ${selectedId === venue.id ? 'border-[#1E4D38] bg-[#EAF2EA] text-[#1E4D38]' : 'border-[#DDE4DC] bg-white text-[#59635D]'}`}>{venue.name || 'New venue'}</button>)}</div>
+        <div className="flex gap-2 overflow-x-auto pb-1">{content.venues.map((venue, index) => <button key={venue.id} onClick={() => { setSelectedId(venue.id); setPlacing(false); }} className={`inline-flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-xs font-bold ${selectedId === venue.id ? 'border-[#1E4D38] bg-[#EAF2EA] text-[#1E4D38]' : 'border-[#DDE4DC] bg-white text-[#59635D]'}`}><span className="grid h-5 w-5 place-items-center rounded-full text-[10px] font-extrabold text-white" style={{ backgroundColor: venueColor(index) }}>{index + 1}</span>{venue.name || 'New venue'}</button>)}</div>
         {selected ? <>
           <div className="grid gap-3 sm:grid-cols-2"><label className="text-[11px] font-bold text-[#526057]">Venue name<input value={selected.name} onChange={(event) => updateSelected({ name: event.target.value })} className="mt-1 h-9 w-full rounded border border-[#DDE4DC] px-2 text-xs font-normal" /></label><label className="text-[11px] font-bold text-[#526057]">Zone<input value={selected.zone} onChange={(event) => updateSelected({ zone: event.target.value })} className="mt-1 h-9 w-full rounded border border-[#DDE4DC] px-2 text-xs font-normal" /></label></div>
           <label className="block text-[11px] font-bold text-[#526057]">Description<textarea value={selected.description} onChange={(event) => updateSelected({ description: event.target.value })} rows={3} className="mt-1 w-full resize-y rounded border border-[#DDE4DC] p-2 text-xs font-normal" /></label>
@@ -93,6 +109,6 @@ export default function VenueCatalogEditor({ onChooseImage }: { onChooseImage: (
         </> : <p className="py-10 text-center text-sm text-[#68746C]">Add a venue to begin.</p>}
       </div>
     </div>
-    <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E9EDE8] bg-[#FBFCFA] px-4 py-3 sm:px-5"><span className="text-[11px] text-[#68746C]">Changes publish with the schedule page content.</span><button type="button" onClick={() => void save()} disabled={saving} className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#1E4D38] px-3 text-xs font-extrabold text-white disabled:opacity-50"><Save className="h-4 w-4" />{saving ? 'Publishing…' : 'Publish venues'}</button></footer>
+    <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E9EDE8] bg-[#FBFCFA] px-4 py-3 sm:px-5"><span className="text-[11px] text-[#68746C]">{loaded ? 'Changes publish with the schedule page content.' : 'Loading saved schedule and venue content…'}</span><button type="button" onClick={() => void save()} disabled={saving || !loaded} className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#1E4D38] px-3 text-xs font-extrabold text-white disabled:opacity-50"><Save className="h-4 w-4" />{saving ? 'Publishing…' : 'Publish venues'}</button></footer>
   </section>;
 }

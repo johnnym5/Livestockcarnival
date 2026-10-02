@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Footer from '@/components/Footer';
+import PushOptIn from '@/components/PushOptIn';
 import Header from '@/components/Header';
 import SmoothScroll from '@/components/SmoothScroll';
 import InitialLoadOverlay from '@/components/InitialLoadOverlay';
@@ -131,6 +132,7 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
           >
             <main className="flex-1">{children}</main>
             {!isWorkspaceRoute && <Footer />}
+            {!isWorkspaceRoute && <PushOptIn />}
           </motion.div>
         </AnimatePresence>
         {!isWorkspaceRoute && <LiveChatWidget />}

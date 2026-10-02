@@ -38,17 +38,17 @@ import { CmsProfile, CmsStaff, formatFileSize, makeSlug, MediaGallery, MediaPost
 import { supabase } from '@/lib/supabase/client';
 import SiteContentEditor from '@/components/admin/SiteContentEditor';
 import HomepageAnimationTuner from '@/components/admin/HomepageAnimationTuner';
+import PushCampaignManager from '@/components/admin/PushCampaignManager';
 import { CMS_PERMISSION_OPTIONS, type CmsPermissionKey } from '@/lib/cmsPermissions';
 
 const VenueCatalogEditor = dynamic(() => import('@/components/admin/VenueCatalogEditor'), { ssr: false });
 
-type AdminView = 'stories' | 'galleries' | 'storage' | 'team' | 'homepage' | 'site-content' | 'venues' | 'animation';
+type AdminView = 'stories' | 'galleries' | 'storage' | 'team' | 'homepage' | 'site-content' | 'venues' | 'animation' | 'push';
 type StorageBucketName = 'livestock-images' | 'media-assets' | 'credentials';
 
-const BUCKET_OPTIONS: { id: StorageBucketName; label: string; maxMb: number }[] = [
+const BUCKET_OPTIONS: { id: Exclude<StorageBucketName, 'credentials'>; label: string; maxMb: number }[] = [
   { id: 'livestock-images', label: 'livestock-images (Public, 50MB, Any)', maxMb: 50 },
   { id: 'media-assets', label: 'media-assets (Public, 12MB, Images)', maxMb: 12 },
-  { id: 'credentials', label: 'credentials (Public, 50MB, Any)', maxMb: 50 },
 ];
 
 interface PostDraft {
@@ -967,6 +967,7 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
     { view: 'site-content', label: 'Page content', permission: 'page_magazine', icon: FileText },
     { view: 'venues', label: 'Schedule & venues', permission: 'page_schedule', icon: MapPin },
     { view: 'animation', label: 'Animation tuner', permission: 'animation_settings', icon: Images },
+    { view: 'push', label: 'Push announcements', permission: 'push_notifications', icon: Send },
   ];
   const visibleNavItems = navItems.filter((item) => item.view !== 'site-content' ? allowed(item.permission) : editablePages.length > 0);
 
@@ -1020,7 +1021,7 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
         <header className="sticky top-0 z-20 flex min-h-16 flex-wrap items-center justify-between gap-3 border-b border-[#E3E8E2] bg-[#F3F5F2]/95 px-3 py-2 backdrop-blur-xl sm:flex-nowrap sm:px-8 sm:py-0">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8D6B1B]">{activeView === 'team' ? 'People and permissions' : 'Content management'}</p>
-            <h1 className="mt-0.5 text-lg font-extrabold tracking-tight">{activeView === 'stories' ? 'Media newsroom' : activeView === 'galleries' ? 'Image galleries' : activeView === 'storage' ? 'Media Storage Buckets' : activeView === 'homepage' ? 'Homepage cards' : activeView === 'site-content' ? 'Page content' : activeView === 'venues' ? 'Schedule & venues' : activeView === 'animation' ? 'Animation tuner' : 'Editorial team'}</h1>
+            <h1 className="mt-0.5 text-lg font-extrabold tracking-tight">{activeView === 'stories' ? 'Media newsroom' : activeView === 'galleries' ? 'Image galleries' : activeView === 'storage' ? 'Media Storage Buckets' : activeView === 'homepage' ? 'Homepage cards' : activeView === 'site-content' ? 'Page content' : activeView === 'venues' ? 'Schedule & venues' : activeView === 'animation' ? 'Animation tuner' : activeView === 'push' ? 'Push announcements' : 'Editorial team'}</h1>
           </div>
           <div className="flex min-w-0 max-w-full flex-wrap items-center justify-end gap-2 sm:flex-nowrap sm:gap-3">
             <span className="hidden max-w-48 truncate text-xs font-semibold text-[#5B675F] sm:block">{profile.email}</span>
@@ -1058,6 +1059,8 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
             <VenueCatalogEditor onChooseImage={(setImage) => void openMediaPicker('site-content', setImage)} />
           ) : activeView === 'animation' ? (
             <HomepageAnimationTuner />
+          ) : activeView === 'push' ? (
+            <PushCampaignManager />
           ) : activeView === 'storage' ? (
             <>
               {/* Storage Summary Cards */}

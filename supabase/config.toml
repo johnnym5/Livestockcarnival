@@ -1,0 +1,4 @@
+[functions.push-notifications]
+# Public subscribe/unsubscribe calls use anonymous requests; the function
+# validates campaigns and cron requests itself before privileged operations.
+verify_jwt = false

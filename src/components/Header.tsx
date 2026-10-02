@@ -32,7 +32,6 @@ export default function Header() {
     { name: 'Schedule', href: '/schedule' },
     { name: 'Livestock', href: '/livestock' },
     { name: 'Media', href: '/media' },
-    { name: 'Venue Map', href: '/venue-map' },
     { name: 'Contact', href: '/contact' },
     { name: 'Staff login', href: '/admin/login' },
   ];

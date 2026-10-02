@@ -144,7 +144,7 @@ export default function AttractionsPage() {
                         {attraction.scheduleWindow}
                       </span>
                       <Link
-                        href="/venue-map"
+                        href="/schedule#map"
                         className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#1E4D38] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#163B2B] shadow-button hover:shadow-lg transition-all hover:-translate-y-0.5"
                       >
                         <span>Locate on Map</span>
@@ -224,7 +224,7 @@ export default function AttractionsPage() {
                         <span>Certified Exhibition Breed</span>
                       </div>
                       <Link
-                        href="/venue-map"
+                        href="/schedule#map"
                         className="text-xs font-bold text-[#1E4D38] hover:text-[#8D6B1B] transition-colors inline-flex items-center gap-1"
                       >
                         <span>Locate Stalls</span>

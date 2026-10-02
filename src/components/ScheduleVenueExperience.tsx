@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-leaflet';
+import { divIcon } from 'leaflet';
 import { Clock3, MapPin, Navigation, CalendarPlus, Map, List } from 'lucide-react';
 import { CARNIVAL_PROGRAM, type DayProgram, type TimeBlock } from '@/data/carnivalProgram';
-import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES, type CarnivalVenue } from '@/data/venueCatalog';
+import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES, type CarnivalVenue, venueColor } from '@/data/venueCatalog';
 import { generateICS } from '@/lib/ics';
 import { supabase } from '@/lib/supabase/client';
 import 'leaflet/dist/leaflet.css';
@@ -98,6 +99,7 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
     const linked = eventEntries.find(({ event }) => (eventVenues[event.id] || []).includes(venue.id));
     if (linked) {
       updateUrl(linked.dayKey, linked.event.id);
+      setTrack('All');
     } else {
       updateUrl(dayKey, null);
     }
@@ -112,7 +114,7 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
   };
 
   return (
-    <main className="min-h-[calc(100dvh-76px)] bg-[#F7F8F5] px-3 pb-6 pt-24 sm:px-5 lg:px-8">
+    <div className="min-h-[calc(100dvh-76px)] bg-[#F7F8F5] px-3 pb-6 pt-24 sm:px-5 lg:px-8">
       <div className="mx-auto max-w-[1600px]">
         <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div><p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#8D6B1B]">Official Carnival Guide</p><h1 className="mt-1 text-2xl font-black tracking-tight text-[#111827] sm:text-3xl">Schedule &amp; Venue Map</h1><p className="mt-1 text-sm text-[#59635D]">Choose a day or event to see where the celebration happens.</p></div>
@@ -151,11 +153,19 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
                 <InvalidateMapSize />
                 <TileLayer url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}" attribution="&copy; Google Satellite Imagery" maxZoom={20} />
                 <FlyToSelection venue={selectedVenue} />
-                {venues.map((venue) => {
+                {venues.map((venue, index) => {
                   const active = selectedVenueId === venue.id || selectedEventVenues.some((item) => item.id === venue.id);
-                  return <CircleMarker key={venue.id} center={[venue.latitude, venue.longitude]} radius={active ? 13 : 9} pathOptions={{ fillColor: active ? '#D4AF37' : '#1E4D38', color: '#fff', weight: 2, fillOpacity: 0.96 }} eventHandlers={{ click: () => chooseVenue(venue) }}>
+                  const color = venueColor(index);
+                  const icon = divIcon({
+                    className: 'venue-number-marker',
+                    html: `<span style="width:${active ? 36 : 30}px;height:${active ? 36 : 30}px;background:${color};border:2px solid white;border-radius:50%;box-shadow:0 2px 8px #0008;color:white;display:flex;align-items:center;justify-content:center;font:800 12px/1 Arial,sans-serif">${index + 1}</span>`,
+                    iconSize: [active ? 36 : 30, active ? 36 : 30],
+                    iconAnchor: [active ? 18 : 15, active ? 18 : 15],
+                  });
+                  return <Marker key={venue.id} position={[venue.latitude, venue.longitude]} icon={icon} title={`${index + 1}. ${venue.name}`} eventHandlers={{ click: () => chooseVenue(venue) }}>
+                    <Tooltip direction="top" offset={[0, -12]}>{`${index + 1}. ${venue.name}`}</Tooltip>
                     <Popup><button className="w-56 text-left" onClick={() => chooseVenue(venue)}><strong className="text-sm text-[#173D2E]">{venue.name}</strong><span className="mt-1 block text-xs text-slate-600">{venue.zone}</span><span className="mt-2 block text-[11px] font-bold text-[#1E4D38]">View venue and related events</span></button></Popup>
-                  </CircleMarker>;
+                  </Marker>;
                 })}
               </MapContainer>
             </div>
@@ -167,6 +177,6 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
           </div>
         </section>
       </div>
-    </main>
+    </div>
   );
 }

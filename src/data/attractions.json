@@ -16,7 +16,7 @@
       "Midway Opening, live cultural troupes, animal costume parade floats, beer garden & karaoke"
     ],
     "scheduleWindow": "Day 1 08:00 AM – 21:00 PM",
-    "venueTarget": "/venue-map#zone-3"
+    "venueTarget": "/schedule#map"
   },
   {
     "id": "suya-village",
@@ -34,7 +34,7 @@
       "Open-air garden acoustic music, evening karaoke & late-night artisanal roasting"
     ],
     "scheduleWindow": "Daily 12:00 PM – 23:00 PM",
-    "venueTarget": "/venue-map#zone-2"
+    "venueTarget": "/schedule#map"
   },
   {
     "id": "fashion-runway",
@@ -53,7 +53,7 @@
       "Open crafted, visual, needlework, culinary, and garden entries display"
     ],
     "scheduleWindow": "Nov 21 & 22 · Fashion Arena",
-    "venueTarget": "/venue-map#mainstage"
+    "venueTarget": "/schedule#map"
   },
   {
     "id": "rfid-auctions",
@@ -72,7 +72,7 @@
       "Meat and dairy processing technology exhibition"
     ],
     "scheduleWindow": "Nov 22 & 23 · Auction Arena",
-    "venueTarget": "/venue-map#zone-1"
+    "venueTarget": "/schedule#map"
   },
   {
     "id": "investment-summit",
@@ -91,7 +91,7 @@
       "NHESICS export certification and cold-chain infrastructure briefings"
     ],
     "scheduleWindow": "Nov 22 & 23 · B2B Marquee",
-    "venueTarget": "/venue-map#b2b"
+    "venueTarget": "/schedule#map"
   },
   {
     "id": "pastoralist-forum",
@@ -110,7 +110,7 @@
       "Mobile RFID e-tagging and biosecurity telemetry clinics"
     ],
     "scheduleWindow": "Nov 22 · 15:30 PM – 18:00 PM",
-    "venueTarget": "/venue-map#hall-a"
+    "venueTarget": "/schedule#map"
   },
   {
     "id": "breed-judging",
@@ -129,7 +129,7 @@
       "Beef Show Ring Livestock Judging Awards & Breed Champions Trophy Presentation"
     ],
     "scheduleWindow": "Nov 22 & 23 · Main Ring",
-    "venueTarget": "/venue-map#zone-1"
+    "venueTarget": "/schedule#map"
   },
   {
     "id": "pet-arts-concerts",
@@ -149,6 +149,6 @@
       "Grand Finale Concert featuring superstar Top Nigerian Artist #2 & Laser Light Show"
     ],
     "scheduleWindow": "Daily 09:00 AM – 23:00 PM",
-    "venueTarget": "/venue-map#mainstage"
+    "venueTarget": "/schedule#map"
   }
 ]

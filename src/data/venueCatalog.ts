@@ -8,6 +8,12 @@ export interface CarnivalVenue {
   image: string;
 }
 
+export const VENUE_COLORS = ['#1E4D38', '#C2410C', '#2563EB', '#7C3AED', '#BE123C', '#0F766E', '#A16207', '#334155'] as const;
+
+export function venueColor(index: number) {
+  return VENUE_COLORS[index % VENUE_COLORS.length];
+}
+
 export const DEFAULT_VENUES: CarnivalVenue[] = [
   { id: 'zone-1', name: 'Agro-Commerce & Live-Weight Market', zone: 'North-West Field', description: 'Precision livestock weighing, certified trade, and pastoral commerce.', latitude: 9.042998, longitude: 7.487429, image: '/assets/attractions/arena-breed-judging-court.jpg' },
   { id: 'zone-2', name: 'Twilight Suya & Culinary Village', zone: 'South-West Field', description: 'Open-flame suya, kilishi craft, spice markets, and festival dining.', latitude: 9.0418, longitude: 7.4878, image: '/assets/home/story-suya-market-couples.jpg' },

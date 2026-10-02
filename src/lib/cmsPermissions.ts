@@ -9,6 +9,7 @@ export const CMS_PERMISSION_OPTIONS = [
   { key: 'page_fashion', label: 'Fashion page', description: 'Edit page copy and the breed catalog.' },
   { key: 'animation_settings', label: 'Animation settings', description: 'Tune site motion and the homepage card deck.' },
   { key: 'live_chat', label: 'Live support chat', description: 'View and reply to visitor support threads.' },
+  { key: 'push_notifications', label: 'Push notifications', description: 'Send and schedule public site announcements.' },
 ] as const;
 
 export type CmsPermissionKey = (typeof CMS_PERMISSION_OPTIONS)[number]['key'];
