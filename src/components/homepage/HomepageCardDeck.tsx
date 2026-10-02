@@ -339,8 +339,10 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
   const deckY = useTransform(scrollYProgress, [0, settings.cardScrollStart, settings.fanStartProgress, settings.fanEndProgress, settings.fanHoldEndProgress, restackStart, settings.magazineEndProgress], [stackOffset, stackOffset - viewportHeight * 0.08, stackOffset - viewportHeight * 0.08, -fanVerticalLift, -fanVerticalLift, -fanVerticalLift, stackOffset]);
   const deckScale = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress, restackStart, settings.magazineEndProgress], [isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop, isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop, isMobile ? settings.fanScaleMobile : settings.fanScaleDesktop, isMobile ? settings.fanScaleMobile : settings.fanScaleDesktop, (isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop) * settings.magazineScale]);
   const magazineY = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [viewportHeight, 0]);
-  const deckOpacity = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [1, 0]);
-  const atmosphereOpacity = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [0.22 + (settings.heroBackgroundIntensity / 10) * 0.46, 0]);
+  const deckFadeEnd = settings.fanHoldEndProgress + (settings.magazineEndProgress - settings.fanHoldEndProgress) * 0.35;
+  const atmosphereFadeEnd = settings.fanHoldEndProgress + (settings.magazineEndProgress - settings.fanHoldEndProgress) * 0.5;
+  const deckOpacity = useTransform(scrollYProgress, [settings.fanHoldEndProgress, deckFadeEnd, settings.magazineEndProgress], [1, 0, 0]);
+  const atmosphereOpacity = useTransform(scrollYProgress, [settings.fanHoldEndProgress, atmosphereFadeEnd, settings.magazineEndProgress], [0.22 + (settings.heroBackgroundIntensity / 10) * 0.46, 0, 0]);
   const heroInitial = simplifyMotion ? false : 'hidden';
   const revealOrders = [
     ['logo', 'eyebrow', 'title', 'intro'],
