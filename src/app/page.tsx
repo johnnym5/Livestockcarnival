@@ -94,6 +94,9 @@ export default function Home() {
     };
   }, []);
 
+  const magazineStories = resolveHomepageMagazineStories(magazineContent);
+  const hasDeckLeadStory = magazineOverlapsDeck && Boolean(magazineStories[0]?.image);
+
   return (
     <div id="home-page" data-home-ready={contentReady ? 'true' : 'false'} className="min-h-screen overflow-x-clip bg-[#FBFBFA] text-[#111827]">
       <HomepageCardDeck
@@ -106,6 +109,7 @@ export default function Home() {
           backgroundColor: String(magazineContent.backgroundColor),
           accentColor: String(magazineContent.accentColor),
         }}
+        leadStory={hasDeckLeadStory ? magazineStories[0] : undefined}
       />
 
       <section
@@ -119,7 +123,7 @@ export default function Home() {
             eyebrow={String(magazineContent.eyebrow)}
             title={String(magazineContent.title)}
             intro={String(magazineContent.intro)}
-            stories={resolveHomepageMagazineStories(magazineContent)}
+            stories={hasDeckLeadStory ? magazineStories.slice(1) : magazineStories}
             accentColor={String(magazineContent.accentColor)}
             showHeader={!magazineOverlapsDeck}
           />

@@ -9,6 +9,7 @@ import { ArrowRight, X } from 'lucide-react';
 import { DEFAULT_HOMEPAGE_MOTION, normalizeHomepageMotion, type HomepageMotionSettings } from '@/lib/homepageMotion';
 import type { CardData } from '@/lib/homepageCards';
 import { HomepageMagazineHeading } from '@/components/homepage/HomepageMagazine';
+import { HOMEPAGE_MAGAZINE_DESTINATIONS, type HomepageMagazineStory } from '@/lib/homepageMagazine';
 import { supabase } from '@/lib/supabase/client';
 
 interface MagazineIntro {
@@ -22,6 +23,7 @@ interface MagazineIntro {
 interface HomepageCardDeckProps {
   cards: CardData[];
   magazine: MagazineIntro;
+  leadStory?: HomepageMagazineStory;
   enabled: boolean;
 }
 
@@ -264,7 +266,7 @@ function OpenCard({
   ), document.body);
 }
 
-export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageCardDeckProps) {
+export default function HomepageCardDeck({ cards, magazine, leadStory, enabled }: HomepageCardDeckProps) {
   const sceneRef = useRef<HTMLElement>(null);
   const cardButtonsRef = useRef(new Map<string, HTMLButtonElement>());
   const openingScrollRef = useRef(0);
@@ -438,6 +440,16 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
         >
           <div className="homepage-deck-magazine-copy">
             <HomepageMagazineHeading eyebrow={magazine.eyebrow} title={magazine.title} intro={magazine.intro} accentColor={magazine.accentColor} titleId="homepage-deck-magazine-title" compact />
+            {leadStory?.image && (
+              <Link href={HOMEPAGE_MAGAZINE_DESTINATIONS[leadStory.slug] ?? '/'} className="homepage-deck-magazine-feature group">
+                <Image src={leadStory.image} alt="" fill sizes="(max-width: 767px) 100vw, 84vw" className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]" />
+                <span className="homepage-deck-magazine-feature-copy">
+                  <span className="homepage-deck-magazine-feature-eyebrow">{leadStory.eyebrow}</span>
+                  <span className="homepage-deck-magazine-feature-title">{leadStory.title}</span>
+                  <span className="homepage-deck-magazine-feature-body">{leadStory.body}</span>
+                </span>
+              </Link>
+            )}
           </div>
         </motion.section>
       </div>

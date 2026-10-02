@@ -329,8 +329,14 @@ html.lenis, html.lenis body {
 .homepage-deck-scroll-cue i { width: 13px; height: 21px; border: 2px solid #D9A928; border-radius: 999px; position: relative; }
 .homepage-deck-scroll-cue i::after { position: absolute; top: 4px; left: 4px; width: 2px; height: 5px; content: ''; border-radius: 2px; background: #D9A928; animation: deck-scroll-dot 1.4s ease-in-out infinite; }
 @keyframes deck-scroll-dot { 0%,100% { transform: translateY(0); opacity: .45; } 50% { transform: translateY(6px); opacity: 1; } }
-.homepage-deck-magazine { position: absolute; z-index: 40; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: clamp(40px, 7vh, 84px) clamp(24px, 9vw, 160px) 40px; border-top: 1px solid; box-shadow: 0 -18px 55px rgba(8,20,13,.12); will-change: transform, opacity; }
+.homepage-deck-magazine { position: absolute; z-index: 40; inset: 0 0 auto; display: block; padding: clamp(16px, 3vh, 32px) clamp(24px, 9vw, 160px) 22px; border-top: 1px solid; box-shadow: 0 -18px 55px rgba(8,20,13,.12); will-change: transform, opacity; }
 .homepage-deck-magazine-copy { width: min(100%, 1560px); }
+.homepage-deck-magazine-feature { position: relative; display: block; width: 100%; height: clamp(210px, 38svh, 360px); margin-top: 14px; overflow: hidden; border: 1px solid rgba(30,77,56,.22); border-radius: 10px; background: #10291b; }
+.homepage-deck-magazine-feature::after { position: absolute; inset: 0; content: ''; background: linear-gradient(90deg, rgba(4,18,11,.82), rgba(4,18,11,.4) 54%, rgba(4,18,11,.08)); pointer-events: none; }
+.homepage-deck-magazine-feature-copy { position: absolute; z-index: 1; inset: auto auto 0 0; display: flex; width: min(100%, 780px); flex-direction: column; align-items: flex-start; padding: clamp(18px, 3vw, 34px); color: #fff; }
+.homepage-deck-magazine-feature-eyebrow { margin-bottom: 10px; color: #F2C349; font-size: 9px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+.homepage-deck-magazine-feature-title { max-width: 720px; font-size: clamp(1.5rem, 3.2vw, 2.8rem); font-weight: 950; line-height: 1.02; letter-spacing: -.025em; }
+.homepage-deck-magazine-feature-body { max-width: 620px; margin-top: 10px; color: rgba(255,255,255,.9); font-size: clamp(.78rem, 1.2vw, 1rem); line-height: 1.5; }
 .homepage-deck-modal-layer { position: fixed; z-index: 200; inset: 0; }
 .homepage-deck-backdrop { position: fixed; inset: 0; background: rgba(5,16,10,.24); backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px); }
 .homepage-deck-open-card { position: fixed; z-index: 1; overflow: hidden; border: 1px solid #D8C48A; background: #FBFBFA; box-shadow: 0 32px 100px rgba(3,10,5,.42); transform-style: preserve-3d; }
@@ -377,7 +383,12 @@ html.lenis, html.lenis body {
   .homepage-deck-logo { width: clamp(58px, 19vw, 94px); }
   .homepage-deck-card-label { top: 72%; left: 7%; right: 7%; font-size: clamp(9px, 2.9vw, 12px); }
   .homepage-deck-number { right: 7%; bottom: 4%; font-size: 9px; }
-  .homepage-deck-magazine { inset: 0 0 auto; padding: clamp(52px, 9vh, 76px) 24px 0; }
+  .homepage-deck-magazine { inset: 0 0 auto; display: block; padding: 16px 20px 20px; }
+  .homepage-deck-magazine-feature { height: clamp(170px, 28svh, 230px); margin-top: 12px; border-radius: 8px; }
+  .homepage-deck-magazine-feature-copy { padding: 16px; }
+  .homepage-deck-magazine-feature-eyebrow { margin-bottom: 7px; font-size: 8px; letter-spacing: .12em; }
+  .homepage-deck-magazine-feature-title { font-size: clamp(1.35rem, 5.5vw, 1.8rem); }
+  .homepage-deck-magazine-feature-body { margin-top: 7px; font-size: .76rem; }
   .homepage-deck-open-back { grid-template-columns: 1fr; grid-template-rows: minmax(0, 42%) minmax(0, 58%); }
   .homepage-deck-open-copy { justify-content: flex-start; padding: 22px 24px max(24px, env(safe-area-inset-bottom)); }
   .homepage-deck-open-copy h2 { padding-right: 28px; }
@@ -391,7 +402,7 @@ html.lenis, html.lenis body {
   .is-reduced-motion .homepage-deck-card-position { top: 50%; }
 }
 @media (min-width: 1024px) {
-  .homepage-deck-magazine { inset: 0 0 auto; display: block; padding-bottom: 0; }
+  .homepage-deck-magazine { padding-bottom: 22px; }
 }
 @media (hover: none) and (pointer: coarse) {
   .homepage-deck-atmosphere { animation: none; filter: blur(8px) saturate(.8); background-image: linear-gradient(135deg, rgba(248,239,215,.48), rgba(218,195,145,.34)), url('/assets/livestock/showcase-spectrum-hero.jpg'); transform: scale(1.05); }
