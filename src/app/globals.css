@@ -337,6 +337,7 @@ html.lenis, html.lenis body {
 .homepage-deck-modal-layer { position: fixed; z-index: 200; inset: 0; }
 .homepage-deck-backdrop { position: fixed; inset: 0; background: rgba(5,16,10,.24); backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px); }
 .homepage-deck-open-card { position: fixed; z-index: 1; overflow: hidden; border: 1px solid #D8C48A; background: #FBFBFA; box-shadow: 0 32px 100px rgba(3,10,5,.42); transform-style: preserve-3d; }
+.homepage-deck-open-card:has(.homepage-deck-open-mobile-content) { background: #FBFBFA; transform-style: flat; }
 .homepage-deck-open-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
 .homepage-deck-open-face { position: absolute; inset: 0; overflow: hidden; border: 2px solid; backface-visibility: hidden; }
 .homepage-deck-open-front { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 20px; box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 -24px 48px rgba(0,0,0,.14); }
@@ -346,6 +347,7 @@ html.lenis, html.lenis body {
 .homepage-deck-open-logo { width: min(30vw, 220px); height: auto; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,.28)); }
 .homepage-deck-open-title { max-width: 78%; color: #F4C43D; font-size: clamp(1rem, 2.1vw, 1.75rem); font-weight: 950; line-height: 1.12; letter-spacing: .12em; text-align: center; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.4), 0 5px 16px rgba(0,0,0,.38); }
 .homepage-deck-open-back { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); background: #FBFBFA; transform: rotateY(180deg); }
+.homepage-deck-open-mobile-content { transform: none !important; }
 .homepage-deck-open-image { position: relative; min-width: 0; min-height: 0; background: #0D4020; }
 .homepage-deck-open-copy { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; overflow-y: auto; padding: clamp(24px, 5vw, 76px); }
 .homepage-deck-close { position: absolute; z-index: 5; top: max(18px, env(safe-area-inset-top)); right: max(18px, env(safe-area-inset-right)); display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid #DDE4DC; border-radius: 999px; background: rgba(255,255,255,.96); color: #1E4D38; box-shadow: 0 6px 22px rgba(0,0,0,.14); }

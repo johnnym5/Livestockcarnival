@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertCircle,
+  Bell,
   CheckCircle2,
   Loader2,
   LogOut,
@@ -14,6 +15,13 @@ import {
   X,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+
+function decodeVapidKey(value: string): ArrayBuffer {
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+  const raw = window.atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
+  const bytes = Uint8Array.from(raw, (character) => character.charCodeAt(0));
+  return bytes.buffer as ArrayBuffer;
+}
 
 interface ChatMessage {
   id: string;
@@ -44,6 +52,54 @@ export default function LiveChatWidget() {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [pushStatus, setPushStatus] = useState<'checking' | 'prompt' | 'granted' | 'blocked'>('checking');
+  const [isPushBusy, setIsPushBusy] = useState(false);
+
+  useEffect(() => {
+    const checkPushStatus = async () => {
+      const supported = typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+      if (!supported) {
+        setPushStatus('blocked');
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        setPushStatus('granted');
+      } else if (Notification.permission === 'denied') {
+        setPushStatus('blocked');
+      } else {
+        setPushStatus('prompt');
+      }
+    };
+    void checkPushStatus();
+  }, []);
+
+  const handleEnablePushNotifications = async () => {
+    setIsPushBusy(true);
+    try {
+      const permission = Notification.permission === 'granted'
+        ? 'granted'
+        : await Notification.requestPermission();
+      if (permission !== 'granted') {
+        setPushStatus(permission === 'denied' ? 'blocked' : 'prompt');
+        return;
+      }
+      const registration = await navigator.serviceWorker.register('/push-sw.js', { scope: '/' });
+      const { data, error } = await supabase.functions.invoke('push-notifications', { body: { action: 'public_key' } });
+      if (error || typeof data?.public_key !== 'string') throw new Error('Push not configured');
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: decodeVapidKey(data.public_key),
+      });
+      await supabase.functions.invoke('push-notifications', {
+        body: { action: 'subscribe', subscription: subscription.toJSON() },
+      });
+      setPushStatus('granted');
+    } catch (err) {
+      console.error('Error enabling push notifications:', err);
+    } finally {
+      setIsPushBusy(false);
+    }
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -447,7 +503,7 @@ export default function LiveChatWidget() {
                 </div>
                 <div>
                   <h3 className="text-sm font-extrabold tracking-tight">Carnival Live Help Desk</h3>
-                  <p className="text-[11px] font-medium text-white/70">Direct connection to Secretariat Team</p>
+                  <p className="text-[11px] font-medium text-white/70">Direct connection to Support Team</p>
                 </div>
               </div>
 
@@ -552,6 +608,33 @@ export default function LiveChatWidget() {
                       <CheckCircle2 className="h-3 w-3" /> Connected
                     </span>
                   </div>
+
+                  {/* Push Notification Support Reply Banner */}
+                  {pushStatus === 'prompt' && (
+                    <div className="flex items-center justify-between rounded-xl border border-[#E4B03A]/40 bg-[#FFFDF3] p-2.5 shadow-xs">
+                      <div className="flex items-center gap-2 min-w-0 pr-2">
+                        <Bell className="h-4 w-4 shrink-0 text-[#8D6B1B]" />
+                        <span className="text-[11px] font-semibold text-[#35453A] leading-tight">
+                          Allow notifications to know when support replies you
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleEnablePushNotifications}
+                        disabled={isPushBusy}
+                        className="shrink-0 rounded-lg bg-[#0F4A2F] px-3 py-1.5 text-[11px] font-extrabold text-white shadow-xs transition hover:bg-[#0B3B24] disabled:opacity-50"
+                      >
+                        {isPushBusy ? 'Enabling…' : 'Allow'}
+                      </button>
+                    </div>
+                  )}
+
+                  {pushStatus === 'granted' && (
+                    <div className="flex items-center gap-1.5 rounded-lg bg-[#EAF2EA] px-2.5 py-1 text-[10px] font-bold text-[#0F4A2F] w-fit">
+                      <Bell className="h-3 w-3 text-[#0F4A2F]" />
+                      <span>Reply notifications active</span>
+                    </div>
+                  )}
 
                   {/* Messages Feed */}
                   <div className="flex-1 space-y-3 overflow-y-auto pr-1">

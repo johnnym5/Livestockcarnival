@@ -167,7 +167,6 @@ export default function PushOptIn() {
           </motion.aside>
         </motion.div>}
       </AnimatePresence>
-      <button type="button" onClick={() => setManualOpen(true)} aria-label="Open notification settings" title="Notification settings" className="fixed bottom-6 left-5 z-[98] inline-flex min-h-12 items-center gap-2 rounded-full border border-[#E4B03A]/70 bg-[#f4eddd]/90 px-4 text-xs font-extrabold text-[#1E4D38] shadow-[0_8px_28px_rgba(29,37,30,.22)] backdrop-blur-xl transition hover:bg-[#fffaf0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E4D38] focus-visible:ring-offset-2"><Bell className="h-4 w-4" />Notifications</button>
     </>, document.body)}
     <section aria-label="Browser notification settings" className="border-t border-[#E4B03A]/10 bg-[#F7F4E9]/70 px-5 py-2 text-[#19251C] sm:px-8">
       <div className="mx-auto max-w-7xl text-[10px] text-[#758078]">{notice || (state === 'subscribed' ? 'You’re subscribed to official carnival updates.' : 'Choose whether to receive official carnival notifications.')} <Link href="/privacy" className="font-semibold text-[#1E4D38] underline">Privacy Policy</Link></div>

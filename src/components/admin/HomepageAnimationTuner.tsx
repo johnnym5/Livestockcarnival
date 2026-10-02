@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { Save } from 'lucide-react';
 import { DEFAULT_HOMEPAGE_MOTION, normalizeHomepageMotion, type HomepageMotionSettings } from '@/lib/homepageMotion';
 import { supabase } from '@/lib/supabase/client';
-import { DEFAULT_SITE_ANIMATION, normalizeSiteAnimation, resolveSiteAnimation, SITE_ANIMATION_STORAGE_KEY, SITE_ANIMATION_UPDATED_EVENT, type SiteAnimationDocument, type SiteAnimationValues, type TransitionEffect } from '@/lib/siteAnimation';
+import { DEFAULT_SITE_ANIMATION, getTransitionFrame, normalizeSiteAnimation, resolveSiteAnimation, SITE_ANIMATION_STORAGE_KEY, SITE_ANIMATION_UPDATED_EVENT, type SiteAnimationDocument, type SiteAnimationValues, type TransitionEffect } from '@/lib/siteAnimation';
 
 const controls: { key: keyof HomepageMotionSettings; label: string; min: number; max: number; step: number; group: string }[] = [
   { key: 'sceneLengthVh', label: 'Total pinned scroll length (vh)', min: 280, max: 600, step: 10, group: 'Scene and opening' },
@@ -28,7 +29,7 @@ const controls: { key: keyof HomepageMotionSettings; label: string; min: number;
   { key: 'promptEndProgress', label: 'Prompt fully visible (scene progress)', min: 0.1, max: 0.9, step: 0.01, group: 'Scroll stages' },
   { key: 'heroShrinkEnd', label: 'Hero shrink complete (scene progress)', min: 0.08, max: 0.48, step: 0.01, group: 'Scroll stages' },
   { key: 'magazineEndProgress', label: 'Magazine fully covering deck (scene progress)', min: 0.2, max: 1, step: 0.01, group: 'Magazine overlap' },
-  { key: 'magazineRestackAt', label: 'Restack point during overlap', min: 0.2, max: 0.8, step: 0.01, group: 'Magazine overlap' },
+  { key: 'magazineRestackAt', label: 'Restack point during overlap (90%+)', min: 0.9, max: 0.98, step: 0.01, group: 'Magazine overlap' },
   { key: 'magazineScale', label: 'Deck scale under magazine', min: 0.55, max: 1, step: 0.01, group: 'Magazine overlap' },
   { key: 'magazineBlurDesktop', label: 'Desktop deck blur (px)', min: 0, max: 8, step: 0.1, group: 'Magazine overlap' },
   { key: 'magazineBlurMobile', label: 'Mobile deck blur (px)', min: 0, max: 2.5, step: 0.1, group: 'Magazine overlap' },
@@ -40,7 +41,12 @@ const controls: { key: keyof HomepageMotionSettings; label: string; min: number;
   { key: 'heroBackgroundIntensity', label: 'Hero background animation intensity', min: 0, max: 10, step: 0.1, group: 'Hero and selection' },
   { key: 'expandedCardScaleDesktop', label: 'Desktop expanded card scale', min: 0.9, max: 1.15, step: 0.01, group: 'Hero and selection' },
   { key: 'expandedCardScaleMobile', label: 'Mobile expanded card scale', min: 0.9, max: 1.15, step: 0.01, group: 'Hero and selection' },
-  { key: 'flipDuration', label: 'Card flip and expand (seconds)', min: 0.4, max: 2.5, step: 0.05, group: 'Hero and selection' },
+  { key: 'cardOpenDuration', label: 'Second-click open duration (seconds)', min: 0.2, max: 2.5, step: 0.05, group: 'Card open and close' },
+  { key: 'cardOpenStartScale', label: 'Second-click start scale', min: 0.8, max: 1.15, step: 0.01, group: 'Card open and close' },
+  { key: 'cardOpenEndScale', label: 'Second-click end scale', min: 0.8, max: 1.15, step: 0.01, group: 'Card open and close' },
+  { key: 'cardCloseDuration', label: 'Close card duration (seconds)', min: 0.15, max: 2.5, step: 0.05, group: 'Card open and close' },
+  { key: 'cardCloseStartScale', label: 'Close card start scale', min: 0.8, max: 1.15, step: 0.01, group: 'Card open and close' },
+  { key: 'cardCloseEndScale', label: 'Close card end scale', min: 0.8, max: 1.15, step: 0.01, group: 'Card open and close' },
 ];
 
 export default function HomepageAnimationTuner() {
@@ -53,6 +59,8 @@ export default function HomepageAnimationTuner() {
   const [previewProgress, setPreviewProgress] = useState(0.5);
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
   const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [transitionPreviewMode, setTransitionPreviewMode] = useState<'in' | 'out'>('in');
+  const [transitionPreviewKey, setTransitionPreviewKey] = useState(0);
   useEffect(() => {
     void supabase.from('homepage_motion_settings').select('settings').eq('id', 1).maybeSingle().then(({ data }) => {
       if (data?.settings) setSettings(normalizeHomepageMotion(data.settings));
@@ -104,13 +112,13 @@ export default function HomepageAnimationTuner() {
   const promptOut = 1 - clamp01((previewProgress - settings.fanHoldEndProgress) / (settings.magazineEndProgress - settings.fanHoldEndProgress));
   const activeStackScale = isPreviewMobile ? settings.stackScaleMobile : settings.stackScaleDesktop;
   const activeFanScale = isPreviewMobile ? settings.fanScaleMobile : settings.fanScaleDesktop;
-  const stageScale = (activeStackScale + fanAmount * (activeFanScale - activeStackScale)) * (1 - overlapAmount * (1 - settings.magazineScale));
+  const stageScale = (activeStackScale + fanAmount * (activeFanScale - activeStackScale)) * (1 - restackAmount * (1 - settings.magazineScale));
   const heroOpeningScale = isPreviewMobile ? settings.heroScaleOpeningMobile : settings.heroScaleOpeningDesktop;
   const heroCoveredScale = isPreviewMobile ? settings.heroScaleCoveredMobile : settings.heroScaleCoveredDesktop;
   const heroPreviewProgress = clamp01(previewProgress / settings.heroShrinkEnd);
   const heroPreviewScale = heroOpeningScale + heroPreviewProgress * (heroCoveredScale - heroOpeningScale);
   const expandedPreviewScale = isPreviewMobile ? settings.expandedCardScaleMobile : settings.expandedCardScaleDesktop;
-  const overlapBlur = overlapAmount * settings.magazineBlurDesktop;
+  const overlapBlur = restackAmount * (isPreviewMobile ? settings.magazineBlurMobile : settings.magazineBlurDesktop);
   return <div className="space-y-6"><section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
     <div className="rounded-2xl border border-[#E1E7E0] bg-white p-5 shadow-sm sm:p-7">
       <h2 className="text-base font-extrabold">Homepage animation tuner</h2><p className="mt-1 text-xs text-[#758078]">Changes preview here and only reach the homepage after you save.</p>
@@ -123,7 +131,7 @@ export default function HomepageAnimationTuner() {
       <h3 className="text-xs font-extrabold uppercase tracking-wider">Deck preview</h3>
       <label className="mt-3 block text-[11px] font-bold text-[#526057]">Preview viewport<select className="mt-1 h-9 w-full rounded-lg border border-[#DDE4DC] bg-white px-2" value={previewViewport} onChange={(event) => setPreviewViewport(event.target.value as 'desktop' | 'mobile')}><option value="desktop">Desktop</option><option value="mobile">Mobile</option></select></label>
       <div className={`relative mt-3 h-64 overflow-hidden rounded-xl border border-[#E7EAE6] bg-[#F4F1E8] ${isPreviewMobile ? 'mx-auto max-w-[190px]' : ''}`} style={{ backgroundImage: `radial-gradient(ellipse at 50% 18%, rgba(232,196,104,${settings.heroBackgroundIntensity / 25}), transparent 64%)` }}>
-        <div className="absolute inset-x-2 top-8 z-0 text-center" style={{ transform: `scale(${heroPreviewScale})`, opacity: Math.max(0.12, 1 - fanAmount * 0.88) }}><Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={60} height={46} className="mx-auto h-7 w-auto" /><p className="mt-1 text-[8px] font-black leading-tight text-[#17221A]">WELCOME TO THE <span className="text-[#D9A928]">NATIONAL CARNIVAL</span></p></div>
+        <div className="absolute inset-x-2 top-8 z-0 text-center" style={{ transform: `scale(${heroPreviewScale})`, opacity: Math.max(0.12, 1 - fanAmount * 0.88), filter: `blur(${heroPreviewProgress * settings.heroBlur}px)` }}><Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={60} height={46} className="mx-auto h-7 w-auto" /><p className="mt-1 text-[8px] font-black leading-tight text-[#17221A]">WELCOME TO THE <span className="text-[#D9A928]">NATIONAL CARNIVAL</span></p></div>
         <p className="absolute inset-x-0 top-4 z-20 text-center text-[11px] font-black uppercase tracking-wide text-[#101820]" style={{ opacity: promptIn * promptOut, filter: `blur(${(1 - promptIn) * 3 + (1 - promptOut) * 2}px)` }}>PICK A CARD AND <span className="text-[#D9A928]">EXPLORE!</span></p>
         <div className="absolute left-1/2 top-[61%] h-24 w-44 transition-[filter,transform]" style={{ transform: `translate(-50%, calc(-50% + ${(1 - fanAmount) * settings.stackStartY * 38 - fanAmount * 59}px)) scale(${stageScale})`, filter: `blur(${overlapBlur}px)` }}>
           {Array.from({ length: 5 }, (_, index) => { const n = index - 2; const colors = ['#0D4020', '#2A2006', '#20125C', '#0D4845', '#0E2014']; const fanX = n * (isPreviewMobile ? settings.fanSpreadMobile : spread) * (isPreviewMobile ? 0.5 : 0.82) * fanVisible; const rotation = n * (isPreviewMobile ? 8 : 13) * fanVisible; return <div key={index} className="absolute left-1/2 top-1/2 grid place-items-center rounded-xl border-2 bg-gradient-to-br shadow-lg" style={{ width: '100%', aspectRatio: isPreviewMobile ? '9 / 16' : '16 / 9', borderColor: '#D9A928', background: `linear-gradient(135deg, ${colors[index]}, #031209)`, transform: `translate(calc(-50% + ${fanX}px), calc(-50% + ${Math.abs(n) * settings.stackPeek * 10}px)) rotate(${rotation}deg)`, zIndex: index }}>{index === 2 && <Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={54} height={42} className="w-10" />}</div>; })}
@@ -143,13 +151,29 @@ export default function HomepageAnimationTuner() {
       <p className="mt-1 text-xs leading-5 text-[#758078]">Choose all public pages for defaults, or a route for an override. Workspace routes ignore these settings.</p>
       <label className="mt-5 block max-w-sm text-xs font-bold text-[#526057]">Settings apply to<select className="mt-2 h-10 w-full rounded-lg border border-[#DDE4DC] bg-white px-3" value={route} onChange={(event) => setRoute(event.target.value)}><option value="all">All public pages (global defaults)</option>{['/', '/about', '/accreditation', '/attractions', '/contact', '/fashion-parade', '/livestock', '/media', '/nhesics', '/schedule', '/venue-map'].map((path) => <option key={path} value={path}>{path === '/' ? 'Homepage' : path.slice(1).replaceAll('-', ' ')}</option>)}</select></label>
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <label className="text-xs font-bold text-[#526057]">Page transition style<select value={siteValues.transitionEffect} onChange={(event) => changeSiteValue('transitionEffect', event.target.value as TransitionEffect)} className="mt-2 h-10 w-full rounded-lg border border-[#DDE4DC] bg-white px-3"><option value="fade">Fade</option><option value="blur-fade">Blur and fade</option><option value="slide-fade">Slide and fade</option></select></label>
-        {([['transitionDuration','Transition duration (seconds)',0,3,0.05],['homepageRevealDuration','Homepage white reveal (seconds)',0,8,0.1],['scrollDuration','Smooth scrolling speed (seconds)',0.2,2.5,0.05],['scrollRevealDuration','Scroll reveal timing (seconds)',0,2,0.05],['skeletonDuration','Skeleton animation speed (seconds)',0.4,4,0.1],['interactionDuration','Button interaction timing (seconds)',0,1,0.02]] as [keyof SiteAnimationValues,string,number,number,number][]).map(([key,label,min,max,step])=><label key={key} className="text-xs font-bold text-[#526057]">{label}<div className="mt-2 flex items-center gap-2"><input type="range" min={min} max={max} step={step} value={Number(siteValues[key])} onChange={(event) => changeSiteValue(key, Number(event.target.value))} className="min-w-0 flex-1 accent-[#1E4D38]"/><output className="w-12 text-right tabular-nums">{Number(siteValues[key]).toFixed(2)}</output></div></label>)}
+        {(['in', 'out'] as const).map((direction) => {
+          const prefix = direction === 'in' ? 'transitionIn' : 'transitionOut';
+          const effectKey = `${prefix}Effect` as 'transitionInEffect' | 'transitionOutEffect';
+          const title = direction === 'in' ? 'Transition into page' : 'Transition out of page';
+          return <fieldset key={direction} className="rounded-xl border border-[#E1E7E0] p-4"><legend className="px-1 text-xs font-extrabold text-[#1E4D38]">{title}</legend>
+            <label className="block text-xs font-bold text-[#526057]">Effect<select value={siteValues[effectKey]} onChange={(event) => changeSiteValue(effectKey, event.target.value as TransitionEffect)} className="mt-2 h-10 w-full rounded-lg border border-[#DDE4DC] bg-white px-3">{[['fade','Fade'],['blur-fade','Blur and fade'],['slide-up','Slide up'],['slide-down','Slide down'],['slide-left','Slide left'],['slide-right','Slide right'],['zoom-in','Zoom in'],['zoom-out','Zoom out'],['zoom-blur','Zoom and blur']].map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">{([
+              [`${prefix}Duration`, 'Duration (seconds)', 0, 3, 0.05],
+              [`${prefix}Blur`, 'Blur (px)', 0, 32, 1],
+              [`${prefix}Scale`, direction === 'in' ? 'Starting scale' : 'Ending scale', 0.7, 1.3, 0.01],
+              [`${prefix}Distance`, 'Slide distance (px)', 0, 160, 4],
+            ] as [string, string, number, number, number][]).map(([rawKey, label, min, max, step]) => {
+              const key = rawKey as keyof SiteAnimationValues;
+              return <label key={key} className="text-[11px] font-bold text-[#526057]">{label}<div className="mt-2 flex items-center gap-2"><input type="range" min={min} max={max} step={step} value={Number(siteValues[key])} onChange={(event) => changeSiteValue(key, Number(event.target.value))} className="min-w-0 flex-1 accent-[#1E4D38]"/><output className="w-12 text-right tabular-nums">{Number(siteValues[key]).toFixed(key.toLowerCase().includes('scale') ? 2 : 1)}</output></div></label>;
+            })}</div>
+          </fieldset>;
+        })}
+        {([['homepageRevealDuration','Homepage white reveal (seconds)',0,8,0.1],['scrollDuration','Smooth scrolling speed (seconds)',0.2,2.5,0.05],['scrollRevealDuration','Scroll reveal timing (seconds)',0,2,0.05],['skeletonDuration','Skeleton animation speed (seconds)',0.4,4,0.1],['interactionDuration','Button interaction timing (seconds)',0,1,0.02]] as [keyof SiteAnimationValues,string,number,number,number][]).map(([key,label,min,max,step])=><label key={key} className="text-xs font-bold text-[#526057]">{label}<div className="mt-2 flex items-center gap-2"><input type="range" min={min} max={max} step={step} value={Number(siteValues[key])} onChange={(event) => changeSiteValue(key, Number(event.target.value))} className="min-w-0 flex-1 accent-[#1E4D38]"/><output className="w-12 text-right tabular-nums">{Number(siteValues[key]).toFixed(2)}</output></div></label>)}
         <label className="flex items-center gap-2 text-xs font-bold text-[#526057]"><input type="checkbox" checked={siteValues.skeletonEnabled} onChange={(event) => changeSiteValue('skeletonEnabled', event.target.checked)} className="accent-[#1E4D38]"/>Enable skeleton loader animation</label>
         {(route === 'all' || route === '/') && <label className="flex items-center gap-2 text-xs font-bold text-[#526057]"><input type="checkbox" checked={siteValues.cardDeckEnabled} onChange={(event) => changeSiteValue('cardDeckEnabled', event.target.checked)} className="accent-[#1E4D38]"/>Enable homepage card deck (off uses magazine)</label>}
       </div>
       <button type="button" disabled={siteSaving} onClick={() => void saveSite()} className="mt-6 inline-flex h-10 items-center gap-2 rounded-xl bg-[#1E4D38] px-4 text-xs font-extrabold text-white disabled:opacity-60"><Save className="h-4 w-4"/>{siteSaving ? 'Saving…' : 'Save site animation settings'}</button>
     </div>
-    <aside className="rounded-xl bg-[#F7F8F5] p-4"><h3 className="text-xs font-extrabold uppercase tracking-wider">Transition preview</h3><div className="mt-4 grid h-48 place-items-center overflow-hidden rounded-xl border bg-white"><div key={`${siteValues.transitionEffect}-${siteValues.transitionDuration}`} className={`site-transition-preview site-transition-preview--${siteValues.transitionEffect} grid h-28 w-44 place-items-center rounded-xl bg-[#0D4020] text-xs font-black text-[#E4B03A] shadow-xl`} style={{ animationDuration: `${siteValues.transitionDuration}s` }}>CARNIVAL 2026</div></div><p className="mt-3 text-[11px] leading-5 text-[#758078]">This preview updates immediately; saving also applies the settings to public pages in this browser. Reduced-motion preferences shorten animations for visitors who request them.</p></aside>
+    <aside className="rounded-xl bg-[#F7F8F5] p-4"><h3 className="text-xs font-extrabold uppercase tracking-wider">Transition preview</h3><div className="mt-4 grid h-48 place-items-center overflow-hidden rounded-xl border bg-white"><motion.div key={`${transitionPreviewMode}-${transitionPreviewKey}-${transitionPreviewMode === 'in' ? siteValues.transitionInEffect : siteValues.transitionOutEffect}`} initial={transitionPreviewMode === 'in' ? getTransitionFrame(siteValues.transitionInEffect, 'in', siteValues) : { opacity: 1, filter: 'blur(0px)', x: 0, y: 0, scale: 1 }} animate={transitionPreviewMode === 'in' ? { opacity: 1, filter: 'blur(0px)', x: 0, y: 0, scale: 1 } : getTransitionFrame(siteValues.transitionOutEffect, 'out', siteValues)} transition={{ duration: transitionPreviewMode === 'in' ? siteValues.transitionInDuration : siteValues.transitionOutDuration, ease: transitionPreviewMode === 'in' ? 'easeOut' : 'easeIn' }} className="grid h-28 w-44 place-items-center rounded-xl bg-[#0D4020] text-xs font-black text-[#E4B03A] shadow-xl">CARNIVAL 2026</motion.div></div><div className="mt-3 flex gap-2"><button type="button" onClick={() => { setTransitionPreviewMode('in'); setTransitionPreviewKey((key) => key + 1); }} className="rounded-lg bg-[#1E4D38] px-3 py-2 text-[10px] font-extrabold text-white">Preview entrance</button><button type="button" onClick={() => { setTransitionPreviewMode('out'); setTransitionPreviewKey((key) => key + 1); }} className="rounded-lg border border-[#DDE4DC] bg-white px-3 py-2 text-[10px] font-extrabold text-[#1E4D38]">Preview exit</button></div><p className="mt-3 text-[11px] leading-5 text-[#758078]">Previews use the selected direction’s effect, duration, blur, zoom scale, and slide distance. Saved settings apply to public page navigation.</p></aside>
   </section></div>;
 }

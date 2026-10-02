@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
 import { supabase } from '@/lib/supabase/client';
-import { Images, Save } from 'lucide-react';
+import { ArrowDown, ArrowUp, Images, Save } from 'lucide-react';
+import { DEFAULT_HOMEPAGE_MAGAZINE_STORIES, HOMEPAGE_MAGAZINE_DESTINATIONS, resolveHomepageMagazineStories, type MagazineTileLayout } from '@/lib/homepageMagazine';
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 type ContentPage = keyof typeof DEFAULT_SITE_CONTENT;
@@ -52,6 +53,57 @@ function initializeLivestockEntries(value: JsonValue): JsonValue {
     ? record.entries
     : DEFAULT_SITE_CONTENT.livestock.entries as JsonValue[];
   return { ...record, entries, catalogInitialized: true };
+}
+
+function MagazineStoriesField({ value, onChange, onPickImage }: {
+  value: JsonValue;
+  onChange: (value: JsonValue) => void;
+  onPickImage: (path: (string | number)[]) => void;
+}) {
+  const stories = Array.isArray(value) ? value : [];
+  const updateStory = (index: number, key: string, nextValue: JsonValue) => {
+    const next = [...stories];
+    const current = next[index] && typeof next[index] === 'object' && !Array.isArray(next[index]) ? next[index] as { [key: string]: JsonValue } : {};
+    next[index] = { ...current, [key]: nextValue };
+    onChange(next);
+  };
+  const moveStory = (index: number, direction: -1 | 1) => {
+    const next = [...stories];
+    [next[index], next[index + direction]] = [next[index + direction], next[index]];
+    onChange(next);
+  };
+  const inputClass = 'h-9 w-full rounded-lg border border-[#DDE4DC] bg-white px-3 text-xs font-normal outline-none focus:border-[#1E4D38]';
+
+  return (
+    <fieldset className="space-y-3 rounded-xl border border-[#E1E7E0] bg-[#F9FBF8] p-3 sm:p-4">
+      <legend className="px-1 text-xs font-extrabold text-[#1E4D38]">Magazine stories ({stories.length})</legend>
+      <p className="text-xs leading-relaxed text-[#68746C]">Edit the story text, cover image, order, and tile style. Destinations and page coverage are fixed so every visitor page stays represented.</p>
+      {stories.map((rawStory, index) => {
+        const story = rawStory && typeof rawStory === 'object' && !Array.isArray(rawStory) ? rawStory as { [key: string]: JsonValue } : {};
+        const slug = String(story.slug ?? '');
+        return (
+          <div key={slug || index} className="space-y-3 rounded-xl border border-[#E1E7E0] bg-white p-3">
+            <div className="flex items-center justify-between gap-3 border-b border-[#EEF1ED] pb-2">
+              <div><h3 className="text-xs font-extrabold text-[#17251C]">{String(story.title ?? 'Magazine story')}</h3><p className="mt-1 text-[10px] text-[#68746C]">Destination: {HOMEPAGE_MAGAZINE_DESTINATIONS[slug] ?? 'Fixed page link'}</p></div>
+              <div className="flex shrink-0 gap-1">
+                <button type="button" disabled={!index} aria-label={`Move ${String(story.title ?? 'story')} up`} onClick={() => moveStory(index, -1)} className="grid h-8 w-8 place-items-center rounded-lg border border-[#DDE4DC] disabled:opacity-40"><ArrowUp className="h-4 w-4" /></button>
+                <button type="button" disabled={index === stories.length - 1} aria-label={`Move ${String(story.title ?? 'story')} down`} onClick={() => moveStory(index, 1)} className="grid h-8 w-8 place-items-center rounded-lg border border-[#DDE4DC] disabled:opacity-40"><ArrowDown className="h-4 w-4" /></button>
+              </div>
+            </div>
+            <label className="block space-y-1.5 text-[11px] font-bold text-[#526057]"><span>Category / eyebrow</span><input value={String(story.eyebrow ?? '')} onChange={(event) => updateStory(index, 'eyebrow', event.target.value)} className={inputClass} /></label>
+            <label className="block space-y-1.5 text-[11px] font-bold text-[#526057]"><span>Headline</span><input value={String(story.title ?? '')} onChange={(event) => updateStory(index, 'title', event.target.value)} className={inputClass} /></label>
+            <label className="block space-y-1.5 text-[11px] font-bold text-[#526057]"><span>Story snippet</span><textarea rows={3} value={String(story.body ?? '')} onChange={(event) => updateStory(index, 'body', event.target.value)} className="w-full resize-y rounded-lg border border-[#DDE4DC] bg-white px-3 py-2 text-xs font-normal leading-5 outline-none focus:border-[#1E4D38]" /></label>
+            <label className="block space-y-1.5 text-[11px] font-bold text-[#526057]"><span>Tile layout</span><select value={String(story.layout ?? 'wide')} onChange={(event) => updateStory(index, 'layout', event.target.value as MagazineTileLayout)} className={inputClass}><option value="wide">Wide image feature</option><option value="square">Square image tile</option><option value="tall">Tall image feature</option><option value="text-large">Large unboxed text</option><option value="text">Medium unboxed text</option><option value="text-small">Small unboxed text</option><option value="image">Image-led feature</option></select></label>
+            <div className="flex flex-wrap items-center gap-3 rounded-lg border border-[#E6EBE4] bg-[#FBFCFA] p-2.5">
+              {String(story.image ?? '') && <Image src={String(story.image)} alt="" width={104} height={68} unoptimized className="h-14 w-20 rounded-md object-cover" />}
+              <p className="min-w-0 flex-1 truncate text-[10px] text-[#68746C]">{String(story.image ?? '') || 'No image selected'}</p>
+              <button type="button" onClick={() => onPickImage(['stories', index, 'image'])} className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#E8F1E8] px-2.5 text-[10px] font-bold text-[#1E4D38]"><Images className="h-3.5 w-3.5" />Choose image</button>
+            </div>
+          </div>
+        );
+      })}
+    </fieldset>
+  );
 }
 
 function ContentField({
@@ -144,7 +196,11 @@ export default function SiteContentEditor({
       if (queryError) setError('Could not load saved page content. Check that the site content migration has been applied.');
       else if (data?.content) {
         const savedContent = data.content as JsonValue;
-        setContent(page === 'livestock' ? initializeLivestockEntries(savedContent) : savedContent);
+        if (page === 'magazine' && savedContent && typeof savedContent === 'object' && !Array.isArray(savedContent)) {
+          setContent({ ...DEFAULT_SITE_CONTENT.magazine, ...savedContent, stories: resolveHomepageMagazineStories(savedContent) } as unknown as JsonValue);
+        } else {
+          setContent(page === 'livestock' ? initializeLivestockEntries(savedContent) : savedContent);
+        }
         setStatus(data.status as 'draft' | 'published');
       } else {
         setContent(DEFAULT_SITE_CONTENT[page] as JsonValue);
@@ -162,15 +218,21 @@ export default function SiteContentEditor({
     }
     if (nextStatus === 'published') {
       const record = content as Record<string, JsonValue>;
+      const magazineStories = Array.isArray(record.stories) ? record.stories : [];
       const missing = page === 'magazine'
         ? ['title', 'intro'].some((key) => !String(record[key] ?? '').trim())
+          || DEFAULT_HOMEPAGE_MAGAZINE_STORIES.some((story) => !magazineStories.some((entry) => Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry) && (entry as { [key: string]: JsonValue }).slug === story.slug && Boolean(String((entry as { [key: string]: JsonValue }).title ?? '').trim())))
         : page === 'schedule'
           ? !record.days || typeof record.days !== 'object' || Array.isArray(record.days) || Object.keys(record.days).length < 1
           : page === 'livestock'
             ? !String(record.title ?? '').trim() || !String(record.description ?? '').trim()
             : !record.pageCopy || !String((record.pageCopy as Record<string, JsonValue>).title ?? '').trim();
       if (missing) {
-        setError('Complete the required page title and introduction or add at least one schedule day before publishing.');
+        setError(page === 'magazine'
+          ? 'Add a magazine title and introduction, and keep a titled story for every visitor page before publishing.'
+          : page === 'schedule'
+            ? 'Add at least one schedule day before publishing.'
+            : 'Complete the required page title and description before publishing.');
         return;
       }
     }
@@ -200,7 +262,9 @@ export default function SiteContentEditor({
       {error && <p role="alert" className="mx-4 mt-4 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-800 sm:mx-5">{error}</p>}
       {loading ? <p className="p-8 text-center text-sm text-[#758078]">Loading {labels[page].toLowerCase()}…</p> : (
         <div className="max-h-[72vh] space-y-4 overflow-y-auto p-4 sm:p-5">
-          {content && typeof content === 'object' && !Array.isArray(content) && Object.entries(content).filter(([key]) => key !== 'catalogInitialized').map(([key, value]) => <ContentField key={key} label={titleCase(key)} value={value} path={[key]} onChange={change} onPickImage={pickImage} />)}
+          {content && typeof content === 'object' && !Array.isArray(content) && Object.entries(content).filter(([key]) => key !== 'catalogInitialized').map(([key, value]) => key === 'stories' && page === 'magazine'
+            ? <MagazineStoriesField key={key} value={value} onChange={(nextValue) => change(['stories'], nextValue)} onPickImage={pickImage} />
+            : <ContentField key={key} label={titleCase(key)} value={value} path={[key]} onChange={change} onPickImage={pickImage} />)}
         </div>
       )}
       <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E9EDE8] bg-[#FBFCFA] px-4 py-3 sm:px-5">

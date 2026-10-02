@@ -2,6 +2,7 @@ import { DEFAULT_FASHION_BREEDS } from '@/data/fashionBreeds';
 import { CARNIVAL_PROGRAM } from '@/data/carnivalProgram';
 import { DEFAULT_LIVESTOCK_ENTRIES } from '@/data/livestockCatalog';
 import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES } from '@/data/venueCatalog';
+import { DEFAULT_HOMEPAGE_MAGAZINE_STORIES } from '@/lib/homepageMagazine';
 
 export const DEFAULT_SITE_CONTENT: Record<string, Record<string, unknown>> = {
   magazine: {
@@ -10,6 +11,7 @@ export const DEFAULT_SITE_CONTENT: Record<string, Record<string, unknown>> = {
     intro: 'From championship breeds and cultural pageantry to live music, food, and the festival grounds, find the experiences you want to explore.',
     backgroundColor: '#FBFBFA',
     accentColor: '#8D6B1B',
+    stories: DEFAULT_HOMEPAGE_MAGAZINE_STORIES,
   },
   schedule: {
     eyebrow: 'Carnival Program',

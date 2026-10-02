@@ -370,7 +370,7 @@ export default function AdminLiveChatPage({ workspace = 'admin' }: { workspace?:
         <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between border-b border-[#E3E8E2] bg-[#F3F5F2]/90 px-4 backdrop-blur-xl sm:px-8">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8D6B1B]">
-              Secretariat Support
+              Support Team
             </p>
             <h1 className="mt-0.5 text-lg font-extrabold tracking-tight">Live Support Chat Console</h1>
           </div>
@@ -579,7 +579,7 @@ export default function AdminLiveChatPage({ workspace = 'admin' }: { workspace?:
                         >
                           <div className="mb-1 flex items-center gap-2">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                              {isAdmin ? 'Official Secretariat Reply' : selectedThread.user_name}
+                              {isAdmin ? 'Official Support Reply' : selectedThread.user_name}
                             </span>
                           </div>
                           <div
@@ -610,7 +610,7 @@ export default function AdminLiveChatPage({ workspace = 'admin' }: { workspace?:
                     type="text"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Type official secretariat reply..."
+                    placeholder="Type official support reply..."
                     disabled={isSendingReply}
                     className="h-11 flex-1 rounded-xl border border-slate-200 bg-[#F8FAF8] px-4 text-xs outline-none focus:border-[#0F4A2F] focus:bg-white font-medium"
                   />

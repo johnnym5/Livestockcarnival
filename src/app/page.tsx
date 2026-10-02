@@ -1,61 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, CalendarDays } from 'lucide-react';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import ScrollReveal from '@/components/ScrollReveal';
+import { useReducedMotion } from 'framer-motion';
 import HomepageCardDeck from '@/components/homepage/HomepageCardDeck';
+import HomepageMagazine from '@/components/homepage/HomepageMagazine';
 import { supabase } from '@/lib/supabase/client';
 import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
 import { DEFAULT_HOMEPAGE_CARDS, mapCmsCard, type CardData } from '@/lib/homepageCards';
+import { resolveHomepageMagazineStories } from '@/lib/homepageMagazine';
 import { useSiteAnimation } from '@/components/SiteAnimationContext';
-
-function MagazineFeature({ card, index }: { card: CardData; index: number }) {
-  const featureRef = useRef<HTMLElement>(null);
-  const reducedMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: featureRef, offset: ['start 92%', 'start 24%'] });
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.25, 0.55], [0, 1, 1]);
-  const overlayOpacity = useTransform(scrollYProgress, [0.18, 0.48, 0.72], [0, 1, 1]);
-  const contentOpacity = useTransform(scrollYProgress, [0.34, 0.62, 0.82], [0, 1, 1]);
-  const contentY = useTransform(scrollYProgress, [0.34, 0.82], [22, 0]);
-
-  return (
-    <motion.article
-      ref={featureRef}
-      className="group relative isolate mx-auto aspect-[4/3] min-h-[470px] w-full max-w-[1440px] overflow-hidden rounded-[1.5rem] border border-[#D8C48A]/70 bg-[#07150D] shadow-[0_28px_80px_rgba(17,24,39,0.22),0_8px_22px_rgba(17,24,39,0.1)] md:aspect-[16/9] md:min-h-[500px] lg:max-h-[760px]"
-      aria-label={`Magazine feature ${index + 1}: ${card.title}`}
-    >
-      <motion.div className="absolute inset-0" style={reducedMotion ? undefined : { opacity: imageOpacity }}>
-        <Image src={card.image} alt={card.title} fill sizes="(max-width: 767px) 100vw, 92vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" />
-      </motion.div>
-      <span className="absolute left-6 top-6 z-10 rounded-full border border-white/60 bg-[#07150D]/40 px-4 py-1.5 text-xs font-extrabold tracking-[0.18em] text-white backdrop-blur-sm sm:left-8 sm:top-8">{card.number || String(index + 1).padStart(2, '0')}</span>
-      <motion.div
-        className="absolute inset-0 z-10"
-        style={reducedMotion ? undefined : { opacity: overlayOpacity }}
-      >
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#06150D]/95 via-[#06150D]/72 to-transparent" />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 backdrop-blur-[4px]"
-          style={{
-            maskImage: 'linear-gradient(to top, #000 0%, #000 42%, transparent 84%)',
-            WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 42%, transparent 84%)',
-          }}
-        />
-        <motion.div className="absolute inset-x-0 bottom-0 mx-auto flex h-full max-w-[1240px] flex-col justify-end px-6 pb-7 pt-20 sm:px-10 sm:pb-10 sm:pt-24 lg:px-12" style={reducedMotion ? undefined : { opacity: contentOpacity, y: contentY }}>
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#F2C349] [text-shadow:0_2px_8px_rgba(0,0,0,0.55)] sm:text-xs">{card.eyebrow}</p>
-          <h3 className="mt-3 max-w-5xl text-3xl font-black leading-[1.02] text-white [text-shadow:0_2px_2px_rgba(0,0,0,0.32),0_8px_24px_rgba(0,0,0,0.48)] sm:text-4xl md:text-5xl lg:text-6xl">{card.title}</h3>
-          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.55)] sm:mt-4 sm:text-base lg:text-lg">{card.body}</p>
-          <Link href={card.link} className="mt-5 inline-flex min-h-11 items-center gap-2 self-start text-[10px] font-extrabold uppercase tracking-[0.12em] text-white transition-colors hover:text-[#F2C349] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:mt-6 sm:text-xs">
-            {card.cta}<ArrowRight aria-hidden="true" size={16} />
-          </Link>
-        </motion.div>
-      </motion.div>
-    </motion.article>
-  );
-}
 
 export default function Home() {
   const [cards, setCards] = useState<CardData[]>(DEFAULT_HOMEPAGE_CARDS);
@@ -121,17 +76,14 @@ export default function Home() {
         style={{ backgroundColor: String(magazineContent.backgroundColor), borderColor: `${String(magazineContent.accentColor)}55` }}
         className={`border-t text-[#111827] ${magazineOverlapsDeck ? '-mt-[18vh] relative z-10' : ''}`}
       >
-        <div className={`mx-auto max-w-7xl px-5 sm:px-8 lg:px-10 ${siteAnimation.cardDeckEnabled ? 'pt-0 pb-12 sm:pb-16' : 'py-16 sm:py-20 lg:py-24'}`}>
-          {!siteAnimation.cardDeckEnabled && <ScrollReveal direction="up" duration={0.6} once>
-            <div className="mb-9 max-w-3xl sm:mb-12">
-              <p style={{ color: String(magazineContent.accentColor) }} className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.22em] sm:text-xs">{String(magazineContent.eyebrow)}</p>
-              <h2 id="magazine-highlights-title" className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{String(magazineContent.title)}</h2>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#4B5563] sm:text-base">{String(magazineContent.intro)}</p>
-            </div>
-          </ScrollReveal>}
-          <div className="flex flex-col gap-6 sm:gap-8 lg:gap-10">
-            {cards.map((card, index) => <MagazineFeature key={`magazine-${card.id}`} card={card} index={index} />)}
-          </div>
+        <div className={siteAnimation.cardDeckEnabled ? 'pb-12 sm:pb-16' : ''}>
+          <HomepageMagazine
+            eyebrow={String(magazineContent.eyebrow)}
+            title={String(magazineContent.title)}
+            intro={String(magazineContent.intro)}
+            stories={resolveHomepageMagazineStories(magazineContent)}
+            accentColor={String(magazineContent.accentColor)}
+          />
         </div>
       </section>
 

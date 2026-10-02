@@ -4,7 +4,7 @@ import { motion, MotionProps } from 'framer-motion';
 import { useInView, useReducedMotion } from 'framer-motion';
 import { ReactNode, ElementType, useRef } from 'react';
 import { dramaticEase } from '@/lib/motion';
-import { useSiteAnimation } from '@/components/SiteAnimationContext';
+import { usePageTransitionActive, useSiteAnimation } from '@/components/SiteAnimationContext';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'zoom' | 'zoom-out' | 'fade' | 'clip';
 
@@ -59,6 +59,7 @@ export default function ScrollReveal({
   });
   const prefersReducedMotion = useReducedMotion();
   const siteAnimation = useSiteAnimation();
+  const pageTransitionActive = usePageTransitionActive();
   const MotionTag = motion[Tag as keyof typeof motion] as React.ComponentType<
     MotionProps & {
       className?: string;
@@ -68,13 +69,14 @@ export default function ScrollReveal({
     }
   >;
   const isVisible = prefersReducedMotion || isInView;
+  const avoidDoubleReveal = pageTransitionActive && isInView;
 
   return (
     <MotionTag
       ref={elementRef}
       className={className}
       variants={getVariants(direction)}
-      initial={prefersReducedMotion ? false : 'hidden'}
+      initial={prefersReducedMotion || avoidDoubleReveal ? false : 'hidden'}
       animate={isVisible ? 'visible' : 'hidden'}
       aria-hidden={!isVisible}
       inert={!isVisible}

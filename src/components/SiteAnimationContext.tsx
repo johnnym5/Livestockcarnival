@@ -5,3 +5,6 @@ import { DEFAULT_SITE_ANIMATION, type SiteAnimationValues } from '@/lib/siteAnim
 
 export const SiteAnimationContext = createContext<SiteAnimationValues>(DEFAULT_SITE_ANIMATION.defaults);
 export const useSiteAnimation = () => useContext(SiteAnimationContext);
+
+export const PageTransitionContext = createContext(false);
+export const usePageTransitionActive = () => useContext(PageTransitionContext);
