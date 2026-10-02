@@ -95,11 +95,11 @@ export default function ContactPage() {
                   title: 'Social Media Channels',
                   content: (
                     <div className="space-y-1">
-                      <a href="https://x.com/livestockcarnival" target="_blank" rel="noopener noreferrer" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm font-medium">
-                        Twitter (X): @livestockcarnival
+                      <a href="https://x.com/livestock_carnival" target="_blank" rel="noopener noreferrer" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm font-medium">
+                        Twitter (X): @livestock_carnival
                       </a>
-                      <a href="https://instagram.com/livestockcarnival" target="_blank" rel="noopener noreferrer" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm font-medium">
-                        Instagram: @livestockcarnival
+                      <a href="https://instagram.com/livestock_carnival" target="_blank" rel="noopener noreferrer" className="block text-[#4B5563] hover:text-[#1E4D38] transition-colors text-sm font-medium">
+                        Instagram: @livestock_carnival
                       </a>
                     </div>
                   ),
