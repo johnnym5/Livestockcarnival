@@ -339,7 +339,8 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
   const deckY = useTransform(scrollYProgress, [0, settings.cardScrollStart, settings.fanStartProgress, settings.fanEndProgress, settings.fanHoldEndProgress, restackStart, settings.magazineEndProgress], [stackOffset, stackOffset - viewportHeight * 0.08, stackOffset - viewportHeight * 0.08, -fanVerticalLift, -fanVerticalLift, -fanVerticalLift, stackOffset]);
   const deckScale = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress, restackStart, settings.magazineEndProgress], [isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop, isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop, isMobile ? settings.fanScaleMobile : settings.fanScaleDesktop, isMobile ? settings.fanScaleMobile : settings.fanScaleDesktop, (isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop) * settings.magazineScale]);
   const magazineY = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [viewportHeight, 0]);
-  const deckOpacity = useTransform(scrollYProgress, [restackStart, settings.magazineEndProgress], [1, 0]);
+  const deckOpacity = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [1, 0]);
+  const atmosphereOpacity = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [0.22 + (settings.heroBackgroundIntensity / 10) * 0.46, 0]);
   const heroInitial = simplifyMotion ? false : 'hidden';
   const revealOrders = [
     ['logo', 'eyebrow', 'title', 'intro'],
@@ -415,6 +416,7 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
       style={{ height: simplifyMotion ? 'auto' : `${settings.sceneLengthVh}vh`, '--homepage-background-intensity': String(settings.heroBackgroundIntensity / 10) } as React.CSSProperties}
     >
       <div className="homepage-deck-scene">
+        <motion.div className="homepage-deck-atmosphere" style={{ opacity: simplifyMotion ? 1 : atmosphereOpacity }} aria-hidden="true" />
         <div className="homepage-deck-hero">{hero}</div>
         {!simplifyMotion && <motion.p className="homepage-deck-prompt" style={{ opacity: promptOpacity, scale: promptScale }} aria-hidden="true"><span>PICK A CARD AND</span> <strong>EXPLORE!</strong></motion.p>}
         <motion.div className="homepage-deck-fan" style={{ y: simplifyMotion ? 0 : deckY, scale: simplifyMotion ? 1 : deckScale, opacity: simplifyMotion ? 1 : deckOpacity }}>

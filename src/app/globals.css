@@ -297,12 +297,12 @@ html.lenis, html.lenis body {
   position: absolute; inset: 0 0 auto; height: 100%; pointer-events: none; opacity: .72;
   background: radial-gradient(ellipse at 50% 12%, rgba(232, 196, 104, .14), transparent 52%);
 }
-.homepage-deck-runway { position: relative; isolation: isolate; overflow: clip; background: linear-gradient(135deg, #F7F0E2 0%, #EFE5D1 48%, #FBF8F0 100%); }
+.homepage-deck-runway { position: relative; overflow: clip; background: transparent; }
 .homepage-deck-scene {
-  position: sticky; top: var(--homepage-sticky-top, 72px); height: calc(100svh - var(--homepage-sticky-top, 72px)); min-height: 0; overflow: clip; isolation: isolate;
-  background: linear-gradient(135deg, #F7F0E2 0%, #EFE5D1 48%, #FBF8F0 100%);
+  position: sticky; z-index: 20; top: var(--homepage-sticky-top, 72px); height: calc(100svh - var(--homepage-sticky-top, 72px)); min-height: 0; overflow: clip; isolation: isolate;
+  background: transparent;
 }
-.homepage-deck-scene::before { position: absolute; z-index: 0; inset: -15%; content: ''; pointer-events: none; opacity: calc(.22 + var(--homepage-background-intensity, .5) * .46); background: linear-gradient(115deg, rgba(250,245,232,.78), rgba(238,224,196,.62)), url('/assets/livestock/showcase-spectrum-hero.jpg') center 45% / cover; filter: blur(22px) saturate(.72); transform: scale(1.08); animation: homepage-hero-atmosphere 24s ease-in-out infinite alternate; }
+.homepage-deck-atmosphere { position: absolute; z-index: 0; inset: -15%; pointer-events: none; background: linear-gradient(115deg, rgba(250,245,232,.78), rgba(238,224,196,.62)), url('/assets/livestock/showcase-spectrum-hero.jpg') center 45% / cover; filter: blur(22px) saturate(.72); transform: scale(1.08); animation: homepage-hero-atmosphere 24s ease-in-out infinite alternate; }
 @keyframes homepage-hero-atmosphere { from { transform: scale(.96) translateY(0); } to { transform: scale(1.04) translateY(1.5%); } }
 .homepage-deck-hero { position: absolute; z-index: 5; inset: 3% 20px auto; display: flex; justify-content: center; text-align: center; pointer-events: none; }
 .homepage-deck-hero-inner { width: min(100%, 1160px); transform-origin: center top; will-change: transform, filter; }
@@ -364,7 +364,7 @@ html.lenis, html.lenis body {
 .is-reduced-motion .homepage-deck-scroll-cue,.is-reduced-motion .homepage-deck-magazine { display: none; }
 @media (max-width: 767px) {
   .homepage-deck-scene { --homepage-sticky-top: 56px; min-height: 0; }
-  .homepage-deck-scene::before { animation: none; filter: blur(8px) saturate(.8); background-image: linear-gradient(135deg, rgba(248,239,215,.48), rgba(218,195,145,.34)), url('/assets/livestock/showcase-spectrum-hero.jpg'); transform: scale(1.05); }
+  .homepage-deck-atmosphere { animation: none; filter: blur(8px) saturate(.8); background-image: linear-gradient(135deg, rgba(248,239,215,.48), rgba(218,195,145,.34)), url('/assets/livestock/showcase-spectrum-hero.jpg'); transform: scale(1.05); }
   .homepage-deck-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
   .homepage-deck-hero { inset: 4% 14px auto; }
   .homepage-deck-title { max-width: 640px; margin-top: 10px; font-size: clamp(2.05rem, 9vw, 3.55rem); text-shadow: 0 1px 0 rgba(255,255,255,.78), 0 4px 14px rgba(31,38,28,.14); }
@@ -391,12 +391,10 @@ html.lenis, html.lenis body {
   .is-reduced-motion .homepage-deck-card-position { top: 50%; }
 }
 @media (min-width: 1024px) {
-  .homepage-deck-runway { isolation: auto; }
-  .homepage-deck-scene { z-index: 20; background: transparent; }
   .homepage-deck-magazine { inset: 0 0 auto; display: block; padding-bottom: 0; }
 }
 @media (hover: none) and (pointer: coarse) {
-  .homepage-deck-scene::before { animation: none; filter: blur(8px) saturate(.8); background-image: linear-gradient(135deg, rgba(248,239,215,.48), rgba(218,195,145,.34)), url('/assets/livestock/showcase-spectrum-hero.jpg'); transform: scale(1.05); }
+  .homepage-deck-atmosphere { animation: none; filter: blur(8px) saturate(.8); background-image: linear-gradient(135deg, rgba(248,239,215,.48), rgba(218,195,145,.34)), url('/assets/livestock/showcase-spectrum-hero.jpg'); transform: scale(1.05); }
   .homepage-deck-hero-inner,.homepage-deck-fan,.homepage-deck-fan-rise,.homepage-deck-card-position,.homepage-deck-open-card,.homepage-deck-open-inner { will-change: transform, opacity; }
   .homepage-deck-logo,.homepage-deck-open-logo { filter: none; }
   .homepage-deck-prompt { text-shadow: 0 2px 0 #fff, 0 3px 8px rgba(16,24,18,.2); }
@@ -408,7 +406,7 @@ html.lenis, html.lenis body {
   .homepage-deck-card-position { width: 72vw; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .homepage-deck-scene::before { animation: none; }
+  .homepage-deck-atmosphere { animation: none; }
   .homepage-deck-scroll-cue i::after { animation: none; }
   .homepage-deck-card,.homepage-deck-close { transition: none !important; }
 }
