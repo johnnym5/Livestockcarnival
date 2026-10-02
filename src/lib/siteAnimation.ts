@@ -17,6 +17,9 @@ export interface SiteAnimationDocument {
   pageOverrides: Record<string, Partial<SiteAnimationValues>>;
 }
 
+export const SITE_ANIMATION_STORAGE_KEY = 'livestockcarnival:site-animation-settings';
+export const SITE_ANIMATION_UPDATED_EVENT = 'livestockcarnival:site-animation-settings-updated';
+
 export const DEFAULT_SITE_ANIMATION: SiteAnimationDocument = {
   defaults: {
     transitionEffect: 'blur-fade', transitionDuration: 0.5, homepageRevealDuration: 3,

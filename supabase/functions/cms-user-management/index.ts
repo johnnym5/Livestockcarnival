@@ -12,7 +12,7 @@ const permissionKeys = new Set([
 const parsePermissions = (input: unknown): string[] | null => {
   if (!Array.isArray(input)) return null;
   const values = [...new Set(input.filter((value): value is string => typeof value === 'string'))];
-  if (values.length < 1 || values.some((value) => !permissionKeys.has(value))) return null;
+  if (values.length !== input.length || values.some((value) => !permissionKeys.has(value))) return null;
   return values;
 };
 
@@ -85,7 +85,7 @@ Deno.serve(async (request: Request) => {
 
   if (body.action === 'invite') {
     const permissions = parsePermissions(body.permissions);
-    if (!permissions) return jsonResponse(400, { error: 'Select at least one valid access area for this editor.' });
+    if (!permissions?.length) return jsonResponse(400, { error: 'Select at least one valid access area for this editor.' });
     if (!body.display_name?.trim()) return jsonResponse(400, { error: 'Enter the staff member’s name.' });
     const email = body.email?.trim().toLowerCase();
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -104,12 +104,12 @@ Deno.serve(async (request: Request) => {
       return jsonResponse(400, { error: inviteError?.message ?? 'Could not send the invitation.' });
     }
 
-    const { error: insertError } = await adminClient.from('cms_users').insert({
+    const { error: insertError } = await adminClient.from('cms_users').upsert({
       user_id: invitation.user.id,
       email,
       display_name: body.display_name?.trim() ?? '',
       role: 'editorial',
-    });
+    }, { onConflict: 'user_id' });
 
     if (insertError) {
       await adminClient.auth.admin.deleteUser(invitation.user.id);
@@ -129,7 +129,7 @@ Deno.serve(async (request: Request) => {
 
   if (body.action === 'update_permissions') {
     const permissions = parsePermissions(body.permissions);
-    if (!body.user_id || !permissions) return jsonResponse(400, { error: 'Select at least one valid access area.' });
+    if (!body.user_id || !permissions) return jsonResponse(400, { error: 'Choose a user and provide a valid access list.' });
     const { error: replaceError } = await adminClient.rpc('cms_replace_editor_permissions', {
       actor_id: userResult.user.id, target_user_id: body.user_id, requested_permissions: permissions,
     });

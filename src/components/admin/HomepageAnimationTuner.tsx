@@ -1,24 +1,46 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { Save } from 'lucide-react';
 import { DEFAULT_HOMEPAGE_MOTION, normalizeHomepageMotion, type HomepageMotionSettings } from '@/lib/homepageMotion';
 import { supabase } from '@/lib/supabase/client';
-import { DEFAULT_SITE_ANIMATION, normalizeSiteAnimation, resolveSiteAnimation, type SiteAnimationDocument, type SiteAnimationValues, type TransitionEffect } from '@/lib/siteAnimation';
+import { DEFAULT_SITE_ANIMATION, normalizeSiteAnimation, resolveSiteAnimation, SITE_ANIMATION_STORAGE_KEY, SITE_ANIMATION_UPDATED_EVENT, type SiteAnimationDocument, type SiteAnimationValues, type TransitionEffect } from '@/lib/siteAnimation';
 
-const controls: { key: keyof HomepageMotionSettings; label: string; min: number; max: number; step: number }[] = [
-  { key: 'stackStartY', label: 'Starting vertical position', min: 0.55, max: 1.2, step: 0.01 },
-  { key: 'stackScaleDesktop', label: 'Desktop stack size', min: 0.35, max: 0.8, step: 0.01 },
-  { key: 'stackScaleMobile', label: 'Mobile stack size', min: 0.5, max: 1, step: 0.01 },
-  { key: 'stackPeek', label: 'Peek amount', min: 0.08, max: 0.45, step: 0.01 },
-  { key: 'fanSpreadDesktop', label: 'Desktop fan spread', min: 35, max: 100, step: 1 },
-  { key: 'fanSpreadMobile', label: 'Mobile fan spread', min: 30, max: 85, step: 1 },
-  { key: 'riseDuration', label: 'Rise duration (seconds)', min: 0.25, max: 2.5, step: 0.05 },
-  { key: 'fanDuration', label: 'Fan duration (seconds)', min: 0.5, max: 4, step: 0.05 },
-  { key: 'flipDuration', label: 'Flip duration (seconds)', min: 0.3, max: 1.8, step: 0.05 },
-  { key: 'magazineScale', label: 'Magazine overlap scale', min: 0.65, max: 1, step: 0.01 },
-  { key: 'magazineBlurDesktop', label: 'Desktop overlap blur', min: 0, max: 8, step: 0.1 },
-  { key: 'magazineBlurMobile', label: 'Mobile overlap blur', min: 0, max: 4, step: 0.1 },
+const controls: { key: keyof HomepageMotionSettings; label: string; min: number; max: number; step: number; group: string }[] = [
+  { key: 'sceneLengthVh', label: 'Total pinned scroll length (vh)', min: 280, max: 600, step: 10, group: 'Scene and opening' },
+  { key: 'heroStepStagger', label: 'Delay between hero elements (seconds)', min: 0.04, max: 0.5, step: 0.01, group: 'Scene and opening' },
+  { key: 'heroStepDuration', label: 'Hero element reveal (seconds)', min: 0.15, max: 1.5, step: 0.05, group: 'Scene and opening' },
+  { key: 'riseDelay', label: 'Delay before deck rises (seconds)', min: 0, max: 2.5, step: 0.05, group: 'Scene and opening' },
+  { key: 'riseDuration', label: 'Deck rise duration (seconds)', min: 0.25, max: 3, step: 0.05, group: 'Scene and opening' },
+  { key: 'stackStartY', label: 'Deck starting position', min: 0.3, max: 0.8, step: 0.01, group: 'Scene and opening' },
+  { key: 'stackScaleDesktop', label: 'Desktop deck scale', min: 0.65, max: 1.2, step: 0.01, group: 'Deck and fan' },
+  { key: 'stackScaleMobile', label: 'Mobile deck scale', min: 0.55, max: 1.1, step: 0.01, group: 'Deck and fan' },
+  { key: 'fanScaleDesktop', label: 'Desktop fanned card scale', min: 0.55, max: 1.25, step: 0.01, group: 'Deck and fan' },
+  { key: 'fanScaleMobile', label: 'Mobile fanned card scale', min: 0.5, max: 1.1, step: 0.01, group: 'Deck and fan' },
+  { key: 'stackPeek', label: 'Stack card spacing', min: 0.08, max: 0.55, step: 0.01, group: 'Deck and fan' },
+  { key: 'fanSpreadDesktop', label: 'Desktop fan spread', min: 35, max: 100, step: 1, group: 'Deck and fan' },
+  { key: 'fanSpreadMobile', label: 'Mobile fan spread', min: 24, max: 72, step: 1, group: 'Deck and fan' },
+  { key: 'fanStartProgress', label: 'Fan start point (scene progress)', min: 0.02, max: 0.55, step: 0.01, group: 'Scroll stages' },
+  { key: 'fanEndProgress', label: 'Fan open point (scene progress)', min: 0.08, max: 0.72, step: 0.01, group: 'Scroll stages' },
+  { key: 'fanHoldEndProgress', label: 'End of fan hold (scene progress)', min: 0.12, max: 0.86, step: 0.01, group: 'Scroll stages' },
+  { key: 'promptStartProgress', label: 'Prompt fade start (after fan opens)', min: 0.08, max: 0.84, step: 0.01, group: 'Scroll stages' },
+  { key: 'promptEndProgress', label: 'Prompt fully visible (scene progress)', min: 0.1, max: 0.9, step: 0.01, group: 'Scroll stages' },
+  { key: 'heroShrinkEnd', label: 'Hero shrink complete (scene progress)', min: 0.08, max: 0.48, step: 0.01, group: 'Scroll stages' },
+  { key: 'magazineEndProgress', label: 'Magazine fully covering deck (scene progress)', min: 0.2, max: 1, step: 0.01, group: 'Magazine overlap' },
+  { key: 'magazineRestackAt', label: 'Restack point during overlap', min: 0.2, max: 0.8, step: 0.01, group: 'Magazine overlap' },
+  { key: 'magazineScale', label: 'Deck scale under magazine', min: 0.55, max: 1, step: 0.01, group: 'Magazine overlap' },
+  { key: 'magazineBlurDesktop', label: 'Desktop deck blur (px)', min: 0, max: 8, step: 0.1, group: 'Magazine overlap' },
+  { key: 'magazineBlurMobile', label: 'Mobile deck blur (px)', min: 0, max: 2.5, step: 0.1, group: 'Magazine overlap' },
+  { key: 'heroScaleOpeningDesktop', label: 'Desktop opening hero scale', min: 0.75, max: 1.4, step: 0.01, group: 'Hero and selection' },
+  { key: 'heroScaleOpeningMobile', label: 'Mobile opening hero scale', min: 0.75, max: 1.3, step: 0.01, group: 'Hero and selection' },
+  { key: 'heroScaleCoveredDesktop', label: 'Desktop covered/fan hero scale', min: 0.5, max: 1.1, step: 0.01, group: 'Hero and selection' },
+  { key: 'heroScaleCoveredMobile', label: 'Mobile covered/fan hero scale', min: 0.5, max: 1.1, step: 0.01, group: 'Hero and selection' },
+  { key: 'heroBlur', label: 'Hero blur after scroll (px, max 10)', min: 0, max: 10, step: 0.1, group: 'Hero and selection' },
+  { key: 'heroBackgroundIntensity', label: 'Hero background animation intensity', min: 0, max: 10, step: 0.1, group: 'Hero and selection' },
+  { key: 'expandedCardScaleDesktop', label: 'Desktop expanded card scale', min: 0.9, max: 1.15, step: 0.01, group: 'Hero and selection' },
+  { key: 'expandedCardScaleMobile', label: 'Mobile expanded card scale', min: 0.9, max: 1.15, step: 0.01, group: 'Hero and selection' },
+  { key: 'flipDuration', label: 'Card flip and expand (seconds)', min: 0.4, max: 2.5, step: 0.05, group: 'Hero and selection' },
 ];
 
 export default function HomepageAnimationTuner() {
@@ -28,6 +50,9 @@ export default function HomepageAnimationTuner() {
   const [siteDocument, setSiteDocument] = useState<SiteAnimationDocument>(DEFAULT_SITE_ANIMATION);
   const [route, setRoute] = useState('all');
   const [siteSaving, setSiteSaving] = useState(false);
+  const [previewProgress, setPreviewProgress] = useState(0.5);
+  const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
+  const [previewExpanded, setPreviewExpanded] = useState(false);
   useEffect(() => {
     void supabase.from('homepage_motion_settings').select('settings').eq('id', 1).maybeSingle().then(({ data }) => {
       if (data?.settings) setSettings(normalizeHomepageMotion(data.settings));
@@ -45,7 +70,14 @@ export default function HomepageAnimationTuner() {
   const saveSite = async () => {
     setSiteSaving(true);
     const { error } = await supabase.from('site_animation_settings').upsert({ id: 1, settings: siteDocument, updated_at: new Date().toISOString() });
-    setMessage(error ? `Could not save site animation settings: ${error.message}` : 'Site-wide animation settings saved.');
+    if (error) {
+      setMessage(`Could not save site animation settings: ${error.message}`);
+    } else {
+      const normalized = normalizeSiteAnimation(siteDocument);
+      try { window.localStorage.setItem(SITE_ANIMATION_STORAGE_KEY, JSON.stringify(normalized)); } catch { /* Storage may be unavailable. */ }
+      window.dispatchEvent(new CustomEvent(SITE_ANIMATION_UPDATED_EVENT, { detail: normalized }));
+      setMessage('Site-wide animation settings saved and applied.');
+    }
     setSiteSaving(false);
   };
   const save = async () => {
@@ -55,14 +87,55 @@ export default function HomepageAnimationTuner() {
     setSaving(false);
   };
   const spread = settings.fanSpreadDesktop;
+  const heroRevealSequences = [
+    'Logo → eyebrow → headline → introduction',
+    'Headline → logo → eyebrow → introduction',
+    'Logo → headline → introduction → eyebrow',
+    'Eyebrow → logo → headline → introduction',
+  ];
+  const heroRevealSequence = heroRevealSequences[Math.round(settings.heroRevealPreset)] ?? heroRevealSequences[0];
+  const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
+  const isPreviewMobile = previewViewport === 'mobile';
+  const fanAmount = clamp01((previewProgress - settings.fanStartProgress) / (settings.fanEndProgress - settings.fanStartProgress));
+  const overlapAmount = clamp01((previewProgress - settings.fanHoldEndProgress) / (settings.magazineEndProgress - settings.fanHoldEndProgress));
+  const restackAmount = clamp01((overlapAmount - settings.magazineRestackAt) / (1 - settings.magazineRestackAt));
+  const fanVisible = fanAmount * (1 - restackAmount);
+  const promptIn = clamp01((previewProgress - settings.promptStartProgress) / (settings.promptEndProgress - settings.promptStartProgress));
+  const promptOut = 1 - clamp01((previewProgress - settings.fanHoldEndProgress) / (settings.magazineEndProgress - settings.fanHoldEndProgress));
+  const activeStackScale = isPreviewMobile ? settings.stackScaleMobile : settings.stackScaleDesktop;
+  const activeFanScale = isPreviewMobile ? settings.fanScaleMobile : settings.fanScaleDesktop;
+  const stageScale = (activeStackScale + fanAmount * (activeFanScale - activeStackScale)) * (1 - overlapAmount * (1 - settings.magazineScale));
+  const heroOpeningScale = isPreviewMobile ? settings.heroScaleOpeningMobile : settings.heroScaleOpeningDesktop;
+  const heroCoveredScale = isPreviewMobile ? settings.heroScaleCoveredMobile : settings.heroScaleCoveredDesktop;
+  const heroPreviewProgress = clamp01(previewProgress / settings.heroShrinkEnd);
+  const heroPreviewScale = heroOpeningScale + heroPreviewProgress * (heroCoveredScale - heroOpeningScale);
+  const expandedPreviewScale = isPreviewMobile ? settings.expandedCardScaleMobile : settings.expandedCardScaleDesktop;
+  const overlapBlur = overlapAmount * settings.magazineBlurDesktop;
   return <div className="space-y-6"><section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
     <div className="rounded-2xl border border-[#E1E7E0] bg-white p-5 shadow-sm sm:p-7">
       <h2 className="text-base font-extrabold">Homepage animation tuner</h2><p className="mt-1 text-xs text-[#758078]">Changes preview here and only reach the homepage after you save.</p>
-      <div className="mt-6 grid gap-x-6 gap-y-5 sm:grid-cols-2">{controls.map(({ key, label, min, max, step }) => <label key={key} className="block text-xs font-bold text-[#526057]">{label}<div className="mt-2 flex items-center gap-3"><input className="min-w-0 flex-1 accent-[#1E4D38]" type="range" min={min} max={max} step={step} value={settings[key]} onChange={(event) => setSettings((current) => ({ ...current, [key]: Number(event.target.value) }))} /><output className="w-12 text-right tabular-nums">{settings[key]}</output></div></label>)}</div>
+      <label className="mt-5 block max-w-lg text-xs font-bold text-[#526057]">Hero reveal order<select className="mt-2 h-10 w-full rounded-lg border border-[#DDE4DC] bg-white px-3" value={Math.round(settings.heroRevealPreset)} onChange={(event) => setSettings((current) => normalizeHomepageMotion({ ...current, heroRevealPreset: Number(event.target.value) }))}><option value="0">Logo → eyebrow → headline → introduction</option><option value="1">Headline → logo → eyebrow → introduction</option><option value="2">Logo → headline → introduction → eyebrow</option><option value="3">Eyebrow → logo → headline → introduction</option></select></label>
+      <div className="mt-6 grid gap-x-6 gap-y-5 sm:grid-cols-2">{controls.map((control, index) => <div key={control.key}>{(index === 0 || controls[index - 1].group !== control.group) && <h3 className="mb-2 mt-3 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#8D6B1B] sm:col-span-2">{control.group}</h3>}<label className="block text-xs font-bold text-[#526057]">{control.label}<div className="mt-2 flex items-center gap-3"><input className="min-w-0 flex-1 accent-[#1E4D38]" type="range" min={control.min} max={control.max} step={control.step} value={settings[control.key]} onChange={(event) => setSettings((current) => normalizeHomepageMotion({ ...current, [control.key]: Number(event.target.value) }))} /><output className="w-12 text-right tabular-nums">{settings[control.key] < 1 ? settings[control.key].toFixed(2) : settings[control.key]}</output></div></label></div>)}</div>
       {message && <p className="mt-5 text-xs font-semibold text-[#1E4D38]">{message}</p>}
       <button type="button" onClick={() => void save()} disabled={saving} className="mt-6 inline-flex h-10 items-center gap-2 rounded-xl bg-[#1E4D38] px-4 text-xs font-extrabold text-white disabled:opacity-60"><Save className="h-4 w-4" />{saving ? 'Saving…' : 'Save animation settings'}</button>
     </div>
-    <aside className="rounded-2xl border border-[#E1E7E0] bg-[#FBFCFA] p-5"><h3 className="text-xs font-extrabold uppercase tracking-wider">Live preview</h3><div className="relative mt-4 h-64 overflow-hidden rounded-xl border border-[#E7EAE6] bg-[#F4F1E8]"><div className="absolute left-1/2 top-1/2 h-32 w-48 -translate-x-1/2 -translate-y-1/2" style={{ transform: `translate(-50%, calc(-50% + ${(settings.stackStartY - 0.5) * 90}px))` }}>{Array.from({ length: 5 }, (_, index) => { const n = index - 2; return <div key={index} className="absolute inset-0 rounded-xl border-2 border-[#E4B03A] bg-gradient-to-br from-[#0D4020] to-[#031209] shadow-lg transition-all" style={{ transitionDuration: `${settings.fanDuration}s`, transform: `translate(${n * spread * 0.48}px, ${Math.abs(n) * settings.stackPeek * 36}px) rotate(${n * 9}deg) scale(${settings.stackScaleDesktop})`, zIndex: 5 - Math.abs(n) }} />; })}<p className="absolute inset-x-0 -top-9 text-center text-xs font-black uppercase text-[#101820]">Pick a card and explore</p></div></div><p className="mt-3 text-[11px] leading-5 text-[#758078]">Preview responds to stack position, size, peek, and fan timing. Test final scroll timing on the public homepage after saving.</p></aside>
+    <aside className="rounded-2xl border border-[#E1E7E0] bg-[#FBFCFA] p-5">
+      <h3 className="text-xs font-extrabold uppercase tracking-wider">Deck preview</h3>
+      <label className="mt-3 block text-[11px] font-bold text-[#526057]">Preview viewport<select className="mt-1 h-9 w-full rounded-lg border border-[#DDE4DC] bg-white px-2" value={previewViewport} onChange={(event) => setPreviewViewport(event.target.value as 'desktop' | 'mobile')}><option value="desktop">Desktop</option><option value="mobile">Mobile</option></select></label>
+      <div className={`relative mt-3 h-64 overflow-hidden rounded-xl border border-[#E7EAE6] bg-[#F4F1E8] ${isPreviewMobile ? 'mx-auto max-w-[190px]' : ''}`} style={{ backgroundImage: `radial-gradient(ellipse at 50% 18%, rgba(232,196,104,${settings.heroBackgroundIntensity / 25}), transparent 64%)` }}>
+        <div className="absolute inset-x-2 top-8 z-0 text-center" style={{ transform: `scale(${heroPreviewScale})`, opacity: Math.max(0.12, 1 - fanAmount * 0.88) }}><Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={60} height={46} className="mx-auto h-7 w-auto" /><p className="mt-1 text-[8px] font-black leading-tight text-[#17221A]">WELCOME TO THE <span className="text-[#D9A928]">NATIONAL CARNIVAL</span></p></div>
+        <p className="absolute inset-x-0 top-4 z-20 text-center text-[11px] font-black uppercase tracking-wide text-[#101820]" style={{ opacity: promptIn * promptOut, filter: `blur(${(1 - promptIn) * 3 + (1 - promptOut) * 2}px)` }}>PICK A CARD AND <span className="text-[#D9A928]">EXPLORE!</span></p>
+        <div className="absolute left-1/2 top-[61%] h-24 w-44 transition-[filter,transform]" style={{ transform: `translate(-50%, calc(-50% + ${(1 - fanAmount) * settings.stackStartY * 38 - fanAmount * 59}px)) scale(${stageScale})`, filter: `blur(${overlapBlur}px)` }}>
+          {Array.from({ length: 5 }, (_, index) => { const n = index - 2; const colors = ['#0D4020', '#2A2006', '#20125C', '#0D4845', '#0E2014']; const fanX = n * (isPreviewMobile ? settings.fanSpreadMobile : spread) * (isPreviewMobile ? 0.5 : 0.82) * fanVisible; const rotation = n * (isPreviewMobile ? 8 : 13) * fanVisible; return <div key={index} className="absolute left-1/2 top-1/2 grid place-items-center rounded-xl border-2 bg-gradient-to-br shadow-lg" style={{ width: '100%', aspectRatio: isPreviewMobile ? '9 / 16' : '16 / 9', borderColor: '#D9A928', background: `linear-gradient(135deg, ${colors[index]}, #031209)`, transform: `translate(calc(-50% + ${fanX}px), calc(-50% + ${Math.abs(n) * settings.stackPeek * 10}px)) rotate(${rotation}deg)`, zIndex: index }}>{index === 2 && <Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={54} height={42} className="w-10" />}</div>; })}
+        </div>
+        <div className="absolute inset-x-0 bottom-0 z-10 border-t border-[#D9A928]/60 transition-[height,opacity]" style={{ height: `${overlapAmount * 100}%`, opacity: overlapAmount, background: '#F4F1E8' }} />
+        {previewExpanded && <div className="absolute inset-0 z-40 grid place-items-center bg-black/35 backdrop-blur-sm"><div className="grid h-full w-full place-items-center rounded-xl border-2 border-[#D9A928] bg-gradient-to-br from-[#0D4020] to-[#031209] shadow-2xl" style={{ transform: `scale(${expandedPreviewScale})` }}><div className="text-center"><Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={70} height={54} className="mx-auto w-12" /><span className="mt-2 block text-[9px] font-black uppercase tracking-widest text-[#F2C349]">Expanded card preview</span></div></div><button type="button" onClick={() => setPreviewExpanded(false)} className="absolute right-2 top-2 rounded-full bg-white px-3 py-1 text-[10px] font-bold text-[#1E4D38]">Close preview</button></div>}
+      </div>
+      <button type="button" onClick={() => setPreviewExpanded((current) => !current)} className="mt-3 rounded-lg border border-[#DDE4DC] bg-white px-3 py-2 text-[10px] font-extrabold text-[#1E4D38]">{previewExpanded ? 'Hide expanded preview' : 'Preview expanded card'}</button>
+      <p className="mt-3 text-[10px] font-bold text-[#526057]">Hero reveal: {heroRevealSequence}</p>
+      <label className="mt-3 block text-[11px] font-bold text-[#526057]">Scrub scene preview<input className="mt-2 w-full accent-[#1E4D38]" type="range" min="0" max="1" step="0.01" value={previewProgress} onChange={(event) => setPreviewProgress(Number(event.target.value))} /><span className="flex justify-between font-medium text-[#758078]"><span>Opening</span><span>Fan</span><span>Magazine</span></span></label>
+      <p className="mt-3 text-[11px] leading-5 text-[#758078]">Scrub the scene to preview the opening, fan, prompt, restack, and magazine overlap. Motion settings apply on the public homepage after saving.</p>
+    </aside>
   </section>
   <section className="grid gap-5 rounded-2xl border border-[#E1E7E0] bg-white p-5 shadow-sm lg:grid-cols-[minmax(0,1fr)_320px] sm:p-7">
     <div>
@@ -77,6 +150,6 @@ export default function HomepageAnimationTuner() {
       </div>
       <button type="button" disabled={siteSaving} onClick={() => void saveSite()} className="mt-6 inline-flex h-10 items-center gap-2 rounded-xl bg-[#1E4D38] px-4 text-xs font-extrabold text-white disabled:opacity-60"><Save className="h-4 w-4"/>{siteSaving ? 'Saving…' : 'Save site animation settings'}</button>
     </div>
-    <aside className="rounded-xl bg-[#F7F8F5] p-4"><h3 className="text-xs font-extrabold uppercase tracking-wider">Transition preview</h3><div className="mt-4 grid h-48 place-items-center overflow-hidden rounded-xl border bg-white"><div key={`${siteValues.transitionEffect}-${siteValues.transitionDuration}`} className="grid h-28 w-44 place-items-center rounded-xl bg-[#0D4020] text-xs font-black text-[#E4B03A] shadow-xl" style={{ animation: `site-transition-preview ${siteValues.transitionDuration}s ease both`, filter: siteValues.transitionEffect === 'blur-fade' ? 'drop-shadow(0 0 6px #1E4D38)' : undefined }}>CARNIVAL 2026</div></div><p className="mt-3 text-[11px] leading-5 text-[#758078]">This preview updates immediately; public pages use it after saving. Reduced-motion preferences shorten animations for visitors who request them.</p></aside>
+    <aside className="rounded-xl bg-[#F7F8F5] p-4"><h3 className="text-xs font-extrabold uppercase tracking-wider">Transition preview</h3><div className="mt-4 grid h-48 place-items-center overflow-hidden rounded-xl border bg-white"><div key={`${siteValues.transitionEffect}-${siteValues.transitionDuration}`} className={`site-transition-preview site-transition-preview--${siteValues.transitionEffect} grid h-28 w-44 place-items-center rounded-xl bg-[#0D4020] text-xs font-black text-[#E4B03A] shadow-xl`} style={{ animationDuration: `${siteValues.transitionDuration}s` }}>CARNIVAL 2026</div></div><p className="mt-3 text-[11px] leading-5 text-[#758078]">This preview updates immediately; saving also applies the settings to public pages in this browser. Reduced-motion preferences shorten animations for visitors who request them.</p></aside>
   </section></div>;
 }

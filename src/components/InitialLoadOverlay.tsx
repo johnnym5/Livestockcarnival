@@ -8,12 +8,21 @@ export default function InitialLoadOverlay({ isHomePage = false, duration = 3 }:
   const readyRef = useRef(false);
 
   useEffect(() => {
+    // The overlay survives App Router navigation. When the user returns to the
+    // homepage, the page scene may have remounted while this overlay is already
+    // dismissed, so replay the reveal signal without showing the veil again.
+    if (isHomePage && readyRef.current) {
+      window.dispatchEvent(new Event('homepage:reveal-start'));
+      return;
+    }
+
     let frame = 0;
     let fallbackTimer = 0;
     let observer: MutationObserver | null = null;
     const dismiss = () => {
       if (readyRef.current) return;
       readyRef.current = true;
+      if (isHomePage) window.dispatchEvent(new Event('homepage:reveal-start'));
       frame = window.requestAnimationFrame(() => setReady(true));
     };
 

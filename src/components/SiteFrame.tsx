@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import SmoothScroll from '@/components/SmoothScroll';
 import InitialLoadOverlay from '@/components/InitialLoadOverlay';
-import { DEFAULT_SITE_ANIMATION, normalizeSiteAnimation, resolveSiteAnimation, type SiteAnimationDocument, type SiteAnimationValues } from '@/lib/siteAnimation';
+import { DEFAULT_SITE_ANIMATION, normalizeSiteAnimation, resolveSiteAnimation, SITE_ANIMATION_STORAGE_KEY, SITE_ANIMATION_UPDATED_EVENT, type SiteAnimationDocument, type SiteAnimationValues } from '@/lib/siteAnimation';
 import { supabase } from '@/lib/supabase/client';
 import { SiteAnimationContext } from '@/components/SiteAnimationContext';
 import type { CSSProperties } from 'react';
@@ -28,11 +28,44 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     if (isWorkspaceRoute) return () => { active = false; };
+    void Promise.resolve().then(() => {
+      if (!active) return;
+      try {
+        const cached = window.localStorage.getItem(SITE_ANIMATION_STORAGE_KEY);
+        if (cached) setAnimationDocument(normalizeSiteAnimation(JSON.parse(cached)));
+      } catch {
+        // A missing or stale local cache falls back to the database settings.
+      }
+    });
     void supabase.from('site_animation_settings').select('settings').eq('id', 1).maybeSingle().then(({ data }) => {
-      if (active && data?.settings) setAnimationDocument(normalizeSiteAnimation(data.settings));
+      if (active && data?.settings) {
+        const normalized = normalizeSiteAnimation(data.settings);
+        setAnimationDocument(normalized);
+        try { window.localStorage.setItem(SITE_ANIMATION_STORAGE_KEY, JSON.stringify(normalized)); } catch { /* Storage may be unavailable. */ }
+      }
     });
     return () => { active = false; };
   }, [isWorkspaceRoute]);
+
+  useEffect(() => {
+    const applySettings = (raw: unknown) => {
+      if (!raw) return;
+      const normalized = normalizeSiteAnimation(raw);
+      setAnimationDocument(normalized);
+      try { window.localStorage.setItem(SITE_ANIMATION_STORAGE_KEY, JSON.stringify(normalized)); } catch { /* Storage may be unavailable. */ }
+    };
+    const onSettingsUpdated = (event: Event) => applySettings((event as CustomEvent<unknown>).detail);
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== SITE_ANIMATION_STORAGE_KEY || !event.newValue) return;
+      try { applySettings(JSON.parse(event.newValue)); } catch { /* Ignore malformed cached settings. */ }
+    };
+    window.addEventListener(SITE_ANIMATION_UPDATED_EVENT, onSettingsUpdated);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(SITE_ANIMATION_UPDATED_EVENT, onSettingsUpdated);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
 
   const animation: SiteAnimationValues = isWorkspaceRoute
     ? DEFAULT_SITE_ANIMATION.defaults

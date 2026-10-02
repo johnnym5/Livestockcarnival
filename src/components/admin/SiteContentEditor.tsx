@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
 import { supabase } from '@/lib/supabase/client';
 import { Images, Save } from 'lucide-react';
@@ -43,6 +44,16 @@ function blankFromSample(sample: JsonValue, key = ''): JsonValue {
   return '';
 }
 
+function initializeLivestockEntries(value: JsonValue): JsonValue {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return value;
+  const record = value as Record<string, JsonValue>;
+  if (record.catalogInitialized === true) return value;
+  const entries = Array.isArray(record.entries) && record.entries.length
+    ? record.entries
+    : DEFAULT_SITE_CONTENT.livestock.entries as JsonValue[];
+  return { ...record, entries, catalogInitialized: true };
+}
+
 function ContentField({
   label,
   value,
@@ -68,6 +79,7 @@ function ContentField({
     return (
       <fieldset className="min-w-0 space-y-3 rounded-xl border border-[#E1E7E0] bg-[#F9FBF8] p-3 sm:p-4">
         <legend className="px-1 text-xs font-extrabold text-[#1E4D38]">{label} ({value.length})</legend>
+        {label.toLowerCase() === 'entries' && <p className="text-xs leading-relaxed text-[#68746C]">These animals appear in the public livestock catalog after you publish. Edit each animal, choose its image, or add, reorder, and remove entries below.</p>}
         {value.map((item, index) => (
           <div key={index} className="min-w-0 rounded-xl border border-[#E1E7E0] bg-white p-3">
             {item && typeof item === 'object' && !Array.isArray(item)
@@ -80,7 +92,7 @@ function ContentField({
             </div>
           </div>
         ))}
-        <button type="button" onClick={addItem} className="rounded-lg bg-[#E8F1E8] px-3 py-2 text-xs font-bold text-[#1E4D38]">Add {label.replace(/s$/, '')}</button>
+        <button type="button" onClick={addItem} className="rounded-lg bg-[#E8F1E8] px-3 py-2 text-xs font-bold text-[#1E4D38]">{label.toLowerCase() === 'entries' ? 'Add animal' : `Add ${label.replace(/s$/, '')}`}</button>
       </fieldset>
     );
   }
@@ -101,6 +113,7 @@ function ContentField({
       <span>{label}</span>
       {label.toLowerCase().includes('color') ? <input type="color" value={String(value || '#ffffff')} onChange={(event) => onChange(path, event.target.value)} className="h-10 w-16 rounded-lg border border-[#DDE4DC] bg-white p-1" /> : isLongText ? <textarea rows={3} value={String(value ?? '')} onChange={(event) => onChange(path, event.target.value)} className="w-full resize-y rounded-lg border border-[#DDE4DC] bg-white px-3 py-2 text-xs font-normal leading-5 outline-none focus:border-[#1E4D38]" /> :
         <input type={isNumber ? 'number' : 'text'} value={String(value ?? '')} onChange={(event) => onChange(path, isNumber ? Number(event.target.value) : event.target.value)} className="h-9 w-full min-w-0 rounded-lg border border-[#DDE4DC] bg-white px-3 text-xs font-normal outline-none focus:border-[#1E4D38]" />}
+      {isImage && String(value ?? '').trim() && <Image src={String(value)} alt={`${label} preview`} width={180} height={112} unoptimized className="mt-2 h-24 w-40 rounded-lg border border-[#DDE4DC] bg-white object-cover" />}
       {isImage && <button type="button" onClick={() => onPickImage(path)} className="inline-flex items-center gap-1.5 rounded-lg bg-[#E8F1E8] px-2.5 py-1.5 text-[10px] font-bold text-[#1E4D38]"><Images className="h-3.5 w-3.5" />Choose from media library</button>}
     </label>
   );
@@ -130,7 +143,8 @@ export default function SiteContentEditor({
       if (!active) return;
       if (queryError) setError('Could not load saved page content. Check that the site content migration has been applied.');
       else if (data?.content) {
-        setContent(data.content as JsonValue);
+        const savedContent = data.content as JsonValue;
+        setContent(page === 'livestock' ? initializeLivestockEntries(savedContent) : savedContent);
         setStatus(data.status as 'draft' | 'published');
       } else {
         setContent(DEFAULT_SITE_CONTENT[page] as JsonValue);
@@ -186,7 +200,7 @@ export default function SiteContentEditor({
       {error && <p role="alert" className="mx-4 mt-4 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-800 sm:mx-5">{error}</p>}
       {loading ? <p className="p-8 text-center text-sm text-[#758078]">Loading {labels[page].toLowerCase()}…</p> : (
         <div className="max-h-[72vh] space-y-4 overflow-y-auto p-4 sm:p-5">
-          {content && typeof content === 'object' && !Array.isArray(content) && Object.entries(content).map(([key, value]) => <ContentField key={key} label={titleCase(key)} value={value} path={[key]} onChange={change} onPickImage={pickImage} />)}
+          {content && typeof content === 'object' && !Array.isArray(content) && Object.entries(content).filter(([key]) => key !== 'catalogInitialized').map(([key, value]) => <ContentField key={key} label={titleCase(key)} value={value} path={[key]} onChange={change} onPickImage={pickImage} />)}
         </div>
       )}
       <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E9EDE8] bg-[#FBFCFA] px-4 py-3 sm:px-5">

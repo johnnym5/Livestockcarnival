@@ -1,37 +1,59 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, CalendarDays } from 'lucide-react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import ScrollReveal from '@/components/ScrollReveal';
-import HomepageCarousel from '@/components/homepage/HomepageCarousel';
+import HomepageCardDeck from '@/components/homepage/HomepageCardDeck';
 import { supabase } from '@/lib/supabase/client';
 import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
 import { DEFAULT_HOMEPAGE_CARDS, mapCmsCard, type CardData } from '@/lib/homepageCards';
 import { useSiteAnimation } from '@/components/SiteAnimationContext';
 
 function MagazineFeature({ card, index }: { card: CardData; index: number }) {
-  const imageFirst = index % 2 === 0;
+  const featureRef = useRef<HTMLElement>(null);
+  const reducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: featureRef, offset: ['start 92%', 'start 24%'] });
+  const imageOpacity = useTransform(scrollYProgress, [0, 0.25, 0.55], [0, 1, 1]);
+  const overlayOpacity = useTransform(scrollYProgress, [0.18, 0.48, 0.72], [0, 1, 1]);
+  const contentOpacity = useTransform(scrollYProgress, [0.34, 0.62, 0.82], [0, 1, 1]);
+  const contentY = useTransform(scrollYProgress, [0.34, 0.82], [22, 0]);
 
   return (
-    <ScrollReveal direction={index % 2 === 0 ? 'left' : 'right'} duration={0.65} once>
-      <article className="group grid min-h-[330px] overflow-hidden rounded-[1.5rem] border border-[#E0E3DC] bg-white shadow-[0_18px_55px_rgba(17,24,39,0.08)] transition-shadow duration-300 hover:shadow-[0_24px_70px_rgba(17,24,39,0.14)] md:min-h-[380px] md:grid-cols-2">
-        <div className={`relative min-h-[220px] overflow-hidden bg-[#E5E7E6] md:min-h-full ${imageFirst ? 'md:order-1' : 'md:order-2'}`}>
-          <Image src={card.image} alt={card.title} fill sizes="(max-width: 767px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#07150D]/35 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-white/15" />
-          <span className="absolute bottom-4 left-4 rounded-full border border-white/55 bg-[#07150D]/45 px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-white backdrop-blur-sm">{card.number}</span>
-        </div>
-        <div className={`flex flex-col justify-center px-6 py-8 sm:px-9 md:px-12 md:py-12 lg:px-16 ${imageFirst ? 'md:order-2' : 'md:order-1'}`}>
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#8D6B1B] sm:text-xs">{card.eyebrow}</p>
-          <h3 className="mt-3 text-2xl font-black leading-tight text-[#111827] sm:text-3xl lg:text-4xl">{card.title}</h3>
-          <p className="mt-4 text-sm leading-relaxed text-[#4B5563] sm:text-base">{card.body}</p>
-          <Link href={card.link} className="mt-6 inline-flex min-h-11 items-center gap-2 self-start text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#1E4D38] transition-colors hover:text-[#8D6B1B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1E4D38] sm:text-xs">
+    <motion.article
+      ref={featureRef}
+      className="group relative isolate mx-auto aspect-[4/3] min-h-[470px] w-full max-w-[1440px] overflow-hidden rounded-[1.5rem] border border-[#D8C48A]/70 bg-[#07150D] shadow-[0_22px_65px_rgba(17,24,39,0.15)] md:aspect-[16/9] md:min-h-[500px] lg:max-h-[760px]"
+      aria-label={`Magazine feature ${index + 1}: ${card.title}`}
+    >
+      <motion.div className="absolute inset-0" style={reducedMotion ? undefined : { opacity: imageOpacity }}>
+        <Image src={card.image} alt={card.title} fill sizes="(max-width: 767px) 100vw, 92vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" />
+      </motion.div>
+      <span className="absolute left-6 top-6 z-10 rounded-full border border-white/60 bg-[#07150D]/40 px-4 py-1.5 text-xs font-extrabold tracking-[0.18em] text-white backdrop-blur-sm sm:left-8 sm:top-8">{card.number || String(index + 1).padStart(2, '0')}</span>
+      <motion.div
+        className="absolute inset-0 z-10"
+        style={reducedMotion ? undefined : { opacity: overlayOpacity }}
+      >
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-[#06150D]/95 via-[#06150D]/72 to-transparent" />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 backdrop-blur-[4px]"
+          style={{
+            maskImage: 'linear-gradient(to top, #000 0%, #000 42%, transparent 84%)',
+            WebkitMaskImage: 'linear-gradient(to top, #000 0%, #000 42%, transparent 84%)',
+          }}
+        />
+        <motion.div className="absolute inset-x-0 bottom-0 mx-auto flex h-full max-w-[1240px] flex-col justify-end px-6 pb-7 pt-20 sm:px-10 sm:pb-10 sm:pt-24 lg:px-12" style={reducedMotion ? undefined : { opacity: contentOpacity, y: contentY }}>
+          <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#F2C349] sm:text-xs">{card.eyebrow}</p>
+          <h3 className="mt-3 max-w-5xl text-3xl font-black leading-[1.02] text-white sm:text-4xl md:text-5xl lg:text-6xl">{card.title}</h3>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-white/85 sm:mt-4 sm:text-base lg:text-lg">{card.body}</p>
+          <Link href={card.link} className="mt-5 inline-flex min-h-11 items-center gap-2 self-start text-[10px] font-extrabold uppercase tracking-[0.12em] text-white transition-colors hover:text-[#F2C349] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:mt-6 sm:text-xs">
             {card.cta}<ArrowRight aria-hidden="true" size={16} />
           </Link>
-        </div>
-      </article>
-    </ScrollReveal>
+        </motion.div>
+      </motion.div>
+    </motion.article>
   );
 }
 
@@ -46,8 +68,8 @@ export default function Home() {
 
     const loadContent = async () => {
       const [cardsResult, magazineResult] = await Promise.all([
-        supabase.from('homepage_cards').select('*').eq('enabled', true).eq('published', true).order('position', { ascending: true }),
-        supabase.from('site_page_content').select('content').eq('page_key', 'magazine').eq('published', true).maybeSingle(),
+        supabase.from('homepage_cards').select('*').eq('enabled', true).eq('status', 'published').order('position', { ascending: true }),
+        supabase.from('site_page_content').select('content').eq('page_key', 'magazine').eq('status', 'published').maybeSingle(),
       ]);
       if (!active) return;
 
@@ -78,31 +100,18 @@ export default function Home() {
   }, []);
 
   return (
-    <div id="home-page" data-home-ready={contentReady ? 'true' : 'false'} className="min-h-screen overflow-hidden bg-[#FBFBFA] text-[#111827]">
-      <section className="homepage-hero relative px-4 pb-6 pt-16 sm:px-7 sm:pb-12 sm:pt-32 lg:px-10 lg:pb-16 lg:pt-36">
-        <div aria-hidden="true" className="homepage-hero-glow" />
-        <div className="relative mx-auto max-w-[1440px] text-center">
-          <ScrollReveal direction="up" duration={0.55} once>
-            <Image src="/assets/branding/carnival-logo-transparent.png" alt="Livestock Carnival" width={174} height={132} priority className="mx-auto h-[68px] w-auto object-contain sm:h-[96px]" />
-            <p className="mx-auto mt-3 flex max-w-3xl items-center justify-center gap-3 text-[9px] font-extrabold uppercase tracking-[0.15em] text-[#8D6B1B] sm:text-xs sm:tracking-[0.22em]">
-              <span className="hidden h-px w-10 bg-[#D7C58D] sm:block" />Federal Republic of Nigeria <span aria-hidden="true">·</span> Official Carnival &amp; Expo<span className="hidden h-px w-10 bg-[#D7C58D] sm:block" />
-            </p>
-            <h1 className="mx-auto mt-4 max-w-5xl text-[clamp(2.2rem,7vw,6.25rem)] font-black leading-[0.98] tracking-[-0.055em] text-[#111827]">
-              Welcome to the <span className="text-[#D9A928]">National Livestock Carnival</span>
-            </h1>
-            <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-[#4B5563] sm:text-base md:text-lg">
-              Explore championship livestock, Nigerian culture, live performances, festival food and the carnival grounds.
-              <span className="hidden sm:inline"> Scroll through the highlights to discover what’s waiting for you.</span>
-            </p>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {siteAnimation.cardDeckEnabled && (
-        <section aria-label="Carnival highlights" className="homepage-carousel-section pb-16 sm:pb-20 lg:pb-24">
-          <HomepageCarousel cards={cards} />
-        </section>
-      )}
+    <div id="home-page" data-home-ready={contentReady ? 'true' : 'false'} className="min-h-screen overflow-x-clip bg-[#FBFBFA] text-[#111827]">
+      <HomepageCardDeck
+        cards={cards}
+        enabled={siteAnimation.cardDeckEnabled}
+        magazine={{
+          eyebrow: String(magazineContent.eyebrow),
+          title: String(magazineContent.title),
+          intro: String(magazineContent.intro),
+          backgroundColor: String(magazineContent.backgroundColor),
+          accentColor: String(magazineContent.accentColor),
+        }}
+      />
 
       <section
         id="magazine-highlights"
@@ -111,13 +120,13 @@ export default function Home() {
         className="border-t text-[#111827]"
       >
         <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24">
-          <ScrollReveal direction="up" duration={0.6} once>
+          {!siteAnimation.cardDeckEnabled && <ScrollReveal direction="up" duration={0.6} once>
             <div className="mb-9 max-w-3xl sm:mb-12">
               <p style={{ color: String(magazineContent.accentColor) }} className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.22em] sm:text-xs">{String(magazineContent.eyebrow)}</p>
               <h2 id="magazine-highlights-title" className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">{String(magazineContent.title)}</h2>
               <p className="mt-4 max-w-2xl text-sm leading-relaxed text-[#4B5563] sm:text-base">{String(magazineContent.intro)}</p>
             </div>
-          </ScrollReveal>
+          </ScrollReveal>}
           <div className="flex flex-col gap-6 sm:gap-8 lg:gap-10">
             {cards.map((card, index) => <MagazineFeature key={`magazine-${card.id}`} card={card} index={index} />)}
           </div>

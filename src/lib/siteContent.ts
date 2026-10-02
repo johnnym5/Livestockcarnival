@@ -1,5 +1,6 @@
 import { DEFAULT_FASHION_BREEDS } from '@/data/fashionBreeds';
 import { CARNIVAL_PROGRAM } from '@/data/carnivalProgram';
+import { DEFAULT_LIVESTOCK_ENTRIES } from '@/data/livestockCatalog';
 
 export const DEFAULT_SITE_CONTENT: Record<string, Record<string, unknown>> = {
   magazine: {
@@ -19,7 +20,8 @@ export const DEFAULT_SITE_CONTENT: Record<string, Record<string, unknown>> = {
     badge: 'Golden Camel & Livestock Registry',
     title: 'Championship Herds & Royal Cavalry',
     description: 'Explore official verified records of premier dromedaries, royal Durbar steeds, and certified Zebu cattle from leading livestock breeders and Emirates across Nigeria.',
-    entries: [],
+    entries: DEFAULT_LIVESTOCK_ENTRIES,
+    catalogInitialized: true,
   },
   fashion: {
     pageCopy: {

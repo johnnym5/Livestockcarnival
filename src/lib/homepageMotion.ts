@@ -1,56 +1,167 @@
 export interface HomepageMotionSettings {
+  heroRevealPreset: number;
+  heroStepStagger: number;
+  heroStepDuration: number;
+  riseDelay: number;
+  sceneLengthVh: number;
   stackStartY: number;
   stackScaleDesktop: number;
   stackScaleMobile: number;
+  fanScaleDesktop: number;
+  fanScaleMobile: number;
   stackPeek: number;
   fanSpreadDesktop: number;
   fanSpreadMobile: number;
-  fanDuration: number;
   riseDuration: number;
   flipDuration: number;
+  heroScaleOpeningDesktop: number;
+  heroScaleOpeningMobile: number;
+  heroScaleCoveredDesktop: number;
+  heroScaleCoveredMobile: number;
+  heroBlur: number;
+  heroBackgroundIntensity: number;
+  expandedCardScaleDesktop: number;
+  expandedCardScaleMobile: number;
+  heroShrinkEnd: number;
+  fanStartProgress: number;
+  fanEndProgress: number;
+  promptStartProgress: number;
+  promptEndProgress: number;
+  fanHoldEndProgress: number;
+  magazineEndProgress: number;
+  magazineRestackAt: number;
   magazineScale: number;
   magazineBlurDesktop: number;
   magazineBlurMobile: number;
 }
 
 export const DEFAULT_HOMEPAGE_MOTION: HomepageMotionSettings = {
-  stackStartY: 0.82,
-  stackScaleDesktop: 0.66,
-  stackScaleMobile: 0.86,
-  stackPeek: 0.33,
+  heroRevealPreset: 0,
+  heroStepStagger: 0.16,
+  heroStepDuration: 0.65,
+  riseDelay: 0.9,
+  sceneLengthVh: 390,
+  stackStartY: 0.41,
+  stackScaleDesktop: 1.05,
+  stackScaleMobile: 0.98,
+  fanScaleDesktop: 1,
+  fanScaleMobile: 0.88,
+  stackPeek: 0.3,
   fanSpreadDesktop: 68,
-  fanSpreadMobile: 54,
-  fanDuration: 1.7,
-  riseDuration: 0.72,
-  flipDuration: 0.72,
-  magazineScale: 0.88,
+  fanSpreadMobile: 46,
+  riseDuration: 1.1,
+  flipDuration: 1.15,
+  heroScaleOpeningDesktop: 1.12,
+  heroScaleOpeningMobile: 1.05,
+  heroScaleCoveredDesktop: 0.75,
+  heroScaleCoveredMobile: 0.75,
+  heroBlur: 2,
+  heroBackgroundIntensity: 5,
+  expandedCardScaleDesktop: 1,
+  expandedCardScaleMobile: 1,
+  heroShrinkEnd: 0.28,
+  fanStartProgress: 0.15,
+  fanEndProgress: 0.42,
+  promptStartProgress: 0.42,
+  promptEndProgress: 0.48,
+  fanHoldEndProgress: 0.56,
+  magazineEndProgress: 0.94,
+  magazineRestackAt: 0.5,
+  magazineScale: 0.75,
   magazineBlurDesktop: 2,
-  magazineBlurMobile: 0.9,
+  magazineBlurMobile: 0.7,
 };
 
 const ranges: Record<keyof HomepageMotionSettings, [number, number]> = {
-  stackStartY: [0.35, 1.35],
-  stackScaleDesktop: [0.3, 0.9],
-  stackScaleMobile: [0.4, 1],
-  stackPeek: [0.05, 0.42],
+  heroRevealPreset: [0, 3],
+  heroStepStagger: [0.04, 0.5],
+  heroStepDuration: [0.15, 1.5],
+  riseDelay: [0, 2.5],
+  sceneLengthVh: [280, 600],
+  stackStartY: [0.3, 0.8],
+  stackScaleDesktop: [0.65, 1.2],
+  stackScaleMobile: [0.55, 1.1],
+  fanScaleDesktop: [0.55, 1.25],
+  fanScaleMobile: [0.5, 1.1],
+  stackPeek: [0.08, 0.55],
   fanSpreadDesktop: [35, 100],
-  fanSpreadMobile: [28, 80],
-  fanDuration: [0.5, 3.5],
-  riseDuration: [0.2, 1.8],
-  flipDuration: [0.25, 1.5],
+  fanSpreadMobile: [24, 72],
+  riseDuration: [0.25, 3],
+  flipDuration: [0.4, 2.5],
+  heroScaleOpeningDesktop: [0.75, 1.4],
+  heroScaleOpeningMobile: [0.75, 1.3],
+  heroScaleCoveredDesktop: [0.5, 1.1],
+  heroScaleCoveredMobile: [0.5, 1.1],
+  heroBlur: [0, 10],
+  heroBackgroundIntensity: [0, 10],
+  expandedCardScaleDesktop: [0.9, 1.15],
+  expandedCardScaleMobile: [0.9, 1.15],
+  heroShrinkEnd: [0.08, 0.48],
+  fanStartProgress: [0.02, 0.55],
+  fanEndProgress: [0.08, 0.72],
+  promptStartProgress: [0.08, 0.84],
+  promptEndProgress: [0.1, 0.9],
+  fanHoldEndProgress: [0.12, 0.86],
+  magazineEndProgress: [0.2, 1],
+  magazineRestackAt: [0.2, 0.8],
   magazineScale: [0.55, 1],
   magazineBlurDesktop: [0, 8],
   magazineBlurMobile: [0, 2.5],
 };
 
+const clamp = (value: unknown, fallback: number, min: number, max: number) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(min, Math.min(max, number)) : fallback;
+};
+
 export function normalizeHomepageMotion(value: unknown): HomepageMotionSettings {
-  const candidate = (value && typeof value === 'object' ? value : {}) as Partial<Record<keyof HomepageMotionSettings, unknown>>;
-  return Object.fromEntries(
+  const candidate = (value && typeof value === 'object' ? value : {}) as Record<string, unknown>;
+  // Map settings shared with the retired carousel, while resetting its old
+  // geometry values that would move the redesigned deck off-screen.
+  const source: Record<string, unknown> = {
+    ...candidate,
+    fanScaleDesktop: candidate.fanScaleDesktop ?? DEFAULT_HOMEPAGE_MOTION.fanScaleDesktop,
+    fanScaleMobile: candidate.fanScaleMobile ?? DEFAULT_HOMEPAGE_MOTION.fanScaleMobile,
+    heroScaleOpeningDesktop: candidate.heroScaleOpeningDesktop ?? DEFAULT_HOMEPAGE_MOTION.heroScaleOpeningDesktop,
+    heroScaleOpeningMobile: candidate.heroScaleOpeningMobile ?? DEFAULT_HOMEPAGE_MOTION.heroScaleOpeningMobile,
+    heroScaleCoveredDesktop: candidate.heroScaleCoveredDesktop ?? candidate.heroScale ?? DEFAULT_HOMEPAGE_MOTION.heroScaleCoveredDesktop,
+    heroScaleCoveredMobile: candidate.heroScaleCoveredMobile ?? candidate.heroScale ?? DEFAULT_HOMEPAGE_MOTION.heroScaleCoveredMobile,
+    expandedCardScaleDesktop: candidate.expandedCardScaleDesktop ?? DEFAULT_HOMEPAGE_MOTION.expandedCardScaleDesktop,
+    expandedCardScaleMobile: candidate.expandedCardScaleMobile ?? DEFAULT_HOMEPAGE_MOTION.expandedCardScaleMobile,
+    ...(Number.isFinite(Number(candidate.sceneLengthVh)) ? {} : {
+        stackStartY: DEFAULT_HOMEPAGE_MOTION.stackStartY,
+        stackScaleDesktop: DEFAULT_HOMEPAGE_MOTION.stackScaleDesktop,
+        stackScaleMobile: DEFAULT_HOMEPAGE_MOTION.stackScaleMobile,
+        heroScaleOpeningDesktop: DEFAULT_HOMEPAGE_MOTION.heroScaleOpeningDesktop,
+        heroScaleOpeningMobile: DEFAULT_HOMEPAGE_MOTION.heroScaleOpeningMobile,
+        heroScaleCoveredDesktop: Number(candidate.heroScale ?? DEFAULT_HOMEPAGE_MOTION.heroScaleCoveredDesktop),
+        heroScaleCoveredMobile: Number(candidate.heroScale ?? DEFAULT_HOMEPAGE_MOTION.heroScaleCoveredMobile),
+        fanScaleDesktop: DEFAULT_HOMEPAGE_MOTION.fanScaleDesktop,
+        fanScaleMobile: DEFAULT_HOMEPAGE_MOTION.fanScaleMobile,
+        heroShrinkEnd: DEFAULT_HOMEPAGE_MOTION.heroShrinkEnd,
+        fanStartProgress: DEFAULT_HOMEPAGE_MOTION.fanStartProgress,
+        fanEndProgress: DEFAULT_HOMEPAGE_MOTION.fanEndProgress,
+        promptStartProgress: DEFAULT_HOMEPAGE_MOTION.promptStartProgress,
+        promptEndProgress: DEFAULT_HOMEPAGE_MOTION.promptEndProgress,
+        fanHoldEndProgress: DEFAULT_HOMEPAGE_MOTION.fanHoldEndProgress,
+        magazineEndProgress: DEFAULT_HOMEPAGE_MOTION.magazineEndProgress,
+        magazineRestackAt: DEFAULT_HOMEPAGE_MOTION.magazineRestackAt,
+      }),
+  };
+  const normalized = Object.fromEntries(
     (Object.keys(DEFAULT_HOMEPAGE_MOTION) as (keyof HomepageMotionSettings)[]).map((key) => {
       const fallback = DEFAULT_HOMEPAGE_MOTION[key];
-      const raw = Number(candidate[key]);
       const [min, max] = ranges[key];
-      return [key, Number.isFinite(raw) ? Math.max(min, Math.min(max, raw)) : fallback];
+      return [key, clamp(source[key], fallback, min, max)];
     })
   ) as unknown as HomepageMotionSettings;
+
+  // Keep the scroll points ordered when an editor moves a stage boundary.
+  normalized.fanEndProgress = Math.max(normalized.fanStartProgress + 0.04, normalized.fanEndProgress);
+  normalized.fanHoldEndProgress = Math.max(normalized.fanEndProgress + 0.02, normalized.fanHoldEndProgress);
+  normalized.promptStartProgress = Math.max(normalized.fanEndProgress, Math.min(normalized.promptStartProgress, normalized.fanHoldEndProgress - 0.04));
+  normalized.promptEndProgress = Math.max(normalized.promptStartProgress + 0.02, Math.min(normalized.promptEndProgress, normalized.fanHoldEndProgress));
+  normalized.magazineEndProgress = Math.max(normalized.fanHoldEndProgress + 0.04, normalized.magazineEndProgress);
+
+  return normalized;
 }

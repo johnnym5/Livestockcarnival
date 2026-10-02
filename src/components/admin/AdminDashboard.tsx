@@ -587,7 +587,6 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
 
   const saveMemberPermissions = async (member: CmsStaff) => {
     const nextPermissions = permissionDrafts[member.user_id] ?? member.permissions;
-    if (!nextPermissions.length) { setError('Each editor must keep at least one workspace area.'); return; }
     const { data, error: updateError } = await supabase.functions.invoke('cms-user-management', { body: { action: 'update_permissions', user_id: member.user_id, permissions: nextPermissions } });
     if (updateError) { setError(data?.error ?? 'Could not save editor access.'); return; }
     setStaff((current) => current.map((item) => item.user_id === member.user_id ? { ...item, permissions: nextPermissions } : item));
@@ -1320,7 +1319,7 @@ export default function AdminDashboardPage({ workspace = 'admin' }: { workspace?
                       const current = permissionDrafts[member.user_id] ?? member.permissions;
                       return <label key={option.key} className="flex cursor-pointer items-start gap-2 rounded-lg border border-[#E7EBE6] bg-[#FBFCFA] p-2.5 text-xs"><input type="checkbox" checked={current.includes(option.key)} onChange={(event) => setPermissionDrafts((drafts) => ({ ...drafts, [member.user_id]: event.target.checked ? [...current, option.key] : current.filter((key) => key !== option.key) }))} className="mt-0.5 accent-[#1E4D38]" /><span><strong className="block">{option.label}</strong><span className="mt-0.5 block text-[10px] leading-4 text-[#758078]">{option.description}</span></span></label>;
                     })}</div>}
-                    {member.role === 'editorial' && permissionDrafts[member.user_id] && <button type="button" onClick={() => void saveMemberPermissions(member)} className="mt-3 h-9 rounded-lg bg-[#1E4D38] px-3 text-xs font-bold text-white">Save access</button>}
+                    {member.role === 'editorial' && permissionDrafts[member.user_id] && <div className="mt-3 flex flex-wrap items-center gap-3"><button type="button" onClick={() => void saveMemberPermissions(member)} className="h-9 rounded-lg bg-[#1E4D38] px-3 text-xs font-bold text-white">Save access</button>{permissionDrafts[member.user_id].length === 0 && <span className="text-xs text-[#9A4B4B]">Saving will revoke all workspace access.</span>}</div>}
                   </div>
                 ))}
                 {!staff.length && <p className="p-8 text-center text-xs text-[#778279]">No editorial accounts yet.</p>}
