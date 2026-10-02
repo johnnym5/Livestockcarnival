@@ -54,7 +54,7 @@ Open `/admin/login`. The super admin signs in and invites editorial staff from *
 
 ## 5. Configure Web Push and private accreditation files
 
-The migration `20261008000000_push_notifications_and_private_credentials.sql` adds the `push_notifications` editor permission, private accreditation storage, subscriber/campaign tables, rate limiting, and scheduled database jobs. Apply it with `npx supabase db push` before deploying the new site build. Credential objects are stored as paths in `accreditations.file_path`; public clients can upload PDFs into `accreditations/` but cannot read them. Review documents through Supabase Dashboard → Storage using an authorized administrator account. After migration, the public bucket URLs that may have existed for older files no longer grant access.
+The migration `20261008000000_push_notifications_and_private_credentials.sql` adds the `push_notifications` editor permission, private accreditation storage, subscriber/campaign tables, rate limiting, and scheduled database jobs. Apply it with `npx supabase db push` before deploying the new site build. Credential objects are stored as paths in `accreditations.file_path`; public clients can upload PDFs into `accreditations/` but cannot read them. Review documents through Supabase Dashboard → Storage using an authorized administrator account. After migration, the public bucket URLs that may have existed for older files no longer grant access. After the event, the daily cleanup removes all accreditation records and private credential PDFs, including any applications still pending review.
 
 Create a VAPID key pair locally; keep the private key secret:
 
@@ -65,14 +65,14 @@ npx --yes web-push generate-vapid-keys
 Set the Edge Function secrets (paste the generated values into your terminal prompt; do not commit them):
 
 ```powershell
-npx supabase secrets set SITE_URL=https://livestockcarnival.ng VAPID_PUBLIC_KEY=<public-key> VAPID_PRIVATE_KEY=<private-key> PUSH_CRON_SECRET=<long-random-secret>
+npx supabase secrets set SITE_URL=https://livestockcarnival.ng VAPID_PUBLIC_KEY="PASTE_GENERATED_PUBLIC_KEY" VAPID_PRIVATE_KEY="PASTE_GENERATED_PRIVATE_KEY" PUSH_CRON_SECRET="PASTE_A_LONG_RANDOM_SECRET"
 ```
 
-Store the same cron secret and the function URL in Supabase Vault. Replace `<project-ref>` and `<long-random-secret>`; run this only in the Supabase SQL Editor over a trusted administrator session:
+Store the same cron secret and the function URL in Supabase Vault. Replace `PROJECT_REF` and `PASTE_THE_SAME_CRON_SECRET`; run this only in the Supabase SQL Editor over a trusted administrator session:
 
 ```sql
-select vault.create_secret('https://<project-ref>.supabase.co/functions/v1/push-notifications', 'push_function_url');
-select vault.create_secret('<long-random-secret>', 'push_cron_secret');
+select vault.create_secret('https://PROJECT_REF.supabase.co/functions/v1/push-notifications', 'push_function_url');
+select vault.create_secret('PASTE_THE_SAME_CRON_SECRET', 'push_cron_secret');
 ```
 
 Deploy the function after the migration and secrets are configured:
@@ -81,6 +81,6 @@ Deploy the function after the migration and secrets are configured:
 npx supabase functions deploy push-notifications
 ```
 
-The migration schedules broadcast dispatch every minute and accreditation cleanup daily. Cleanup starts after the carnival ends and removes reviewed (non-pending) accreditation rows and their private files; pending reviews are retained for staff action. Campaign copy and delivery totals are retained for up to 90 days, and hashed anti-abuse rate-limit records for up to 3 hours. Set the super-admin/editor `Push notifications` permission in Team access to control who can create, send, schedule, and cancel broadcasts. Subscribers can opt out from the website or their browser settings. On iPhone/iPad, users must add the site to the Home Screen and launch it from that icon before subscribing.
+The migration schedules broadcast dispatch every minute and accreditation cleanup daily. Cleanup starts after the carnival ends and removes all accreditation records and their private files. Campaign copy and delivery totals are retained for up to 90 days, and hashed anti-abuse rate-limit records for up to 3 hours. Set the super-admin/editor `Push notifications` permission in Team access to control who can create, send, schedule, and cancel broadcasts. Subscribers can opt out from the website or their browser settings. On iPhone/iPad, users must add the site to the Home Screen and launch it from that icon before subscribing.
 
 The public `/privacy` and `/terms` pages describe this website and its push notifications. The separate pass and vendor portals have their own terms and privacy responsibilities.

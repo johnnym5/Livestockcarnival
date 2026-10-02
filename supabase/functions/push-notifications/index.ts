@@ -151,15 +151,15 @@ Deno.serve(async (request: Request) => {
     const secret = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '');
     if (!cronSecret || !secret || secret !== cronSecret || request.headers.get('x-push-cron') !== 'true') return respond(403, { error: 'Scheduled cleanup is not authorized.' }, origin);
     if (Date.now() < Date.parse('2026-11-24T00:00:00+01:00')) return respond(200, { deleted: 0, reason: 'The event has not ended.' }, origin);
-    const { data: rows, error } = await adminClient.from('accreditations').select('id,file_path').neq('status', 'pending');
-    if (error) return respond(500, { error: 'Could not load completed accreditation records.' }, origin);
+    const { data: rows, error } = await adminClient.from('accreditations').select('id,file_path');
+    if (error) return respond(500, { error: 'Could not load accreditation records for retention cleanup.' }, origin);
     let deleted = 0;
     for (const row of rows ?? []) {
       if (typeof row.file_path === 'string' && row.file_path) {
         const { error: storageError } = await adminClient.storage.from('credentials').remove([row.file_path]);
         if (storageError && !/not found/i.test(storageError.message)) continue;
       }
-      const { error: deleteError } = await adminClient.from('accreditations').delete().eq('id', row.id).neq('status', 'pending');
+      const { error: deleteError } = await adminClient.from('accreditations').delete().eq('id', row.id);
       if (!deleteError) deleted += 1;
     }
     return respond(200, { deleted }, origin);
