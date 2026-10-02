@@ -216,7 +216,11 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
   const [lowPowerDevice, setLowPowerDevice] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(1024);
   const reducedMotion = useReducedMotion();
-  const simplifyMotion = Boolean(reducedMotion || lowPowerDevice);
+  // Older phones often report four or fewer logical cores. That is not a
+  // reason to disable the scroll timeline altogether: on iOS this made the
+  // deck remain in its static stack until the magazine entered. Keep the full
+  // transform-only timeline enabled and use lowPowerDevice only to reduce blur.
+  const simplifyMotion = Boolean(reducedMotion);
   const viewportHeight = useWindowHeight();
   const stickyHeaderHeight = isMobile ? 56 : 72;
   const sceneEndPercent = 100 - (stickyHeaderHeight / viewportHeight) * 100;
