@@ -329,11 +329,8 @@ html.lenis, html.lenis body {
 .homepage-deck-scroll-cue i { width: 13px; height: 21px; border: 2px solid #D9A928; border-radius: 999px; position: relative; }
 .homepage-deck-scroll-cue i::after { position: absolute; top: 4px; left: 4px; width: 2px; height: 5px; content: ''; border-radius: 2px; background: #D9A928; animation: deck-scroll-dot 1.4s ease-in-out infinite; }
 @keyframes deck-scroll-dot { 0%,100% { transform: translateY(0); opacity: .45; } 50% { transform: translateY(6px); opacity: 1; } }
-.homepage-deck-magazine { position: absolute; z-index: 40; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: clamp(80px, 17vh, 150px) clamp(24px, 9vw, 160px) 40px; border-top: 1px solid; box-shadow: 0 -18px 55px rgba(8,20,13,.12); will-change: transform, opacity; }
-.homepage-deck-magazine-copy { width: min(100%, 1120px); }
-.homepage-deck-magazine-copy p { margin: 0 0 12px; font-size: 11px; font-weight: 900; letter-spacing: .22em; text-transform: uppercase; }
-.homepage-deck-magazine-copy h2 { max-width: 900px; margin: 0; color: #111827; font-size: clamp(2.1rem, 5vw, 4.6rem); font-weight: 950; line-height: .98; letter-spacing: -.045em; }
-.homepage-deck-magazine-copy span { display: block; max-width: 820px; margin-top: 18px; color: #4B5563; font-size: clamp(.9rem, 1.3vw, 1.15rem); line-height: 1.65; }
+.homepage-deck-magazine { position: absolute; z-index: 40; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: clamp(40px, 7vh, 84px) clamp(24px, 9vw, 160px) 40px; border-top: 1px solid; box-shadow: 0 -18px 55px rgba(8,20,13,.12); will-change: transform, opacity; }
+.homepage-deck-magazine-copy { width: min(100%, 1560px); }
 .homepage-deck-modal-layer { position: fixed; z-index: 200; inset: 0; }
 .homepage-deck-backdrop { position: fixed; inset: 0; background: rgba(5,16,10,.24); backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px); }
 .homepage-deck-open-card { position: fixed; z-index: 1; overflow: hidden; border: 1px solid #D8C48A; background: #FBFBFA; box-shadow: 0 32px 100px rgba(3,10,5,.42); transform-style: preserve-3d; }
@@ -380,9 +377,7 @@ html.lenis, html.lenis body {
   .homepage-deck-logo { width: clamp(58px, 19vw, 94px); }
   .homepage-deck-card-label { top: 72%; left: 7%; right: 7%; font-size: clamp(9px, 2.9vw, 12px); }
   .homepage-deck-number { right: 7%; bottom: 4%; font-size: 9px; }
-  .homepage-deck-magazine { padding: 76px 24px 24px; }
-  .homepage-deck-magazine-copy h2 { font-size: clamp(2rem, 9vw, 3rem); }
-  .homepage-deck-magazine-copy span { margin-top: 12px; font-size: .85rem; }
+  .homepage-deck-magazine { inset: 0 0 auto; padding: clamp(52px, 9vh, 76px) 24px 0; }
   .homepage-deck-open-back { grid-template-columns: 1fr; grid-template-rows: minmax(0, 42%) minmax(0, 58%); }
   .homepage-deck-open-copy { justify-content: flex-start; padding: 22px 24px max(24px, env(safe-area-inset-bottom)); }
   .homepage-deck-open-copy h2 { padding-right: 28px; }
@@ -394,6 +389,11 @@ html.lenis, html.lenis body {
   .homepage-deck-scroll-cue { margin-top: 16px; font-size: 8px; }
   .is-reduced-motion .homepage-deck-scene { min-height: 780px; }
   .is-reduced-motion .homepage-deck-card-position { top: 50%; }
+}
+@media (min-width: 1024px) {
+  .homepage-deck-runway { isolation: auto; }
+  .homepage-deck-scene { z-index: 20; background: transparent; }
+  .homepage-deck-magazine { inset: 0 0 auto; display: block; padding-bottom: 0; }
 }
 @media (hover: none) and (pointer: coarse) {
   .homepage-deck-scene::before { animation: none; filter: blur(8px) saturate(.8); background-image: linear-gradient(135deg, rgba(248,239,215,.48), rgba(218,195,145,.34)), url('/assets/livestock/showcase-spectrum-hero.jpg'); transform: scale(1.05); }

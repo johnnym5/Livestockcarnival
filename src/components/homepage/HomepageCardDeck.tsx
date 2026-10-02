@@ -8,6 +8,7 @@ import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform, typ
 import { ArrowRight, X } from 'lucide-react';
 import { DEFAULT_HOMEPAGE_MOTION, normalizeHomepageMotion, type HomepageMotionSettings } from '@/lib/homepageMotion';
 import type { CardData } from '@/lib/homepageCards';
+import { HomepageMagazineHeading } from '@/components/homepage/HomepageMagazine';
 import { supabase } from '@/lib/supabase/client';
 
 interface MagazineIntro {
@@ -327,7 +328,7 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
     openingScrollRef.current = window.scrollY;
   }, [openedCard]);
 
-  const heroScale = useTransform(scrollYProgress, [0, settings.heroShrinkEnd], [isMobile ? settings.heroScaleOpeningMobile : settings.heroScaleOpeningDesktop, isMobile ? settings.heroScaleCoveredMobile : settings.heroScaleCoveredDesktop]);
+  const heroScale = useTransform(scrollYProgress, [0, settings.cardScrollStart, settings.heroShrinkEnd], [isMobile ? settings.heroScaleOpeningMobile : settings.heroScaleOpeningDesktop, isMobile ? settings.heroScaleOpeningMobile : settings.heroScaleOpeningDesktop, isMobile ? settings.heroScaleCoveredMobile : settings.heroScaleCoveredDesktop]);
   const heroOpacity = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress], [1, 1, 0.12]);
   const promptOpacity = useTransform(scrollYProgress, [settings.promptStartProgress, settings.promptEndProgress, settings.fanHoldEndProgress, settings.magazineEndProgress], [0, 1, 1, 0]);
   const promptScale = useTransform(scrollYProgress, [settings.promptStartProgress, settings.promptEndProgress, settings.fanHoldEndProgress, settings.magazineEndProgress], [0.88, 1, 1, 0.75]);
@@ -335,16 +336,10 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
   const stackOffset = settings.stackStartY * viewportHeight * (isMobile ? 0.7 : 1);
   const fanVerticalLift = viewportHeight * (isMobile ? 0.1 : 0.15);
   const restackStart = settings.fanHoldEndProgress + (settings.magazineEndProgress - settings.fanHoldEndProgress) * settings.magazineRestackAt;
-  const deckY = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress, settings.fanHoldEndProgress, restackStart, settings.magazineEndProgress], [stackOffset, stackOffset, -fanVerticalLift, -fanVerticalLift, -fanVerticalLift, stackOffset]);
+  const deckY = useTransform(scrollYProgress, [0, settings.cardScrollStart, settings.fanStartProgress, settings.fanEndProgress, settings.fanHoldEndProgress, restackStart, settings.magazineEndProgress], [stackOffset, stackOffset - viewportHeight * 0.08, stackOffset - viewportHeight * 0.08, -fanVerticalLift, -fanVerticalLift, -fanVerticalLift, stackOffset]);
   const deckScale = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress, restackStart, settings.magazineEndProgress], [isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop, isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop, isMobile ? settings.fanScaleMobile : settings.fanScaleDesktop, isMobile ? settings.fanScaleMobile : settings.fanScaleDesktop, (isMobile ? settings.stackScaleMobile : settings.stackScaleDesktop) * settings.magazineScale]);
   const magazineY = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.magazineEndProgress], [viewportHeight, 0]);
-  const magazineOpacity = useTransform(scrollYProgress, [settings.fanHoldEndProgress, settings.fanHoldEndProgress + 0.04], [0, 1]);
   const deckOpacity = useTransform(scrollYProgress, [restackStart, settings.magazineEndProgress], [1, 0]);
-  const heroScrollBlur = useTransform(scrollYProgress, [0, settings.fanStartProgress, settings.fanEndProgress, settings.fanHoldEndProgress], [0, 0, settings.heroBlur, settings.heroBlur]);
-  const magazineDeckBlur = isMobile ? settings.magazineBlurMobile : settings.magazineBlurDesktop;
-  const deckScrollBlur = useTransform(scrollYProgress, [settings.fanHoldEndProgress, restackStart, settings.magazineEndProgress], [0, 0, magazineDeckBlur]);
-  const heroFilter = useTransform(heroScrollBlur, (blur) => `blur(${lowPowerDevice ? blur * 0.5 : blur}px)`);
-  const deckFilter = useTransform(deckScrollBlur, (blur) => `blur(${lowPowerDevice ? blur * 0.5 : blur}px)`);
   const heroInitial = simplifyMotion ? false : 'hidden';
   const revealOrders = [
     ['logo', 'eyebrow', 'title', 'intro'],
@@ -395,7 +390,7 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
       initial={heroInitial}
       animate={simplifyMotion || revealed ? 'visible' : 'hidden'}
       className="homepage-deck-hero-inner"
-      style={!simplifyMotion && enabled ? { scale: heroScale, opacity: heroOpacity, filter: heroFilter } : undefined}
+      style={!simplifyMotion && enabled ? { scale: heroScale, opacity: heroOpacity } : undefined}
     >
       <motion.div variants={heroStep('logo')} className="homepage-deck-logo-wrap"><Image src="/assets/branding/carnival-logo-transparent.png" alt="Livestock Carnival" width={220} height={166} priority className="h-[72px] w-auto object-contain sm:h-[108px]" /></motion.div>
       <motion.p variants={heroStep('eyebrow')} className="homepage-deck-eyebrow"><span />Federal Republic of Nigeria <i aria-hidden="true">·</i> Official Carnival &amp; Expo<span /></motion.p>
@@ -422,7 +417,7 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
       <div className="homepage-deck-scene">
         <div className="homepage-deck-hero">{hero}</div>
         {!simplifyMotion && <motion.p className="homepage-deck-prompt" style={{ opacity: promptOpacity, scale: promptScale }} aria-hidden="true"><span>PICK A CARD AND</span> <strong>EXPLORE!</strong></motion.p>}
-        <motion.div className="homepage-deck-fan" style={{ y: simplifyMotion ? 0 : deckY, scale: simplifyMotion ? 1 : deckScale, opacity: simplifyMotion ? 1 : deckOpacity, filter: simplifyMotion ? undefined : deckFilter }}>
+        <motion.div className="homepage-deck-fan" style={{ y: simplifyMotion ? 0 : deckY, scale: simplifyMotion ? 1 : deckScale, opacity: simplifyMotion ? 1 : deckOpacity }}>
           <motion.div
             className="homepage-deck-fan-rise"
             initial={simplifyMotion ? false : { y: initialLift, opacity: 0 }}
@@ -434,17 +429,14 @@ export default function HomepageCardDeck({ cards, magazine, enabled }: HomepageC
         </motion.div>
         <motion.section
           className="homepage-deck-magazine"
-          aria-label="Magazine highlights"
-          style={{ y: simplifyMotion ? 0 : magazineY, opacity: simplifyMotion ? 0 : magazineOpacity, backgroundColor: magazine.backgroundColor, borderColor: `${magazine.accentColor}55` }}
+          style={{ y: simplifyMotion ? 0 : magazineY, backgroundColor: magazine.backgroundColor, borderColor: `${magazine.accentColor}55` }}
+          aria-labelledby="homepage-deck-magazine-title"
         >
           <div className="homepage-deck-magazine-copy">
-            <p style={{ color: magazine.accentColor }}>{magazine.eyebrow}</p>
-            <h2>{magazine.title}</h2>
-            <span>{magazine.intro}</span>
+            <HomepageMagazineHeading eyebrow={magazine.eyebrow} title={magazine.title} intro={magazine.intro} accentColor={magazine.accentColor} titleId="homepage-deck-magazine-title" compact />
           </div>
         </motion.section>
       </div>
-      {simplifyMotion && <section className="homepage-deck-static-magazine" style={{ backgroundColor: magazine.backgroundColor, borderColor: `${magazine.accentColor}55` }}><div><p style={{ color: magazine.accentColor }}>{magazine.eyebrow}</p><h2>{magazine.title}</h2><span>{magazine.intro}</span></div></section>}
       {isClosingCard && <div className="homepage-deck-return-shield" aria-hidden="true" />}
       <AnimatePresence>{openedCard && <OpenCard key={openedCard.card.id} card={openedCard.card} rect={openedCard.rect} duration={simplifyMotion ? 0.15 : settings.cardOpenDuration} closeDuration={simplifyMotion ? 0.15 : settings.cardCloseDuration} openStartScale={settings.cardOpenStartScale} openEndScale={settings.cardOpenEndScale} closeStartScale={settings.cardCloseStartScale} closeEndScale={settings.cardCloseEndScale} expandedScale={isMobile ? settings.expandedCardScaleMobile : settings.expandedCardScaleDesktop} mobile={isMobile} onClosing={() => setIsClosingCard(true)} onClose={onCardClose} />}</AnimatePresence>
     </section>

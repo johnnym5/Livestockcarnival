@@ -449,6 +449,7 @@ export default function LiveChatWidget() {
       const nextState = !prev;
       if (nextState) {
         setHasNotification(false);
+        window.dispatchEvent(new Event('push-opt-in:open'));
       }
       return nextState;
     });

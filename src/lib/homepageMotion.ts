@@ -23,6 +23,7 @@ export interface HomepageMotionSettings {
   expandedCardScaleDesktop: number;
   expandedCardScaleMobile: number;
   heroShrinkEnd: number;
+  cardScrollStart: number;
   fanStartProgress: number;
   fanEndProgress: number;
   promptStartProgress: number;
@@ -66,6 +67,7 @@ export const DEFAULT_HOMEPAGE_MOTION: HomepageMotionSettings = {
   expandedCardScaleDesktop: 1,
   expandedCardScaleMobile: 1,
   heroShrinkEnd: 0.28,
+  cardScrollStart: 0.08,
   fanStartProgress: 0.15,
   fanEndProgress: 0.42,
   promptStartProgress: 0.42,
@@ -109,6 +111,7 @@ const ranges: Record<keyof HomepageMotionSettings, [number, number]> = {
   expandedCardScaleDesktop: [0.9, 1.15],
   expandedCardScaleMobile: [0.9, 1.15],
   heroShrinkEnd: [0.08, 0.48],
+  cardScrollStart: [0.01, 0.45],
   fanStartProgress: [0.02, 0.55],
   fanEndProgress: [0.08, 0.72],
   promptStartProgress: [0.08, 0.84],
@@ -159,6 +162,7 @@ export function normalizeHomepageMotion(value: unknown): HomepageMotionSettings 
         fanScaleDesktop: DEFAULT_HOMEPAGE_MOTION.fanScaleDesktop,
         fanScaleMobile: DEFAULT_HOMEPAGE_MOTION.fanScaleMobile,
         heroShrinkEnd: DEFAULT_HOMEPAGE_MOTION.heroShrinkEnd,
+        cardScrollStart: DEFAULT_HOMEPAGE_MOTION.cardScrollStart,
         fanStartProgress: DEFAULT_HOMEPAGE_MOTION.fanStartProgress,
         fanEndProgress: DEFAULT_HOMEPAGE_MOTION.fanEndProgress,
         promptStartProgress: DEFAULT_HOMEPAGE_MOTION.promptStartProgress,
@@ -178,6 +182,7 @@ export function normalizeHomepageMotion(value: unknown): HomepageMotionSettings 
 
   // Keep the scroll points ordered when an editor moves a stage boundary.
   normalized.fanEndProgress = Math.max(normalized.fanStartProgress + 0.04, normalized.fanEndProgress);
+  normalized.heroShrinkEnd = Math.max(normalized.cardScrollStart + 0.04, normalized.heroShrinkEnd);
   normalized.fanHoldEndProgress = Math.max(normalized.fanEndProgress + 0.02, normalized.fanHoldEndProgress);
   normalized.promptStartProgress = Math.max(normalized.fanEndProgress, Math.min(normalized.promptStartProgress, normalized.fanHoldEndProgress - 0.04));
   normalized.promptEndProgress = Math.max(normalized.promptStartProgress + 0.02, Math.min(normalized.promptEndProgress, normalized.fanHoldEndProgress));

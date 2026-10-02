@@ -20,6 +20,7 @@ export default function PushOptIn() {
   const [state, setState] = useState<PushState>('checking');
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
+  const [permissionFeedback, setPermissionFeedback] = useState('');
   const [showPrompt, setShowPrompt] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [promptDelayElapsed, setPromptDelayElapsed] = useState(false);
@@ -102,6 +103,35 @@ export default function PushOptIn() {
     };
   }, []);
 
+  useEffect(() => {
+    const openFromSupport = async () => {
+      const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+      if (!supported) {
+        setState('unsupported');
+        setManualOpen(true);
+        return;
+      }
+
+      try {
+        const registration = await navigator.serviceWorker.getRegistration('/');
+        const subscription = await registration?.pushManager.getSubscription();
+        if (subscription) {
+          setState('subscribed');
+          setManualOpen(false);
+          return;
+        }
+      } catch {
+        // Continue to the opt-in dialog so the visitor can retry activation.
+      }
+
+      setState(Notification.permission === 'denied' ? 'blocked' : Notification.permission === 'default' ? 'prompt' : 'unsubscribed');
+      setManualOpen(true);
+    };
+
+    window.addEventListener('push-opt-in:open', openFromSupport);
+    return () => window.removeEventListener('push-opt-in:open', openFromSupport);
+  }, []);
+
   const subscribe = async () => {
     setBusy(true); setNotice('');
     try {
@@ -121,6 +151,27 @@ export default function PushOptIn() {
     } catch {
       setNotice('Notifications could not be enabled. Please try again later.');
     } finally { setBusy(false); }
+  };
+
+  const retryBlockedPermission = async () => {
+    setBusy(true);
+    setPermissionFeedback('');
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        setState('unsubscribed');
+        setPermissionFeedback('Permission is now allowed. Select Activate updates to finish setup.');
+      } else {
+        setState(permission === 'denied' ? 'blocked' : 'prompt');
+        setPermissionFeedback(permission === 'denied'
+          ? 'Your browser still has notifications blocked. Change this site’s notification setting in the address bar, then select Retry again.'
+          : 'The browser did not grant permission. Select Retry again when you are ready.');
+      }
+    } catch {
+      setPermissionFeedback('The permission check could not start. Check this site’s browser settings, then try again.');
+    } finally {
+      setBusy(false);
+    }
   };
 
   const unsubscribe = async () => {
@@ -162,7 +213,7 @@ export default function PushOptIn() {
             <div className="relative">
               <p className="text-[10px] font-extrabold uppercase tracking-[.2em] text-[#8D6B1B]">Stay in the celebration</p>
               <h2 id="push-opt-in-title" className="mt-2 pr-10 text-2xl font-black tracking-tight sm:text-3xl">{isSubscribedDialog ? 'You’re subscribed' : isBlockedDialog ? 'Notifications are blocked' : isUnsupportedDialog ? 'Notifications unavailable' : showInstallPrompt ? 'Get updates on your iPhone' : 'Get official carnival updates'}</h2>
-              {showInstallPrompt ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">To receive notifications on iPhone or iPad, use Share → Add to Home Screen, then open this site from its Home Screen icon.</p><button type="button" onClick={closeDialog} className="mt-6 min-h-11 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white">Got it</button></> : isSubscribedDialog ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">This browser is set to receive event announcements and newly published story alerts.</p><button type="button" disabled={busy} onClick={() => void unsubscribe()} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#1E4D38]/25 bg-white/45 px-5 text-xs font-bold text-[#1E4D38] disabled:opacity-60"><BellOff className="h-4 w-4" />{busy ? 'Working…' : 'Unsubscribe'}</button></> : isBlockedDialog ? <p className="mt-3 text-sm leading-6 text-[#5D685F]">Notifications are blocked for this site. Allow them in your browser’s site settings, then return here and reload.</p> : isUnsupportedDialog ? <p className="mt-3 text-sm leading-6 text-[#5D685F]">This browser does not support push notifications. You can still check announcements and new stories on our website.</p> : <><p className="mt-3 text-sm leading-6 text-[#5D685F]">{state === 'prompt' ? 'Get important event announcements and new story alerts on this device. You can unsubscribe at any time.' : 'Browser permission is already allowed. Activate notifications to receive event announcements and new story alerts.'}</p><div className="mt-6 flex flex-wrap items-center gap-2"><button type="button" disabled={busy} onClick={() => { closeDialog(); void subscribe(); }} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#143c2b] disabled:opacity-60"><Bell className="h-4 w-4" />{busy ? 'Working…' : state === 'prompt' ? 'Allow notifications' : 'Activate updates'}</button><button type="button" onClick={closeDialog} className="min-h-11 rounded-xl px-4 text-xs font-semibold text-[#667168] transition hover:bg-white/50">Not now</button></div></>}
+              {showInstallPrompt ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">To receive notifications on iPhone or iPad, use Share → Add to Home Screen, then open this site from its Home Screen icon.</p><button type="button" onClick={closeDialog} className="mt-6 min-h-11 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white">Got it</button></> : isSubscribedDialog ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">This browser is set to receive event announcements and newly published story alerts.</p><button type="button" disabled={busy} onClick={() => void unsubscribe()} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl border border-[#1E4D38]/25 bg-white/45 px-5 text-xs font-bold text-[#1E4D38] disabled:opacity-60"><BellOff className="h-4 w-4" />{busy ? 'Working…' : 'Unsubscribe'}</button></> : isBlockedDialog ? <><p className="mt-3 text-sm leading-6 text-[#5D685F]">Turn on notifications to hear about carnival news, replies to your support messages, and important event updates.</p><p className="mt-3 text-sm leading-6 text-[#5D685F]">This site is currently blocked by your browser. Use the site settings beside the address bar to allow notifications, then come back and retry. Browsers do not show the permission pop-up again while access remains blocked.</p><button type="button" disabled={busy} onClick={() => void retryBlockedPermission()} className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#143c2b] disabled:opacity-60"><Bell className="h-4 w-4" />{busy ? 'Checking…' : 'Retry notifications'}</button>{permissionFeedback && <p role="status" className="mt-3 text-sm leading-6 text-[#1E4D38]">{permissionFeedback}</p>}</> : isUnsupportedDialog ? <p className="mt-3 text-sm leading-6 text-[#5D685F]">This browser does not support push notifications. You can still check announcements and new stories on our website.</p> : <><p className="mt-3 text-sm leading-6 text-[#5D685F]">{state === 'prompt' ? 'Get important event announcements and new story alerts on this device. You can unsubscribe at any time.' : 'Browser permission is already allowed. Activate notifications to receive event announcements and new story alerts.'}</p><div className="mt-6 flex flex-wrap items-center gap-2"><button type="button" disabled={busy} onClick={() => { closeDialog(); void subscribe(); }} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#1E4D38] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#143c2b] disabled:opacity-60"><Bell className="h-4 w-4" />{busy ? 'Working…' : state === 'prompt' ? 'Allow notifications' : 'Activate updates'}</button><button type="button" onClick={closeDialog} className="min-h-11 rounded-xl px-4 text-xs font-semibold text-[#667168] transition hover:bg-white/50">Not now</button></div></>}
             </div>
           </motion.aside>
         </motion.div>}

@@ -25,14 +25,13 @@ function MagazineTile({ story, index }: { story: HomepageMagazineStory; index: n
   const scale = useTransform(scrollYProgress, [0, 0.25, 0.78, 1], [0.975, 1, 1, 0.985]);
   const isText = story.layout === 'text' || story.layout === 'text-large' || story.layout === 'text-small';
   const isImageOnly = story.layout === 'image';
-  const isFeature = story.layout === 'wide' || story.layout === 'text-large';
   const href = HOMEPAGE_MAGAZINE_DESTINATIONS[story.slug] ?? '/';
 
   return (
     <motion.article
       ref={ref}
       style={reducedMotion ? undefined : { opacity, scale }}
-      className={`${isText ? 'relative flex items-center' : 'group relative isolate overflow-hidden rounded-[0.4rem] border border-[#D9DED7] bg-[#E9ECE8]'} ${isFeature ? 'mb-6 w-full' : 'mb-5 inline-block w-full break-inside-avoid align-top'} ${layoutClasses[story.layout]}`}
+      className={`${isText ? 'relative flex items-center' : 'group relative isolate overflow-hidden rounded-[0.4rem] border border-[#D9DED7] bg-[#E9ECE8]'} w-full ${layoutClasses[story.layout]}`}
     >
       <Link
         href={href}
@@ -80,29 +79,79 @@ function MagazineTile({ story, index }: { story: HomepageMagazineStory; index: n
   );
 }
 
+export function HomepageMagazineHeading({
+  eyebrow,
+  title,
+  intro,
+  accentColor,
+  titleId,
+  compact = false,
+}: {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  accentColor: string;
+  titleId: string;
+  compact?: boolean;
+}) {
+  return (
+    <header className={`homepage-magazine-heading ${compact ? 'mb-0 pb-2' : 'mb-7 pb-6 sm:mb-9 sm:pb-8'} grid gap-5 border-b border-[#D9DED7] lg:grid-cols-[minmax(0,1fr)_minmax(20rem,.9fr)] lg:items-end lg:gap-10`}>
+      <div className="min-w-0">
+        <p style={{ color: accentColor }} className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.2em] sm:text-xs">{eyebrow}</p>
+        <h2 id={titleId} className="max-w-3xl text-3xl font-black leading-[1.02] text-[#111827] sm:text-4xl lg:text-5xl">{title}</h2>
+      </div>
+      <div className="max-w-2xl lg:justify-self-end">
+        <p className="text-sm leading-relaxed text-[#59645D] sm:text-base">{intro}</p>
+        <div className="mt-4 flex flex-wrap gap-2 text-[10px] font-bold text-[#1E4D38] sm:text-xs">
+          <span className="rounded-full border border-[#1E4D38]/15 bg-[#1E4D38]/5 px-3 py-2">21–23 November 2026</span>
+          <span className="rounded-full border border-[#1E4D38]/15 bg-[#1E4D38]/5 px-3 py-2">Abuja National Grounds · Old Parade Ground · FCT</span>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function balanceColumns(items: { story: HomepageMagazineStory; index: number }[]) {
+  const columns: typeof items[] = [[], [], []];
+  const heights = [0, 0, 0];
+  const baseHeight: Record<HomepageMagazineStory['layout'], number> = {
+    wide: 0,
+    square: 36,
+    tall: 45,
+    text: 30,
+    'text-large': 0,
+    'text-small': 26,
+    image: 28,
+  };
+
+  items.forEach((item) => {
+    const columnIndex = heights.indexOf(Math.min(...heights));
+    columns[columnIndex].push(item);
+    heights[columnIndex] += baseHeight[item.story.layout] + item.story.title.length * 0.12 + item.story.body.length * 0.025;
+  });
+
+  return columns;
+}
+
 export default function HomepageMagazine({
   eyebrow,
   title,
   intro,
   stories,
   accentColor,
+  showHeader = true,
 }: {
   eyebrow: string;
   title: string;
   intro: string;
   stories: HomepageMagazineStory[];
   accentColor: string;
+  showHeader?: boolean;
 }) {
   return (
-    <div className="mx-auto max-w-[1440px] px-5 pb-16 pt-16 sm:px-8 sm:pb-20 sm:pt-20 lg:px-12 lg:pb-28 lg:pt-24">
-      <header className="mb-9 grid gap-6 border-b border-[#D9DED7] pb-8 sm:mb-12 sm:pb-10 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.7fr)] lg:items-end">
-        <div>
-          <p style={{ color: accentColor }} className="mb-4 text-[10px] font-extrabold uppercase tracking-[0.24em] sm:text-xs">{eyebrow}</p>
-          <h2 id="magazine-highlights-title" className="max-w-4xl text-4xl font-black leading-[0.98] text-[#111827] sm:text-5xl lg:text-6xl">{title}</h2>
-        </div>
-        <p className="max-w-xl text-sm leading-relaxed text-[#59645D] sm:text-base lg:justify-self-end">{intro}</p>
-      </header>
-      <div className="space-y-1">
+    <div className={`mx-auto max-w-[1600px] px-5 pb-16 sm:px-8 sm:pb-20 lg:px-12 lg:pb-28 ${showHeader ? 'pt-16 sm:pt-20 lg:pt-24' : 'pt-0'}`}>
+      {showHeader && <HomepageMagazineHeading eyebrow={eyebrow} title={title} intro={intro} accentColor={accentColor} titleId="magazine-highlights-title" />}
+      <div className="space-y-6">
         {(() => {
           const sections: ({ type: 'feature'; story: HomepageMagazineStory; index: number } | { type: 'masonry'; stories: { story: HomepageMagazineStory; index: number }[] })[] = [];
           let masonry: { story: HomepageMagazineStory; index: number }[] = [];
@@ -120,9 +169,18 @@ export default function HomepageMagazine({
           });
           flushMasonry();
 
-          return sections.map((section, sectionIndex) => section.type === 'feature'
-            ? <MagazineTile key={section.story.slug} story={section.story} index={section.index} />
-            : <div key={`masonry-${sectionIndex}`} className="columns-1 gap-x-5 md:columns-3">{section.stories.map(({ story, index }) => <MagazineTile key={story.slug} story={story} index={index} />)}</div>);
+          return sections.map((section, sectionIndex) => {
+            if (section.type === 'feature') return <MagazineTile key={section.story.slug} story={section.story} index={section.index} />;
+            const columns = balanceColumns(section.stories);
+            return (
+              <div key={`masonry-${sectionIndex}`}>
+                <div className="flex flex-col gap-5 md:hidden">{section.stories.map(({ story, index }) => <MagazineTile key={story.slug} story={story} index={index} />)}</div>
+                <div className="hidden gap-5 md:grid md:grid-cols-3">
+                  {columns.map((column, columnIndex) => <div key={columnIndex} className="flex min-w-0 flex-col gap-5">{column.map(({ story, index }) => <MagazineTile key={story.slug} story={story} index={index} />)}</div>)}
+                </div>
+              </div>
+            );
+          });
         })()}
       </div>
     </div>

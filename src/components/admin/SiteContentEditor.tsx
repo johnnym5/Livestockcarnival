@@ -197,7 +197,12 @@ export default function SiteContentEditor({
       else if (data?.content) {
         const savedContent = data.content as JsonValue;
         if (page === 'magazine' && savedContent && typeof savedContent === 'object' && !Array.isArray(savedContent)) {
-          setContent({ ...DEFAULT_SITE_CONTENT.magazine, ...savedContent, stories: resolveHomepageMagazineStories(savedContent) } as unknown as JsonValue);
+          const savedMagazine = savedContent as { [key: string]: JsonValue };
+          const mergedMagazine: Record<string, unknown> = { ...DEFAULT_SITE_CONTENT.magazine, ...savedMagazine, stories: resolveHomepageMagazineStories(savedContent) };
+          if (savedMagazine.title === 'Ten ways to experience the celebration' || savedMagazine.title === 'Stories from the Celebration' || savedMagazine.title === 'A National Celebration of Livestock, Culture & Opportunity') mergedMagazine.title = DEFAULT_SITE_CONTENT.magazine.title;
+          if (savedMagazine.eyebrow === 'Explore the carnival' || savedMagazine.eyebrow === 'Carnival Highlights' || savedMagazine.eyebrow === '21–23 NOVEMBER 2026 · ABUJA NATIONAL GROUNDS') mergedMagazine.eyebrow = DEFAULT_SITE_CONTENT.magazine.eyebrow;
+          if (typeof savedMagazine.intro === 'string' && (savedMagazine.intro === 'From championship breeds and cultural pageantry to live music, food, and the festival grounds, find the experiences you want to explore.' || savedMagazine.intro.startsWith('Across three days, the Renewed Hope National Livestock Carnival brings championship cattle, camels, sheep and goats together with Royal Durbar pageantry'))) mergedMagazine.intro = DEFAULT_SITE_CONTENT.magazine.intro;
+          setContent(mergedMagazine as unknown as JsonValue);
         } else {
           setContent(page === 'livestock' ? initializeLivestockEntries(savedContent) : savedContent);
         }

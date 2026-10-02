@@ -28,6 +28,7 @@ const controls: { key: keyof HomepageMotionSettings; label: string; min: number;
   { key: 'promptStartProgress', label: 'Prompt fade start (after fan opens)', min: 0.08, max: 0.84, step: 0.01, group: 'Scroll stages' },
   { key: 'promptEndProgress', label: 'Prompt fully visible (scene progress)', min: 0.1, max: 0.9, step: 0.01, group: 'Scroll stages' },
   { key: 'heroShrinkEnd', label: 'Hero shrink complete (scene progress)', min: 0.08, max: 0.48, step: 0.01, group: 'Scroll stages' },
+  { key: 'cardScrollStart', label: 'Card begins moving (scene progress)', min: 0.01, max: 0.45, step: 0.01, group: 'Scroll stages' },
   { key: 'magazineEndProgress', label: 'Magazine fully covering deck (scene progress)', min: 0.2, max: 1, step: 0.01, group: 'Magazine overlap' },
   { key: 'magazineRestackAt', label: 'Restack point during overlap (90%+)', min: 0.9, max: 0.98, step: 0.01, group: 'Magazine overlap' },
   { key: 'magazineScale', label: 'Deck scale under magazine', min: 0.55, max: 1, step: 0.01, group: 'Magazine overlap' },
@@ -105,6 +106,7 @@ export default function HomepageAnimationTuner() {
   const clamp01 = (value: number) => Math.max(0, Math.min(1, value));
   const isPreviewMobile = previewViewport === 'mobile';
   const fanAmount = clamp01((previewProgress - settings.fanStartProgress) / (settings.fanEndProgress - settings.fanStartProgress));
+  const earlyCardMotion = clamp01((previewProgress - settings.cardScrollStart) / Math.max(0.01, settings.fanStartProgress - settings.cardScrollStart));
   const overlapAmount = clamp01((previewProgress - settings.fanHoldEndProgress) / (settings.magazineEndProgress - settings.fanHoldEndProgress));
   const restackAmount = clamp01((overlapAmount - settings.magazineRestackAt) / (1 - settings.magazineRestackAt));
   const fanVisible = fanAmount * (1 - restackAmount);
@@ -115,7 +117,7 @@ export default function HomepageAnimationTuner() {
   const stageScale = (activeStackScale + fanAmount * (activeFanScale - activeStackScale)) * (1 - restackAmount * (1 - settings.magazineScale));
   const heroOpeningScale = isPreviewMobile ? settings.heroScaleOpeningMobile : settings.heroScaleOpeningDesktop;
   const heroCoveredScale = isPreviewMobile ? settings.heroScaleCoveredMobile : settings.heroScaleCoveredDesktop;
-  const heroPreviewProgress = clamp01(previewProgress / settings.heroShrinkEnd);
+  const heroPreviewProgress = clamp01((previewProgress - settings.cardScrollStart) / (settings.heroShrinkEnd - settings.cardScrollStart));
   const heroPreviewScale = heroOpeningScale + heroPreviewProgress * (heroCoveredScale - heroOpeningScale);
   const expandedPreviewScale = isPreviewMobile ? settings.expandedCardScaleMobile : settings.expandedCardScaleDesktop;
   const overlapBlur = restackAmount * (isPreviewMobile ? settings.magazineBlurMobile : settings.magazineBlurDesktop);
@@ -133,10 +135,10 @@ export default function HomepageAnimationTuner() {
       <div className={`relative mt-3 h-64 overflow-hidden rounded-xl border border-[#E7EAE6] bg-[#F4F1E8] ${isPreviewMobile ? 'mx-auto max-w-[190px]' : ''}`} style={{ backgroundImage: `radial-gradient(ellipse at 50% 18%, rgba(232,196,104,${settings.heroBackgroundIntensity / 25}), transparent 64%)` }}>
         <div className="absolute inset-x-2 top-8 z-0 text-center" style={{ transform: `scale(${heroPreviewScale})`, opacity: Math.max(0.12, 1 - fanAmount * 0.88), filter: `blur(${heroPreviewProgress * settings.heroBlur}px)` }}><Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={60} height={46} className="mx-auto h-7 w-auto" /><p className="mt-1 text-[8px] font-black leading-tight text-[#17221A]">WELCOME TO THE <span className="text-[#D9A928]">NATIONAL CARNIVAL</span></p></div>
         <p className="absolute inset-x-0 top-4 z-20 text-center text-[11px] font-black uppercase tracking-wide text-[#101820]" style={{ opacity: promptIn * promptOut, filter: `blur(${(1 - promptIn) * 3 + (1 - promptOut) * 2}px)` }}>PICK A CARD AND <span className="text-[#D9A928]">EXPLORE!</span></p>
-        <div className="absolute left-1/2 top-[61%] h-24 w-44 transition-[filter,transform]" style={{ transform: `translate(-50%, calc(-50% + ${(1 - fanAmount) * settings.stackStartY * 38 - fanAmount * 59}px)) scale(${stageScale})`, filter: `blur(${overlapBlur}px)` }}>
+        <div className="absolute left-1/2 top-[61%] h-24 w-44 transition-[filter,transform]" style={{ transform: `translate(-50%, calc(-50% + ${(1 - earlyCardMotion) * settings.stackStartY * 38 - earlyCardMotion * 10 - fanAmount * 59}px)) scale(${stageScale})`, filter: `blur(${overlapBlur}px)` }}>
           {Array.from({ length: 5 }, (_, index) => { const n = index - 2; const colors = ['#0D4020', '#2A2006', '#20125C', '#0D4845', '#0E2014']; const fanX = n * (isPreviewMobile ? settings.fanSpreadMobile : spread) * (isPreviewMobile ? 0.5 : 0.82) * fanVisible; const rotation = n * (isPreviewMobile ? 8 : 13) * fanVisible; return <div key={index} className="absolute left-1/2 top-1/2 grid place-items-center rounded-xl border-2 bg-gradient-to-br shadow-lg" style={{ width: '100%', aspectRatio: isPreviewMobile ? '9 / 16' : '16 / 9', borderColor: '#D9A928', background: `linear-gradient(135deg, ${colors[index]}, #031209)`, transform: `translate(calc(-50% + ${fanX}px), calc(-50% + ${Math.abs(n) * settings.stackPeek * 10}px)) rotate(${rotation}deg)`, zIndex: index }}>{index === 2 && <Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={54} height={42} className="w-10" />}</div>; })}
         </div>
-        <div className="absolute inset-x-0 bottom-0 z-10 border-t border-[#D9A928]/60 transition-[height,opacity]" style={{ height: `${overlapAmount * 100}%`, opacity: overlapAmount, background: '#F4F1E8' }} />
+        <div className="absolute inset-x-0 bottom-0 z-10 flex items-start justify-center overflow-hidden border-t border-[#D9A928]/60 px-4 pt-3 text-center transition-[height,opacity]" style={{ height: `${overlapAmount * 100}%`, opacity: overlapAmount, background: '#F4F1E8' }}><div><p className="text-[7px] font-extrabold uppercase tracking-[0.18em] text-[#8D6B1B]">A national livestock &amp; cultural expo</p><span className="mt-1 block text-sm font-black leading-tight text-[#111827]">Livestock, culture &amp; opportunity</span></div></div>
         {previewExpanded && <div className="absolute inset-0 z-40 grid place-items-center bg-black/35 backdrop-blur-sm"><div className="grid h-full w-full place-items-center rounded-xl border-2 border-[#D9A928] bg-gradient-to-br from-[#0D4020] to-[#031209] shadow-2xl" style={{ transform: `scale(${expandedPreviewScale})` }}><div className="text-center"><Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={70} height={54} className="mx-auto w-12" /><span className="mt-2 block text-[9px] font-black uppercase tracking-widest text-[#F2C349]">Expanded card preview</span></div></div><button type="button" onClick={() => setPreviewExpanded(false)} className="absolute right-2 top-2 rounded-full bg-white px-3 py-1 text-[10px] font-bold text-[#1E4D38]">Close preview</button></div>}
       </div>
       <button type="button" onClick={() => setPreviewExpanded((current) => !current)} className="mt-3 rounded-lg border border-[#DDE4DC] bg-white px-3 py-2 text-[10px] font-extrabold text-[#1E4D38]">{previewExpanded ? 'Hide expanded preview' : 'Preview expanded card'}</button>

@@ -36,7 +36,12 @@ export default function Home() {
       }
       const magazine = magazineResult.data?.content;
       if (!magazineResult.error && magazine && typeof magazine === 'object') {
-        setMagazineContent({ ...DEFAULT_SITE_CONTENT.magazine, ...(magazine as Record<string, unknown>) });
+        const savedMagazine = magazine as Record<string, unknown>;
+        const mergedMagazine = { ...DEFAULT_SITE_CONTENT.magazine, ...savedMagazine };
+        if (savedMagazine.title === 'Ten ways to experience the celebration' || savedMagazine.title === 'Stories from the Celebration' || savedMagazine.title === 'A National Celebration of Livestock, Culture & Opportunity') mergedMagazine.title = DEFAULT_SITE_CONTENT.magazine.title;
+        if (savedMagazine.eyebrow === 'Explore the carnival' || savedMagazine.eyebrow === 'Carnival Highlights' || savedMagazine.eyebrow === '21–23 NOVEMBER 2026 · ABUJA NATIONAL GROUNDS') mergedMagazine.eyebrow = DEFAULT_SITE_CONTENT.magazine.eyebrow;
+        if (typeof savedMagazine.intro === 'string' && (savedMagazine.intro === 'From championship breeds and cultural pageantry to live music, food, and the festival grounds, find the experiences you want to explore.' || savedMagazine.intro.startsWith('Across three days, the Renewed Hope National Livestock Carnival brings championship cattle, camels, sheep and goats together with Royal Durbar pageantry'))) mergedMagazine.intro = DEFAULT_SITE_CONTENT.magazine.intro;
+        setMagazineContent(mergedMagazine);
       }
       setContentReady(true);
       window.dispatchEvent(new Event('homepage:scene-ready'));
@@ -74,7 +79,7 @@ export default function Home() {
         id="magazine-highlights"
         aria-labelledby="magazine-highlights-title"
         style={{ backgroundColor: String(magazineContent.backgroundColor), borderColor: `${String(magazineContent.accentColor)}55` }}
-        className={`border-t text-[#111827] ${magazineOverlapsDeck ? '-mt-[18vh] relative z-10' : ''}`}
+        className={`border-t text-[#111827] ${magazineOverlapsDeck ? '-mt-[55vh] lg:-mt-[68vh] relative z-10' : ''}`}
       >
         <div className={siteAnimation.cardDeckEnabled ? 'pb-12 sm:pb-16' : ''}>
           <HomepageMagazine
@@ -83,6 +88,7 @@ export default function Home() {
             intro={String(magazineContent.intro)}
             stories={resolveHomepageMagazineStories(magazineContent)}
             accentColor={String(magazineContent.accentColor)}
+            showHeader={!magazineOverlapsDeck}
           />
         </div>
       </section>

@@ -6,9 +6,9 @@ import { DEFAULT_HOMEPAGE_MAGAZINE_STORIES } from '@/lib/homepageMagazine';
 
 export const DEFAULT_SITE_CONTENT: Record<string, Record<string, unknown>> = {
   magazine: {
-    eyebrow: 'Explore the carnival',
-    title: 'Ten ways to experience the celebration',
-    intro: 'From championship breeds and cultural pageantry to live music, food, and the festival grounds, find the experiences you want to explore.',
+    eyebrow: 'THE NATIONAL LIVESTOCK CARNIVAL',
+    title: 'Livestock, Culture & Opportunity',
+    intro: 'Champion breeds, Nigerian pageantry, live music and food, bringing families, herders and agribusiness together in Abuja.',
     backgroundColor: '#FBFBFA',
     accentColor: '#8D6B1B',
     stories: DEFAULT_HOMEPAGE_MAGAZINE_STORIES,
