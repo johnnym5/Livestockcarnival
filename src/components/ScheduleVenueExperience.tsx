@@ -14,23 +14,33 @@ import 'leaflet/dist/leaflet.css';
 type ScheduleContent = { days?: Record<string, DayProgram>; venues?: CarnivalVenue[]; eventVenues?: Record<string, string[]> };
 type MobileView = 'schedule' | 'map';
 
+function parseCoordinate(value: unknown, min: number, max: number): number | null {
+  if (typeof value !== 'number' && (typeof value !== 'string' || value.trim() === '')) return null;
+  const coordinate = Number(value);
+  return Number.isFinite(coordinate) && coordinate >= min && coordinate <= max ? coordinate : null;
+}
+
+function venueLatLng(venue: { latitude?: unknown; longitude?: unknown }): [number, number] | null {
+  const latitude = parseCoordinate(venue.latitude, -90, 90);
+  const longitude = parseCoordinate(venue.longitude, -180, 180);
+  return latitude === null || longitude === null ? null : [latitude, longitude];
+}
+
 function normalizeVenues(value: unknown): CarnivalVenue[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((item): CarnivalVenue[] => {
     if (!item || typeof item !== 'object') return [];
     const venue = item as Partial<Record<keyof CarnivalVenue, unknown>>;
-    const latitude = typeof venue.latitude === 'number' ? venue.latitude : Number(venue.latitude);
-    const longitude = typeof venue.longitude === 'number' ? venue.longitude : Number(venue.longitude);
-    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)
-      || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return [];
+    const coordinates = venueLatLng(venue);
+    if (!coordinates) return [];
     if (typeof venue.id !== 'string' || typeof venue.name !== 'string') return [];
     return [{
       id: venue.id,
       name: venue.name,
       zone: typeof venue.zone === 'string' ? venue.zone : '',
       description: typeof venue.description === 'string' ? venue.description : '',
-      latitude,
-      longitude,
+      latitude: coordinates[0],
+      longitude: coordinates[1],
       image: typeof venue.image === 'string' ? venue.image : '',
     }];
   });
@@ -48,20 +58,22 @@ function normalizeEventVenues(value: unknown): Record<string, string[]> | null {
 function FlyToSelection({ venue }: { venue: CarnivalVenue | null }) {
   const map = useMap();
   useEffect(() => {
-    if (venue && isValidVenueCoordinates(venue)) {
-      map.flyTo([venue.latitude, venue.longitude], 18, { duration: 0.8 });
+    if (!venue) return;
+    const destination = venueLatLng(venue);
+    if (!destination) return;
+    try {
+      map.flyTo(destination, 18, { duration: 0.8 });
+    } catch (error) {
+      // A stale/malformed venue payload should never crash the whole schedule UI.
+      if (error instanceof Error && error.message.includes('Invalid LatLng')) return;
+      throw error;
     }
   }, [map, venue]);
   return null;
 }
 
 function isValidVenueCoordinates(venue: CarnivalVenue): boolean {
-  return Number.isFinite(venue.latitude)
-    && Number.isFinite(venue.longitude)
-    && venue.latitude >= -90
-    && venue.latitude <= 90
-    && venue.longitude >= -180
-    && venue.longitude <= 180;
+  return venueLatLng(venue) !== null;
 }
 
 function InvalidateMapSize() {
