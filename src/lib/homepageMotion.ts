@@ -20,8 +20,11 @@ export interface HomepageMotionSettings {
   heroScaleCoveredMobile: number;
   heroBlur: number;
   heroBackgroundIntensity: number;
-  expandedCardScaleDesktop: number;
-  expandedCardScaleMobile: number;
+  cardFocusScaleDesktop: number;
+  cardFocusScaleMobile: number;
+  cardFocusLiftDesktop: number;
+  cardFocusLiftMobile: number;
+  cardFocusBlur: number;
   heroShrinkEnd: number;
   cardScrollStart: number;
   fanStartProgress: number;
@@ -34,12 +37,8 @@ export interface HomepageMotionSettings {
   magazineScale: number;
   magazineBlurDesktop: number;
   magazineBlurMobile: number;
-  cardOpenDuration: number;
-  cardOpenStartScale: number;
-  cardOpenEndScale: number;
-  cardCloseDuration: number;
-  cardCloseStartScale: number;
-  cardCloseEndScale: number;
+  cardFlipDuration: number;
+  cardReturnDuration: number;
 }
 
 export const DEFAULT_HOMEPAGE_MOTION: HomepageMotionSettings = {
@@ -58,14 +57,17 @@ export const DEFAULT_HOMEPAGE_MOTION: HomepageMotionSettings = {
   fanSpreadMobile: 46,
   riseDuration: 1.1,
   flipDuration: 1.15,
-  heroScaleOpeningDesktop: 1.12,
-  heroScaleOpeningMobile: 1.05,
+  heroScaleOpeningDesktop: 1,
+  heroScaleOpeningMobile: 1,
   heroScaleCoveredDesktop: 0.75,
   heroScaleCoveredMobile: 0.75,
   heroBlur: 2,
   heroBackgroundIntensity: 5,
-  expandedCardScaleDesktop: 1,
-  expandedCardScaleMobile: 1,
+  cardFocusScaleDesktop: 1.1,
+  cardFocusScaleMobile: 1.06,
+  cardFocusLiftDesktop: 24,
+  cardFocusLiftMobile: 14,
+  cardFocusBlur: 2.5,
   heroShrinkEnd: 0.28,
   cardScrollStart: 0.08,
   fanStartProgress: 0.15,
@@ -78,12 +80,8 @@ export const DEFAULT_HOMEPAGE_MOTION: HomepageMotionSettings = {
   magazineScale: 0.75,
   magazineBlurDesktop: 2,
   magazineBlurMobile: 0.7,
-  cardOpenDuration: 1.15,
-  cardOpenStartScale: 1,
-  cardOpenEndScale: 1,
-  cardCloseDuration: 0.65,
-  cardCloseStartScale: 1,
-  cardCloseEndScale: 1,
+  cardFlipDuration: 0.48,
+  cardReturnDuration: 0.36,
 };
 
 const ranges: Record<keyof HomepageMotionSettings, [number, number]> = {
@@ -102,14 +100,17 @@ const ranges: Record<keyof HomepageMotionSettings, [number, number]> = {
   fanSpreadMobile: [24, 72],
   riseDuration: [0.25, 3],
   flipDuration: [0.4, 2.5],
-  heroScaleOpeningDesktop: [0.75, 1.4],
-  heroScaleOpeningMobile: [0.75, 1.3],
+  heroScaleOpeningDesktop: [0.75, 1],
+  heroScaleOpeningMobile: [0.75, 1],
   heroScaleCoveredDesktop: [0.5, 1.1],
   heroScaleCoveredMobile: [0.5, 1.1],
   heroBlur: [0, 10],
   heroBackgroundIntensity: [0, 10],
-  expandedCardScaleDesktop: [0.9, 1.15],
-  expandedCardScaleMobile: [0.9, 1.15],
+  cardFocusScaleDesktop: [1, 1.2],
+  cardFocusScaleMobile: [1, 1.15],
+  cardFocusLiftDesktop: [8, 64],
+  cardFocusLiftMobile: [4, 36],
+  cardFocusBlur: [0, 10],
   heroShrinkEnd: [0.08, 0.48],
   cardScrollStart: [0.01, 0.45],
   fanStartProgress: [0.02, 0.55],
@@ -122,12 +123,8 @@ const ranges: Record<keyof HomepageMotionSettings, [number, number]> = {
   magazineScale: [0.55, 1],
   magazineBlurDesktop: [0, 8],
   magazineBlurMobile: [0, 2.5],
-  cardOpenDuration: [0.2, 2.5],
-  cardOpenStartScale: [0.8, 1.15],
-  cardOpenEndScale: [0.8, 1.15],
-  cardCloseDuration: [0.15, 2.5],
-  cardCloseStartScale: [0.8, 1.15],
-  cardCloseEndScale: [0.8, 1.15],
+  cardFlipDuration: [0.18, 1],
+  cardReturnDuration: [0.15, 0.8],
 };
 
 const clamp = (value: unknown, fallback: number, min: number, max: number) => {
@@ -147,10 +144,6 @@ export function normalizeHomepageMotion(value: unknown): HomepageMotionSettings 
     heroScaleOpeningMobile: candidate.heroScaleOpeningMobile ?? DEFAULT_HOMEPAGE_MOTION.heroScaleOpeningMobile,
     heroScaleCoveredDesktop: candidate.heroScaleCoveredDesktop ?? candidate.heroScale ?? DEFAULT_HOMEPAGE_MOTION.heroScaleCoveredDesktop,
     heroScaleCoveredMobile: candidate.heroScaleCoveredMobile ?? candidate.heroScale ?? DEFAULT_HOMEPAGE_MOTION.heroScaleCoveredMobile,
-    expandedCardScaleDesktop: candidate.expandedCardScaleDesktop ?? DEFAULT_HOMEPAGE_MOTION.expandedCardScaleDesktop,
-    expandedCardScaleMobile: candidate.expandedCardScaleMobile ?? DEFAULT_HOMEPAGE_MOTION.expandedCardScaleMobile,
-    cardOpenDuration: candidate.cardOpenDuration ?? candidate.flipDuration ?? DEFAULT_HOMEPAGE_MOTION.cardOpenDuration,
-    cardCloseDuration: candidate.cardCloseDuration ?? DEFAULT_HOMEPAGE_MOTION.cardCloseDuration,
     ...(Number.isFinite(Number(candidate.sceneLengthVh)) ? {} : {
         stackStartY: DEFAULT_HOMEPAGE_MOTION.stackStartY,
         stackScaleDesktop: DEFAULT_HOMEPAGE_MOTION.stackScaleDesktop,

@@ -16,42 +16,9 @@ export default function Home() {
   const [cards, setCards] = useState<CardData[]>(DEFAULT_HOMEPAGE_CARDS);
   const [magazineContent, setMagazineContent] = useState(DEFAULT_SITE_CONTENT.magazine);
   const [contentReady, setContentReady] = useState(false);
-  const [magazineOverlapPx, setMagazineOverlapPx] = useState(0);
   const siteAnimation = useSiteAnimation();
   const reducedMotion = useReducedMotion();
   const magazineOverlapsDeck = siteAnimation.cardDeckEnabled && !reducedMotion;
-
-  useEffect(() => {
-    if (!magazineOverlapsDeck) {
-      setMagazineOverlapPx(0);
-      return;
-    }
-
-    const scene = document.querySelector<HTMLElement>('.homepage-deck-scene');
-    const magazine = document.querySelector<HTMLElement>('.homepage-deck-magazine');
-    if (!scene || !magazine) return;
-
-    let frame = 0;
-    const measure = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const overlap = Math.max(0, Math.round(scene.getBoundingClientRect().height - magazine.getBoundingClientRect().height));
-        setMagazineOverlapPx((current) => current === overlap ? current : overlap);
-      });
-    };
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(scene);
-    observer.observe(magazine);
-    window.addEventListener('resize', measure);
-    measure();
-
-    return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-      window.removeEventListener('resize', measure);
-    };
-  }, [magazineOverlapsDeck, magazineContent.eyebrow, magazineContent.title, magazineContent.intro]);
 
   useEffect(() => {
     let active = true;
@@ -98,7 +65,7 @@ export default function Home() {
   const hasDeckLeadStory = magazineOverlapsDeck && Boolean(magazineStories[0]?.image);
 
   return (
-    <div id="home-page" data-home-ready={contentReady ? 'true' : 'false'} className="min-h-screen overflow-x-clip bg-[#FBFBFA] text-[#111827]">
+    <section id="home-page" data-home-ready={contentReady ? 'true' : 'false'} className="min-h-screen overflow-x-clip text-[#111827]" style={{ backgroundColor: String(magazineContent.backgroundColor) }}>
       <HomepageCardDeck
         cards={cards}
         enabled={siteAnimation.cardDeckEnabled}
@@ -114,11 +81,11 @@ export default function Home() {
 
       <section
         id="magazine-highlights"
-        aria-labelledby="magazine-highlights-title"
-        style={{ backgroundColor: String(magazineContent.backgroundColor), borderColor: `${String(magazineContent.accentColor)}55`, marginTop: magazineOverlapsDeck ? -magazineOverlapPx : undefined }}
-        className={`relative z-10 border-t text-[#111827]`}
+        aria-labelledby={magazineOverlapsDeck ? 'homepage-deck-magazine-title' : 'magazine-highlights-title'}
+        style={{ backgroundColor: String(magazineContent.backgroundColor) }}
+        className="relative z-10 text-[#111827]"
       >
-        <div className={siteAnimation.cardDeckEnabled ? 'pb-12 sm:pb-16' : ''}>
+        <div>
           <HomepageMagazine
             eyebrow={String(magazineContent.eyebrow)}
             title={String(magazineContent.title)}
@@ -145,6 +112,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </div>
+    </section>
   );
 }

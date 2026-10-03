@@ -34,20 +34,19 @@ const controls: { key: keyof HomepageMotionSettings; label: string; min: number;
   { key: 'magazineScale', label: 'Deck scale under magazine', min: 0.55, max: 1, step: 0.01, group: 'Magazine overlap' },
   { key: 'magazineBlurDesktop', label: 'Desktop deck blur (px)', min: 0, max: 8, step: 0.1, group: 'Magazine overlap' },
   { key: 'magazineBlurMobile', label: 'Mobile deck blur (px)', min: 0, max: 2.5, step: 0.1, group: 'Magazine overlap' },
-  { key: 'heroScaleOpeningDesktop', label: 'Desktop opening hero scale', min: 0.75, max: 1.4, step: 0.01, group: 'Hero and selection' },
-  { key: 'heroScaleOpeningMobile', label: 'Mobile opening hero scale', min: 0.75, max: 1.3, step: 0.01, group: 'Hero and selection' },
+  { key: 'heroScaleOpeningDesktop', label: 'Desktop opening hero scale', min: 0.75, max: 1, step: 0.01, group: 'Hero and selection' },
+  { key: 'heroScaleOpeningMobile', label: 'Mobile opening hero scale', min: 0.75, max: 1, step: 0.01, group: 'Hero and selection' },
   { key: 'heroScaleCoveredDesktop', label: 'Desktop covered/fan hero scale', min: 0.5, max: 1.1, step: 0.01, group: 'Hero and selection' },
   { key: 'heroScaleCoveredMobile', label: 'Mobile covered/fan hero scale', min: 0.5, max: 1.1, step: 0.01, group: 'Hero and selection' },
   { key: 'heroBlur', label: 'Hero blur after scroll (px, max 10)', min: 0, max: 10, step: 0.1, group: 'Hero and selection' },
   { key: 'heroBackgroundIntensity', label: 'Hero background animation intensity', min: 0, max: 10, step: 0.1, group: 'Hero and selection' },
-  { key: 'expandedCardScaleDesktop', label: 'Desktop expanded card scale', min: 0.9, max: 1.15, step: 0.01, group: 'Hero and selection' },
-  { key: 'expandedCardScaleMobile', label: 'Mobile expanded card scale', min: 0.9, max: 1.15, step: 0.01, group: 'Hero and selection' },
-  { key: 'cardOpenDuration', label: 'Second-click open duration (seconds)', min: 0.2, max: 2.5, step: 0.05, group: 'Card open and close' },
-  { key: 'cardOpenStartScale', label: 'Second-click start scale', min: 0.8, max: 1.15, step: 0.01, group: 'Card open and close' },
-  { key: 'cardOpenEndScale', label: 'Second-click end scale', min: 0.8, max: 1.15, step: 0.01, group: 'Card open and close' },
-  { key: 'cardCloseDuration', label: 'Close card duration (seconds)', min: 0.15, max: 2.5, step: 0.05, group: 'Card open and close' },
-  { key: 'cardCloseStartScale', label: 'Close card start scale', min: 0.8, max: 1.15, step: 0.01, group: 'Card open and close' },
-  { key: 'cardCloseEndScale', label: 'Close card end scale', min: 0.8, max: 1.15, step: 0.01, group: 'Card open and close' },
+  { key: 'cardFocusScaleDesktop', label: 'Desktop focused card scale', min: 1, max: 1.2, step: 0.01, group: 'Card focus and flip' },
+  { key: 'cardFocusScaleMobile', label: 'Mobile focused card scale', min: 1, max: 1.15, step: 0.01, group: 'Card focus and flip' },
+  { key: 'cardFocusLiftDesktop', label: 'Desktop card lift (px)', min: 8, max: 64, step: 1, group: 'Card focus and flip' },
+  { key: 'cardFocusLiftMobile', label: 'Mobile card lift (px)', min: 4, max: 36, step: 1, group: 'Card focus and flip' },
+  { key: 'cardFocusBlur', label: 'Blur other cards (px)', min: 0, max: 10, step: 0.1, group: 'Card focus and flip' },
+  { key: 'cardFlipDuration', label: 'Card flip duration (seconds)', min: 0.18, max: 1, step: 0.02, group: 'Card focus and flip' },
+  { key: 'cardReturnDuration', label: 'Card return duration (seconds)', min: 0.15, max: 0.8, step: 0.02, group: 'Card focus and flip' },
 ];
 
 export default function HomepageAnimationTuner() {
@@ -59,7 +58,7 @@ export default function HomepageAnimationTuner() {
   const [siteSaving, setSiteSaving] = useState(false);
   const [previewProgress, setPreviewProgress] = useState(0.5);
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
-  const [previewExpanded, setPreviewExpanded] = useState(false);
+  const [previewFocused, setPreviewFocused] = useState(false);
   const [transitionPreviewMode, setTransitionPreviewMode] = useState<'in' | 'out'>('in');
   const [transitionPreviewKey, setTransitionPreviewKey] = useState(0);
   useEffect(() => {
@@ -119,7 +118,8 @@ export default function HomepageAnimationTuner() {
   const heroCoveredScale = isPreviewMobile ? settings.heroScaleCoveredMobile : settings.heroScaleCoveredDesktop;
   const heroPreviewProgress = clamp01((previewProgress - settings.cardScrollStart) / (settings.heroShrinkEnd - settings.cardScrollStart));
   const heroPreviewScale = heroOpeningScale + heroPreviewProgress * (heroCoveredScale - heroOpeningScale);
-  const expandedPreviewScale = isPreviewMobile ? settings.expandedCardScaleMobile : settings.expandedCardScaleDesktop;
+  const focusedPreviewScale = isPreviewMobile ? settings.cardFocusScaleMobile : settings.cardFocusScaleDesktop;
+  const focusedPreviewLift = isPreviewMobile ? settings.cardFocusLiftMobile : settings.cardFocusLiftDesktop;
   const overlapBlur = restackAmount * (isPreviewMobile ? settings.magazineBlurMobile : settings.magazineBlurDesktop);
   return <div className="space-y-6"><section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
     <div className="rounded-2xl border border-[#E1E7E0] bg-white p-5 shadow-sm sm:p-7">
@@ -135,13 +135,12 @@ export default function HomepageAnimationTuner() {
       <div className={`relative mt-3 h-64 overflow-hidden rounded-xl border border-[#E7EAE6] bg-[#F4F1E8] ${isPreviewMobile ? 'mx-auto max-w-[190px]' : ''}`} style={{ backgroundImage: `radial-gradient(ellipse at 50% 18%, rgba(232,196,104,${settings.heroBackgroundIntensity / 25}), transparent 64%)` }}>
         <div className="absolute inset-x-2 top-8 z-0 text-center" style={{ transform: `scale(${heroPreviewScale})`, opacity: Math.max(0.12, 1 - fanAmount * 0.88), filter: `blur(${heroPreviewProgress * settings.heroBlur}px)` }}><Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={60} height={46} className="mx-auto h-7 w-auto" /><p className="mt-1 text-[8px] font-black leading-tight text-[#17221A]">WELCOME TO THE <span className="text-[#D9A928]">NATIONAL CARNIVAL</span></p></div>
         <p className="absolute inset-x-0 top-4 z-20 text-center text-[11px] font-black uppercase tracking-wide text-[#101820]" style={{ opacity: promptIn * promptOut, filter: `blur(${(1 - promptIn) * 3 + (1 - promptOut) * 2}px)` }}>PICK A CARD AND <span className="text-[#D9A928]">EXPLORE!</span></p>
-        <div className="absolute left-1/2 top-[61%] h-24 w-44 transition-[filter,transform]" style={{ transform: `translate(-50%, calc(-50% + ${(1 - earlyCardMotion) * settings.stackStartY * 38 - earlyCardMotion * 10 - fanAmount * 59}px)) scale(${stageScale})`, filter: `blur(${overlapBlur}px)` }}>
-          {Array.from({ length: 5 }, (_, index) => { const n = index - 2; const colors = ['#0D4020', '#2A2006', '#20125C', '#0D4845', '#0E2014']; const fanX = n * (isPreviewMobile ? settings.fanSpreadMobile : spread) * (isPreviewMobile ? 0.5 : 0.82) * fanVisible; const rotation = n * (isPreviewMobile ? 8 : 13) * fanVisible; return <div key={index} className="absolute left-1/2 top-1/2 grid place-items-center rounded-xl border-2 bg-gradient-to-br shadow-lg" style={{ width: '100%', aspectRatio: isPreviewMobile ? '9 / 16' : '16 / 9', borderColor: '#D9A928', background: `linear-gradient(135deg, ${colors[index]}, #031209)`, transform: `translate(calc(-50% + ${fanX}px), calc(-50% + ${Math.abs(n) * settings.stackPeek * 10}px)) rotate(${rotation}deg)`, zIndex: index }}>{index === 2 && <Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={54} height={42} className="w-10" />}</div>; })}
+        <div className={`absolute left-1/2 top-[61%] transition-[filter,transform] ${isPreviewMobile ? 'h-52 w-28' : 'h-24 w-44'}`} style={{ transform: `translate(-50%, calc(-50% + ${(1 - earlyCardMotion) * settings.stackStartY * 38 - earlyCardMotion * 10 - fanAmount * 59}px)) scale(${stageScale})`, filter: `blur(${overlapBlur}px)` }}>
+          {Array.from({ length: 5 }, (_, index) => { const n = index - 2; const colors = ['#0D4020', '#2A2006', '#20125C', '#0D4845', '#0E2014']; const fanX = n * (isPreviewMobile ? settings.fanSpreadMobile : spread) * (isPreviewMobile ? 0.5 : 0.82) * fanVisible; const rotation = n * (isPreviewMobile ? 8 : 13) * fanVisible; const selected = index === 2 && previewFocused; return <div key={index} className="absolute left-1/2 top-1/2" style={{ width: '100%', aspectRatio: isPreviewMobile ? '9 / 16' : '16 / 9', transform: `translate(calc(-50% + ${fanX}px), calc(-50% + ${Math.abs(n) * settings.stackPeek * 10 - (selected ? focusedPreviewLift * 0.55 : 0)}px)) rotate(${rotation}deg) scale(${selected ? focusedPreviewScale : 1})`, filter: previewFocused && !selected ? `blur(${settings.cardFocusBlur}px)` : `blur(${overlapBlur}px)`, opacity: previewFocused && !selected ? 0.62 : 1, zIndex: selected ? 20 : index, transition: 'transform 420ms cubic-bezier(.22,1,.36,1), filter 220ms ease, opacity 220ms ease' }}><div className="relative grid h-full w-full place-items-center rounded-xl border-2 bg-gradient-to-br shadow-lg" style={{ borderColor: '#D9A928', background: `linear-gradient(135deg, ${colors[index]}, #031209)`, transformStyle: 'preserve-3d', transform: selected ? 'rotateY(180deg)' : 'rotateY(0deg)', transition: 'transform 420ms cubic-bezier(.22,1,.36,1)' }}><div className="absolute inset-0 grid place-items-center rounded-[inherit]" style={{ backfaceVisibility: 'hidden' }}>{index === 2 && <Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={54} height={42} className="w-10" />}</div><div className="absolute inset-0 grid place-items-center rounded-[inherit] bg-[#F4F1E8] px-3 text-center" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}><span className="text-[8px] font-black uppercase text-[#1E4D38]">Card story preview<br />Use the button below to return</span></div></div></div>; })}
         </div>
         <div className="absolute inset-x-0 bottom-0 z-10 flex items-start justify-center overflow-hidden border-t border-[#D9A928]/60 px-4 pt-3 text-center transition-[height,opacity]" style={{ height: `${overlapAmount * 100}%`, opacity: overlapAmount, background: '#F4F1E8' }}><div><p className="text-[7px] font-extrabold uppercase tracking-[0.18em] text-[#8D6B1B]">A national livestock &amp; cultural expo</p><span className="mt-1 block text-sm font-black leading-tight text-[#111827]">Livestock, culture &amp; opportunity</span></div></div>
-        {previewExpanded && <div className="absolute inset-0 z-40 grid place-items-center bg-black/35 backdrop-blur-sm"><div className="grid h-full w-full place-items-center rounded-xl border-2 border-[#D9A928] bg-gradient-to-br from-[#0D4020] to-[#031209] shadow-2xl" style={{ transform: `scale(${expandedPreviewScale})` }}><div className="text-center"><Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={70} height={54} className="mx-auto w-12" /><span className="mt-2 block text-[9px] font-black uppercase tracking-widest text-[#F2C349]">Expanded card preview</span></div></div><button type="button" onClick={() => setPreviewExpanded(false)} className="absolute right-2 top-2 rounded-full bg-white px-3 py-1 text-[10px] font-bold text-[#1E4D38]">Close preview</button></div>}
       </div>
-      <button type="button" onClick={() => setPreviewExpanded((current) => !current)} className="mt-3 rounded-lg border border-[#DDE4DC] bg-white px-3 py-2 text-[10px] font-extrabold text-[#1E4D38]">{previewExpanded ? 'Hide expanded preview' : 'Preview expanded card'}</button>
+      <button type="button" onClick={() => setPreviewFocused((current) => !current)} className="mt-3 rounded-lg border border-[#DDE4DC] bg-white px-3 py-2 text-[10px] font-extrabold text-[#1E4D38]">{previewFocused ? 'Reset focused card preview' : 'Preview first-click card focus'}</button>
       <p className="mt-3 text-[10px] font-bold text-[#526057]">Hero reveal: {heroRevealSequence}</p>
       <label className="mt-3 block text-[11px] font-bold text-[#526057]">Scrub scene preview<input className="mt-2 w-full accent-[#1E4D38]" type="range" min="0" max="1" step="0.01" value={previewProgress} onChange={(event) => setPreviewProgress(Number(event.target.value))} /><span className="flex justify-between font-medium text-[#758078]"><span>Opening</span><span>Fan</span><span>Magazine</span></span></label>
       <p className="mt-3 text-[11px] leading-5 text-[#758078]">Scrub the scene to preview the opening, fan, prompt, restack, and magazine overlap. Motion settings apply on the public homepage after saving.</p>
