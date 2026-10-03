@@ -14,6 +14,37 @@ import 'leaflet/dist/leaflet.css';
 type ScheduleContent = { days?: Record<string, DayProgram>; venues?: CarnivalVenue[]; eventVenues?: Record<string, string[]> };
 type MobileView = 'schedule' | 'map';
 
+function normalizeVenues(value: unknown): CarnivalVenue[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item): CarnivalVenue[] => {
+    if (!item || typeof item !== 'object') return [];
+    const venue = item as Partial<Record<keyof CarnivalVenue, unknown>>;
+    const latitude = typeof venue.latitude === 'number' ? venue.latitude : Number(venue.latitude);
+    const longitude = typeof venue.longitude === 'number' ? venue.longitude : Number(venue.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)
+      || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return [];
+    if (typeof venue.id !== 'string' || typeof venue.name !== 'string') return [];
+    return [{
+      id: venue.id,
+      name: venue.name,
+      zone: typeof venue.zone === 'string' ? venue.zone : '',
+      description: typeof venue.description === 'string' ? venue.description : '',
+      latitude,
+      longitude,
+      image: typeof venue.image === 'string' ? venue.image : '',
+    }];
+  });
+}
+
+function normalizeEventVenues(value: unknown): Record<string, string[]> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  return Object.fromEntries(Object.entries(value).flatMap(([eventId, venueIds]) =>
+    Array.isArray(venueIds)
+      ? [[eventId, venueIds.filter((id): id is string => typeof id === 'string')]]
+      : [],
+  ));
+}
+
 function FlyToSelection({ venue }: { venue: CarnivalVenue | null }) {
   const map = useMap();
   useEffect(() => {
@@ -58,8 +89,10 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
       if (!active || !data?.content || typeof data.content !== 'object') return;
       const content = data.content as ScheduleContent;
       if (content.days && Object.keys(content.days).length) setDays(content.days);
-      if (content.venues?.length) setVenues(content.venues);
-      if (content.eventVenues) setEventVenues(content.eventVenues);
+      const normalizedVenues = normalizeVenues(content.venues);
+      const normalizedEventVenues = normalizeEventVenues(content.eventVenues);
+      if (normalizedVenues.length) setVenues(normalizedVenues);
+      if (normalizedEventVenues) setEventVenues(normalizedEventVenues);
     });
     return () => { active = false; };
   }, []);
