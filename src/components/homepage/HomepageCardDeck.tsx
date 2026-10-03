@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
+import { motion, useAnimationControls, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { ArrowRight, X } from 'lucide-react';
 import { DEFAULT_HOMEPAGE_MOTION, normalizeHomepageMotion, type HomepageMotionSettings } from '@/lib/homepageMotion';
 import type { CardData } from '@/lib/homepageCards';
@@ -51,6 +51,7 @@ function DeckCard({
   settings,
   mobile,
   viewportWidth,
+  viewportHeight,
   selected,
   focusActive,
   flipped,
@@ -68,6 +69,7 @@ function DeckCard({
   settings: HomepageMotionSettings;
   mobile: boolean;
   viewportWidth: number;
+  viewportHeight: number;
   selected: boolean;
   focusActive: boolean;
   flipped: boolean;
@@ -78,6 +80,10 @@ function DeckCard({
   onClose: () => void;
   onReturnComplete: () => void;
 }) {
+  const [showBack, setShowBack] = useState(false);
+  const showBackRef = useRef(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const flipControls = useAnimationControls();
   const center = (count - 1) / 2;
   const offset = index - center;
   const normalizedOffset = center === 0 ? 0 : offset / center;
@@ -95,8 +101,52 @@ function DeckCard({
   const opacity = useTransform(progress, [0, cardFanStart, cardFanEnd, settings.fanHoldEndProgress, restackStart, settings.magazineEndProgress], [1, 0.82, 1, 1, 1, 0]);
   const finalOpacity = useTransform(opacity, (value) => value * (focusActive && !selected ? 0.68 : 1));
   const lift = mobile ? settings.cardFocusLiftMobile : settings.cardFocusLiftDesktop;
-  const scale = mobile ? settings.cardFocusScaleMobile : settings.cardFocusScaleDesktop;
+  const requestedScale = mobile ? settings.cardFocusScaleMobile : settings.cardFocusScaleDesktop;
+  const cardWidth = mobile ? Math.min(viewportWidth * 0.7, 300) : Math.min(Math.max(viewportWidth * 0.4, 300), 560);
+  const cardHeight = cardWidth * (mobile ? 16 / 9 : 9 / 16);
+  const fitScale = Math.min(viewportWidth * 0.94 / cardWidth, Math.max(160, viewportHeight - (mobile ? 56 : 72) - 36) / cardHeight);
+  const scale = Math.min(requestedScale, Math.max(1, fitScale));
   const focusDuration = reducedMotion ? 0 : (returning ? settings.cardReturnDuration : settings.cardFlipDuration);
+
+  useEffect(() => {
+    if (!selected) return;
+    let cancelled = false;
+    const targetSide = flipped;
+    const halfDuration = focusDuration / 2;
+
+    const changeSide = async () => {
+      if (showBackRef.current !== targetSide) {
+        if (reducedMotion) {
+          flipControls.set({ scaleX: 0.01 });
+        } else {
+          await flipControls.start({ scaleX: 0.01, transition: { duration: halfDuration, ease: [0.22, 1, 0.36, 1] } });
+          if (cancelled) return;
+        }
+
+        showBackRef.current = targetSide;
+        setShowBack(targetSide);
+        if (!reducedMotion) await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      }
+
+      if (reducedMotion) {
+        flipControls.set({ scaleX: 1 });
+      } else {
+        await flipControls.start({ scaleX: 1, transition: { duration: halfDuration, ease: [0.22, 1, 0.36, 1] } });
+      }
+
+      if (!cancelled && returning) onReturnComplete();
+    };
+
+    void changeSide();
+    return () => {
+      cancelled = true;
+      flipControls.stop();
+    };
+  }, [selected, flipped, returning, reducedMotion, focusDuration, onReturnComplete, flipControls]);
+
+  useEffect(() => {
+    if (selected && showBack) closeButtonRef.current?.focus({ preventScroll: true });
+  }, [selected, showBack]);
 
   return (
     <motion.div
@@ -116,20 +166,15 @@ function DeckCard({
         animate={{ y: selected && !reducedMotion ? -lift : 0, scale: selected && !reducedMotion ? scale : 1 }}
         transition={{ duration: focusDuration, ease: [0.22, 1, 0.36, 1] }}
       >
-        <motion.div
-          className="homepage-deck-card-flip"
-          animate={{ rotateY: flipped ? 180 : 0 }}
-          transition={{ duration: focusDuration, ease: [0.22, 1, 0.36, 1] }}
-          onAnimationComplete={() => { if (returning) onReturnComplete(); }}
-        >
-          <button
+        <motion.div className="homepage-deck-card-flip" initial={false} animate={flipControls}>
+          {!showBack ? <button
             ref={(element) => registerButton(card.id, element)}
             type="button"
             data-homepage-deck-card={card.id}
             aria-label={`Open ${card.title}`}
             aria-pressed={selected}
-            aria-hidden={flipped}
-            tabIndex={flipped ? -1 : 0}
+            aria-hidden={showBack}
+            tabIndex={showBack ? -1 : 0}
             disabled={focusActive && !selected}
             onClick={() => onSelect(card)}
             className="homepage-deck-card homepage-deck-card-front"
@@ -138,10 +183,9 @@ function DeckCard({
             <Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={118} height={90} className="homepage-deck-logo" />
             <span className="homepage-deck-card-label">{card.pageTitle || card.title}</span>
             <span className="homepage-deck-number" style={{ color: card.accentColor }}>{card.number}</span>
-          </button>
-          <div
+          </button> : <div
             className="homepage-deck-card homepage-deck-card-back"
-            aria-hidden={!flipped}
+            aria-hidden={!showBack}
             style={{ borderColor: card.accentColor }}
           >
             <div className="homepage-deck-card-back-image">
@@ -152,13 +196,13 @@ function DeckCard({
               <p className="homepage-deck-card-back-eyebrow">{card.eyebrow}</p>
               <h2 className="homepage-deck-card-back-title">{card.title}</h2>
               <p className="homepage-deck-card-back-body">{card.body}</p>
-              <Link href={card.link} tabIndex={flipped ? 0 : -1} className="homepage-deck-card-back-link">
+              <Link href={card.link} tabIndex={showBack ? 0 : -1} className="homepage-deck-card-back-link">
                 {card.cta}<ArrowRight aria-hidden="true" size={14} />
               </Link>
             </div>
             <span className="homepage-deck-card-back-number">{card.number}</span>
-            <button type="button" onClick={onClose} tabIndex={flipped ? 0 : -1} aria-label="Close card" className="homepage-deck-card-close"><X aria-hidden="true" size={18} /></button>
-          </div>
+            <button ref={closeButtonRef} type="button" onClick={onClose} tabIndex={showBack ? 0 : -1} aria-label="Close card" className="homepage-deck-card-close"><X aria-hidden="true" size={18} /></button>
+          </div>}
         </motion.div>
       </motion.div>
     </motion.div>
@@ -274,12 +318,12 @@ export default function HomepageCardDeck({ cards, magazine, leadStory, enabled }
     setFocusedCardId(card.id);
     setIsClosingCard(false);
   };
-  const finishCardReturn = () => {
+  const finishCardReturn = useCallback(() => {
     const id = focusedCardId;
     setFocusedCardId(null);
     setIsClosingCard(false);
     if (id) requestAnimationFrame(() => cardButtonsRef.current.get(id)?.focus({ preventScroll: true }));
-  };
+  }, [focusedCardId]);
 
   const hero = (
     <motion.div
@@ -331,6 +375,7 @@ export default function HomepageCardDeck({ cards, magazine, leadStory, enabled }
               settings={settings}
               mobile={isMobile}
               viewportWidth={viewportWidth}
+              viewportHeight={viewportHeight}
               selected={focusedCardId === card.id}
               focusActive={focusIsActive}
               flipped={focusedCardId === card.id && !isClosingCard}
