@@ -23,6 +23,10 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [pathname]);
 
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },

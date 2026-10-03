@@ -1,6 +1,6 @@
 'use client';
 
-import { MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import { MouseEvent, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -34,6 +34,24 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
   const [pendingPath, setPendingPath] = useState<string | null>(null);
   const navigationRef = useRef<PendingNavigation | null>(null);
   const fallbackTimerRef = useRef<number | null>(null);
+  const previousPathRef = useRef(pathname);
+
+  useLayoutEffect(() => {
+    if (previousPathRef.current === pathname) return;
+    previousPathRef.current = pathname;
+
+    const resetScroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      const lenis = (window as Window & {
+        __lenisInstance?: { scrollTo: (target: number, options: { immediate: boolean }) => void };
+      }).__lenisInstance;
+      lenis?.scrollTo(0, { immediate: true });
+    };
+
+    resetScroll();
+    const frame = window.requestAnimationFrame(resetScroll);
+    return () => window.cancelAnimationFrame(frame);
+  }, [pathname]);
 
   useEffect(() => {
     let active = true;
@@ -129,7 +147,6 @@ export default function SiteFrame({ children }: { children: ReactNode }) {
       if (!external && (destination.pathname === pathname || isWorkspaceRoute || destinationWorkspace)) return;
       const nextHref = external ? destination.href : `${destination.pathname}${destination.search}${destination.hash}`;
       event.preventDefault();
-      event.stopPropagation();
       if (reduceMotion || animation.transitionOutDuration === 0) {
         if (!reduceMotion && !external && animation.transitionInDuration > 0) setPendingPath(destination.pathname);
         if (external) window.location.assign(nextHref);
