@@ -17,9 +17,20 @@ type MobileView = 'schedule' | 'map';
 function FlyToSelection({ venue }: { venue: CarnivalVenue | null }) {
   const map = useMap();
   useEffect(() => {
-    if (venue) map.flyTo([venue.latitude, venue.longitude], 18, { duration: 0.8 });
+    if (venue && isValidVenueCoordinates(venue)) {
+      map.flyTo([venue.latitude, venue.longitude], 18, { duration: 0.8 });
+    }
   }, [map, venue]);
   return null;
+}
+
+function isValidVenueCoordinates(venue: CarnivalVenue): boolean {
+  return Number.isFinite(venue.latitude)
+    && Number.isFinite(venue.longitude)
+    && venue.latitude >= -90
+    && venue.latitude <= 90
+    && venue.longitude >= -180
+    && venue.longitude <= 180;
 }
 
 function InvalidateMapSize() {
@@ -65,14 +76,15 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
   }, []);
 
   const eventEntries = useMemo(() => Object.entries(days).flatMap(([key, day]) => day.timeBlocks.map((event) => ({ dayKey: key, day, event }))), [days]);
+  const validVenues = useMemo(() => venues.filter(isValidVenueCoordinates), [venues]);
   const dayKey = urlState.day && days[urlState.day] ? urlState.day : Object.keys(days)[0] || 'day1';
   const selectedEventId = eventEntries.some(({ event, dayKey: eventDay }) => event.id === urlState.event && eventDay === dayKey) ? urlState.event : null;
   const currentDay = days[dayKey] || Object.values(days)[0] || CARNIVAL_PROGRAM.day1;
   const dayEvents = currentDay.timeBlocks;
   const tracks = ['All', ...Array.from(new Set(dayEvents.map((event) => event.track)))];
   const visibleEvents = dayEvents.filter((event) => (track === 'All' || event.track === track) && (!selectedVenueId || (eventVenues[event.id] || []).includes(selectedVenueId)));
-  const selectedVenue = venues.find((venue) => venue.id === selectedVenueId) ?? (selectedEventId ? venues.find((venue) => (eventVenues[selectedEventId] || []).includes(venue.id)) ?? null : null);
-  const selectedEventVenues = selectedEventId ? venues.filter((venue) => (eventVenues[selectedEventId] || []).includes(venue.id)) : [];
+  const selectedVenue = validVenues.find((venue) => venue.id === selectedVenueId) ?? (selectedEventId ? validVenues.find((venue) => (eventVenues[selectedEventId] || []).includes(venue.id)) ?? null : null);
+  const selectedEventVenues = selectedEventId ? validVenues.filter((venue) => (eventVenues[selectedEventId] || []).includes(venue.id)) : [];
 
   const updateUrl = useCallback((nextDay: string, eventId: string | null) => {
     const url = new URL(window.location.href);
@@ -153,7 +165,7 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
                 <InvalidateMapSize />
                 <TileLayer url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}" attribution="&copy; Google Satellite Imagery" maxZoom={20} />
                 <FlyToSelection venue={selectedVenue} />
-                {venues.map((venue, index) => {
+                {validVenues.map((venue, index) => {
                   const active = selectedVenueId === venue.id || selectedEventVenues.some((item) => item.id === venue.id);
                   const color = venueColor(index);
                   const icon = divIcon({

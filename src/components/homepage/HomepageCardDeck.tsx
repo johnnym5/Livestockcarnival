@@ -104,7 +104,11 @@ function DeckCard({
   const requestedScale = mobile ? settings.cardFocusScaleMobile : settings.cardFocusScaleDesktop;
   const cardWidth = mobile ? Math.min(viewportWidth * 0.7, 300) : Math.min(Math.max(viewportWidth * 0.4, 300), 560);
   const cardHeight = cardWidth * (mobile ? 16 / 9 : 9 / 16);
-  const fitScale = Math.min(viewportWidth * 0.94 / cardWidth, Math.max(160, viewportHeight - (mobile ? 56 : 72) - 36) / cardHeight);
+  const cardRotation = normalizedOffset * (mobile ? 17 : 20) * (selected ? 0 : 1);
+  const radians = Math.abs(cardRotation) * Math.PI / 180;
+  const rotatedWidth = cardWidth * Math.cos(radians) + cardHeight * Math.sin(radians);
+  const rotatedHeight = cardHeight * Math.cos(radians) + cardWidth * Math.sin(radians);
+  const fitScale = Math.min(viewportWidth * 0.94 / rotatedWidth, Math.max(160, viewportHeight - (mobile ? 56 : 72) - 36) / rotatedHeight);
   const scale = Math.min(requestedScale, Math.max(1, fitScale));
   const focusDuration = reducedMotion ? 0 : (returning ? settings.cardReturnDuration : settings.cardFlipDuration);
 
@@ -154,7 +158,7 @@ function DeckCard({
       style={{
         x: reducedMotion ? normalizedOffset * (mobile ? 22 : 72) : x,
         y: reducedMotion ? Math.abs(normalizedOffset) * 8 : localY,
-        rotate: reducedMotion ? normalizedOffset * (mobile ? 12 : 16) : rotate,
+        rotate: selected ? 0 : reducedMotion ? normalizedOffset * (mobile ? 12 : 16) : rotate,
         opacity: reducedMotion ? 1 : finalOpacity,
         zIndex: selected ? 1000 : 100 + index,
         filter: focusActive && !selected ? `blur(${settings.cardFocusBlur}px)` : 'blur(0px)',
