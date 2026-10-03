@@ -310,14 +310,15 @@ html.lenis, html.lenis body {
 .homepage-deck-eyebrow { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 8px auto 0; color: #8D6B1B; font-size: clamp(8px, .85vw, 12px); font-weight: 850; letter-spacing: .2em; text-transform: uppercase; }
 .homepage-deck-eyebrow span { width: clamp(18px, 3vw, 44px); height: 1px; background: #D7C58D; }
 .homepage-deck-eyebrow i { font-style: normal; }
-.homepage-deck-title { max-width: 1300px; margin: 12px auto 0; color: #111827; font-size: clamp(2.4rem, 6.8vw, 6.8rem); font-weight: 950; line-height: .94; letter-spacing: -.055em; text-wrap: balance; text-shadow: 0 2px 0 rgba(255,255,255,.72), 0 5px 18px rgba(31,38,28,.14); }
+.homepage-deck-title { max-width: 1300px; margin: 12px auto 0; color: #111827; font-size: clamp(2.4rem, 6.8vw, 6.8rem); font-weight: 950; line-height: .94; letter-spacing: -.055em; text-wrap: balance; text-shadow: 0 4px 12px rgba(0,0,0,.13), 0 1px 2px rgba(0,0,0,.07); }
 .homepage-deck-title span { color: #D9A928; }
 .homepage-deck-intro { max-width: 920px; margin: 12px auto 0; color: #4B5563; font-size: clamp(.82rem, 1.35vw, 1.15rem); line-height: 1.55; }
-.homepage-deck-prompt { position: absolute; z-index: 30; top: 4%; left: 16px; right: 16px; margin: 0 auto; width: fit-content; max-width: calc(100% - 32px); color: #080B0A; font-size: clamp(1.35rem, 3.5vw, 3.2rem); font-weight: 950; line-height: 1.05; letter-spacing: -.035em; text-align: center; text-shadow: 0 2px 0 rgba(255,255,255,.8), 0 5px 14px rgba(16,24,18,.26); pointer-events: none; will-change: transform, filter, opacity; }
+.homepage-deck-prompt { position: absolute; z-index: 30; top: 4%; left: 16px; right: 16px; margin: 0 auto; width: fit-content; max-width: calc(100% - 32px); color: #080B0A; font-size: clamp(1.35rem, 3.5vw, 3.2rem); font-weight: 950; line-height: 1.05; letter-spacing: -.035em; text-align: center; text-shadow: 0 3px 12px rgba(0,0,0,.16), 0 1px 2px rgba(0,0,0,.08); pointer-events: none; will-change: transform, filter, opacity; }
 .homepage-deck-prompt strong { color: #D9A928; }
 .homepage-deck-fan { position: absolute; z-index: 20; inset: 0; pointer-events: none; transform-origin: center 55%; will-change: transform, filter, opacity; }
 .homepage-deck-fan-rise { position: absolute; inset: 0; will-change: transform, opacity; }
 .homepage-deck-card-position { position: absolute; left: 50%; top: 60%; width: clamp(300px, 40vw, 560px); aspect-ratio: 16 / 9; translate: -50% -50%; transform-style: preserve-3d; pointer-events: auto; }
+.homepage-deck-card-fold { width: 100%; height: 100%; transform-style: preserve-3d; will-change: transform; }
 .homepage-deck-card { position: relative; display: grid; width: 100%; height: 100%; place-items: center; overflow: hidden; border: 2px solid; border-radius: clamp(12px, 1.35vw, 22px); cursor: pointer; isolation: isolate; backface-visibility: hidden; transform-style: preserve-3d; transition: box-shadow .2s ease; }
 .homepage-deck-card::after { position: absolute; inset: auto 7% 8%; height: 1px; content: ''; background: rgba(255,255,255,.16); }
 .homepage-deck-card:hover { box-shadow: 0 24px 54px rgba(8,31,18,.32); }
@@ -350,7 +351,6 @@ html.lenis, html.lenis body {
 .homepage-deck-open-logo { width: min(30vw, 220px); height: auto; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,.28)); }
 .homepage-deck-open-title { max-width: 78%; color: #F4C43D; font-size: clamp(1rem, 2.1vw, 1.75rem); font-weight: 950; line-height: 1.12; letter-spacing: .12em; text-align: center; text-transform: uppercase; text-shadow: 0 2px 0 rgba(0,0,0,.4), 0 5px 16px rgba(0,0,0,.38); }
 .homepage-deck-open-back { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); background: #FBFBFA; transform: rotateY(180deg); }
-.homepage-deck-open-mobile-content { transform: none !important; }
 .homepage-deck-open-image { position: relative; min-width: 0; min-height: 0; background: #0D4020; }
 .homepage-deck-open-copy { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; overflow-y: auto; padding: clamp(24px, 5vw, 76px); }
 .homepage-deck-close { position: absolute; z-index: 5; top: max(18px, env(safe-area-inset-top)); right: max(18px, env(safe-area-inset-right)); display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid #DDE4DC; border-radius: 999px; background: rgba(255,255,255,.96); color: #1E4D38; box-shadow: 0 6px 22px rgba(0,0,0,.14); }
@@ -361,7 +361,7 @@ html.lenis, html.lenis body {
 .homepage-deck-static-magazine p { font-size: 11px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; }
 .homepage-deck-static-magazine h2 { margin-top: 12px; font-size: clamp(2rem,5vw,4rem); font-weight: 950; line-height: 1; }
 .homepage-deck-static-magazine span { display: block; max-width: 800px; margin-top: 16px; color: #4B5563; line-height: 1.6; }
-.is-low-power .homepage-deck-prompt { text-shadow: 0 2px 0 #fff, 0 3px 8px rgba(16,24,18,.2); }
+.is-low-power .homepage-deck-prompt { text-shadow: 0 3px 10px rgba(0,0,0,.14); }
 .is-low-power .homepage-deck-backdrop { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .is-reduced-motion .homepage-deck-scene { position: relative; top: auto; height: auto; min-height: 760px; overflow: clip; padding-top: var(--homepage-sticky-top, 72px); }
 .is-reduced-motion .homepage-deck-hero { position: relative; inset: auto; padding: 18px 18px 0; }
@@ -373,7 +373,7 @@ html.lenis, html.lenis body {
   .homepage-deck-atmosphere { animation: none; filter: blur(8px) saturate(.8); background-image: linear-gradient(135deg, rgba(248,239,215,.48), rgba(218,195,145,.34)), url('/assets/livestock/showcase-spectrum-hero.jpg'); transform: scale(1.05); }
   .homepage-deck-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
   .homepage-deck-hero { inset: 4% 14px auto; }
-  .homepage-deck-title { max-width: 640px; margin-top: 10px; font-size: clamp(2.05rem, 9vw, 3.55rem); text-shadow: 0 1px 0 rgba(255,255,255,.78), 0 4px 14px rgba(31,38,28,.14); }
+  .homepage-deck-title { max-width: 640px; margin-top: 10px; font-size: clamp(2.05rem, 9vw, 3.55rem); text-shadow: 0 3px 10px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.06); }
   .homepage-deck-intro { max-width: 540px; margin-top: 10px; font-size: clamp(.78rem, 3.7vw, 1rem); }
   .homepage-deck-eyebrow { gap: 7px; font-size: 7px; letter-spacing: .11em; }
   .homepage-deck-eyebrow span { width: 14px; }
@@ -408,7 +408,7 @@ html.lenis, html.lenis body {
   .homepage-deck-atmosphere { animation: none; filter: blur(8px) saturate(.8); background-image: linear-gradient(135deg, rgba(248,239,215,.48), rgba(218,195,145,.34)), url('/assets/livestock/showcase-spectrum-hero.jpg'); transform: scale(1.05); }
   .homepage-deck-hero-inner,.homepage-deck-fan,.homepage-deck-fan-rise,.homepage-deck-card-position,.homepage-deck-open-card,.homepage-deck-open-inner { will-change: transform, opacity; }
   .homepage-deck-logo,.homepage-deck-open-logo { filter: none; }
-  .homepage-deck-prompt { text-shadow: 0 2px 0 #fff, 0 3px 8px rgba(16,24,18,.2); }
+  .homepage-deck-prompt { text-shadow: 0 3px 10px rgba(0,0,0,.14); }
   .homepage-deck-card { transition: none; }
 }
 @media (max-width: 380px) {
