@@ -132,7 +132,7 @@ export default function Footer() {
             &copy; 2026 Federal Republic of Nigeria · Renewed Hope National Livestock Carnival. All rights reserved.
           </div>
           <div className="flex flex-wrap items-center gap-6">
-            <a href="https://x.com/livestock_carnival" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+            <a href="https://x.com/livestockcarn" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               Twitter (X)
             </a>
             <a href="https://instagram.com/livestock_carnival" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
