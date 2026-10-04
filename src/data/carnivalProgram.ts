@@ -22,7 +22,7 @@ export const CARNIVAL_PROGRAM: Record<string, DayProgram> = {
   // =========================================================================
   day1: {
     dayNumber: 1,
-    dateString: "Friday, 21 November 2026",
+    dateString: "Saturday, 21 November 2026",
     title: "Grand Opening, Presidential Commission & Livestock Parade",
     timeBlocks: [
       {
@@ -89,7 +89,7 @@ export const CARNIVAL_PROGRAM: Record<string, DayProgram> = {
   // =========================================================================
   day2: {
     dayNumber: 2,
-    dateString: "Saturday, 22 November 2026",
+    dateString: "Sunday, 22 November 2026",
     title: "Agro-Investment Summit, Pastoralist Forum & Concert Night 1",
     timeBlocks: [
       {
@@ -157,7 +157,7 @@ export const CARNIVAL_PROGRAM: Record<string, DayProgram> = {
   // =========================================================================
   day3: {
     dayNumber: 3,
-    dateString: "Sunday, 23 November 2026",
+    dateString: "Monday, 23 November 2026",
     title: "Commercial B2B Matchmaking, Breed Awards & Grand Finale Concert",
     timeBlocks: [
       {

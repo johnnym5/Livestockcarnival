@@ -31,7 +31,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'Witness over 200 ceremonial cavalry war stallions, traditional Northern horsemen, camel pageantry, and royal racing displays in a breathtaking celebration of national heritage.',
     image: '/assets/home/story-equestrian-durbar-parade.jpg',
     location: 'Zone 3: Central Track & Oval',
-    dateBadge: 'Friday, 21 Nov 2026',
+    dateBadge: 'Saturday, 21 Nov 2026',
     ctaText: 'Explore Equestrian Schedule',
     ctaLink: '/schedule',
     activities: [
