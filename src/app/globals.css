@@ -317,7 +317,7 @@ html.lenis, html.lenis body {
 .homepage-deck-prompt strong { color: #D9A928; }
 .homepage-deck-fan { position: absolute; z-index: 20; inset: 0; pointer-events: none; transform-origin: center 55%; will-change: transform, filter, opacity; }
 .homepage-deck-fan-rise { position: absolute; inset: 0; will-change: transform, opacity; }
-.homepage-deck-card-position { position: absolute; left: 50%; top: 60%; width: clamp(300px, 40vw, 560px); aspect-ratio: 16 / 9; translate: -50% -50%; transform-style: preserve-3d; pointer-events: auto; transition: filter .22s ease; }
+.homepage-deck-card-position { position: absolute; left: 50%; top: 60%; width: clamp(300px, 40vw, 560px); aspect-ratio: 16 / 9; translate: -50% -50%; container-type: size; transform-style: preserve-3d; pointer-events: auto; transition: filter .22s ease; }
 .homepage-deck-card-focus,.homepage-deck-card-flip { position: relative; width: 100%; height: 100%; }
 .homepage-deck-card-flip { transform-origin: center; }
 .homepage-deck-card-focus,.homepage-deck-card-flip { will-change: transform; }
@@ -337,7 +337,10 @@ html.lenis, html.lenis body {
 .homepage-deck-card-front:hover { box-shadow: 0 24px 54px rgba(8,31,18,.32); }
 .homepage-deck-card:focus-visible { outline: 3px solid #101820; outline-offset: 4px; }
 .homepage-deck-logo { width: clamp(72px, 11vw, 150px); height: auto; object-fit: contain; filter: drop-shadow(0 3px 9px rgba(0,0,0,.2)); pointer-events: none; }
-.homepage-deck-card-label { position: absolute; top: 50%; left: 3.5%; width: 1em; max-height: 80%; overflow: hidden; color: #F4C43D; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(8px, .78vw, 11px); font-weight: 800; line-height: 1.15; letter-spacing: .14em; text-align: center; text-transform: uppercase; text-shadow: 0 2px 7px rgba(0,0,0,.55); writing-mode: vertical-rl; text-orientation: mixed; transform: translateY(-50%) rotate(180deg); pointer-events: none; }
+.homepage-deck-card-label { position: absolute; top: 50%; left: 3.5%; width: 1em; color: #F4C43D; font-family: Georgia, 'Times New Roman', serif; font-size: 6px; font-weight: 800; line-height: 1.15; letter-spacing: .08em; text-align: center; text-transform: uppercase; text-shadow: 0 2px 7px rgba(0,0,0,.55); white-space: nowrap; writing-mode: vertical-rl; text-orientation: mixed; transform: translateY(-50%) rotate(180deg); pointer-events: none; }
+@supports (font-size: 1cqh) {
+  .homepage-deck-card-label { font-size: clamp(3px, calc(62cqh / var(--label-length)), 11px); }
+}
 .homepage-deck-number { position: absolute; right: 5%; bottom: 5%; font-size: clamp(9px, .8vw, 12px); font-weight: 900; letter-spacing: .17em; text-shadow: 0 2px 7px rgba(0,0,0,.5); }
 .homepage-deck-scroll-cue { position: relative; z-index: 31; display: flex; flex-direction: column; align-items: center; gap: 5px; width: fit-content; margin: 20px auto 0; color: #8D6B1B; font-size: 9px; font-weight: 900; letter-spacing: .22em; pointer-events: none; }
 .homepage-deck-scroll-cue i { width: 13px; height: 21px; border: 2px solid #D9A928; border-radius: 999px; position: relative; }
@@ -370,7 +373,7 @@ html.lenis, html.lenis body {
   .homepage-deck-card-position { top: 70%; width: min(70vw, 300px); aspect-ratio: 9 / 16; }
   .homepage-deck-card { border-radius: 16px; }
   .homepage-deck-logo { width: clamp(58px, 19vw, 94px); }
-  .homepage-deck-card-label { left: 5%; font-size: clamp(8px, 2.6vw, 11px); }
+  .homepage-deck-card-label { left: 5%; }
   .homepage-deck-number { right: 7%; bottom: 4%; font-size: 9px; }
   .homepage-deck-magazine { inset: 0 0 auto; display: flex; flex-direction: column; padding: 16px 20px 20px; }
   .homepage-deck-magazine-copy { width: 100%; height: 100%; }

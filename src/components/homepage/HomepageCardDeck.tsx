@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useAnimationControls, useReducedMotion, useScroll, useTransform, type MotionValue } from 'framer-motion';
@@ -185,7 +185,7 @@ function DeckCard({
             style={{ background: coverGradient(card.coverBg), borderColor: card.accentColor, boxShadow: `inset 0 1px 0 rgba(255,255,255,.14), 0 16px 36px rgba(10,20,12,.22), 0 14px 35px ${card.accentColor}33` }}
           >
             <Image src="/assets/branding/carnival-logo-transparent.png" alt="" width={118} height={90} className="homepage-deck-logo" />
-            <span className="homepage-deck-card-label">{card.pageTitle || card.title}</span>
+            <span className="homepage-deck-card-label" style={{ '--label-length': String((card.pageTitle || card.title).length) } as CSSProperties}>{card.pageTitle || card.title}</span>
             <span className="homepage-deck-number" style={{ color: card.accentColor }}>{card.number}</span>
           </button> : <div
             className="homepage-deck-card homepage-deck-card-back"
