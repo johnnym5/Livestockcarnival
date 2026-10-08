@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet";
-import { MapPin, Navigation } from "lucide-react";
+import { ExternalLink, MapPin, Navigation } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 
 const zones = [
@@ -26,6 +26,7 @@ function MapController({ center }: { center: [number, number] }) {
 
 export default function VenueMapClient() {
   const [activeZone, setActiveZone] = useState<[number, number]>([9.0428, 7.4890]);
+  const [mapImageryConsent, setMapImageryConsent] = useState<'pending' | 'accepted' | 'rejected'>('pending');
 
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-80px)]">
@@ -76,10 +77,10 @@ export default function VenueMapClient() {
           className="w-full h-full z-0"
           zoomControl={false}
         >
-          <TileLayer
+          {mapImageryConsent === 'accepted' ? <TileLayer
             url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
             attribution="&copy; Google Maps"
-          />
+          /> : null}
           <MapController center={activeZone} />
           
           {zones.map((zone) => (
@@ -98,6 +99,19 @@ export default function VenueMapClient() {
             </CircleMarker>
           ))}
         </MapContainer>
+        {mapImageryConsent === 'pending' && <div className="absolute inset-x-3 top-3 z-[500] mx-auto max-w-md rounded-xl border border-[#DCE3DC] bg-white/95 p-4 text-center shadow-lg backdrop-blur-sm">
+          <p className="text-sm font-bold text-[#17251D]">Load Google satellite imagery?</p>
+          <p className="mt-1 text-xs leading-5 text-[#59635D]">Google may receive your IP address and browser information when map tiles load. Venue zones remain available without loading the imagery.</p>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            <button type="button" onClick={() => setMapImageryConsent('accepted')} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#1E4D38] px-4 text-xs font-bold text-white">Load map imagery <ExternalLink aria-hidden="true" size={14} /></button>
+            <button type="button" onClick={() => setMapImageryConsent('rejected')} className="min-h-10 rounded-lg border border-[#DCE3DC] px-4 text-xs font-semibold text-[#354139]">Keep imagery off</button>
+          </div>
+          <a className="mt-2 block text-[11px] font-semibold text-[#1E4D38] underline" href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>
+        </div>}
+        {mapImageryConsent === 'rejected' && <div className="absolute inset-x-3 top-3 z-[500] mx-auto flex max-w-md flex-wrap items-center justify-center gap-2 rounded-xl border border-[#DCE3DC] bg-white/95 p-3 text-center shadow-lg backdrop-blur-sm">
+          <p className="text-xs text-[#59635D]">Google imagery is off. Venue zones remain available.</p>
+          <button type="button" onClick={() => setMapImageryConsent('accepted')} className="min-h-9 rounded-lg border border-[#1E4D38]/30 px-3 text-xs font-semibold text-[#1E4D38]">Load imagery</button>
+        </div>}
       </div>
     </div>
   );

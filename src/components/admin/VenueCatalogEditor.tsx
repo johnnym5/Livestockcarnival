@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { divIcon } from 'leaflet';
-import { ImagePlus, MapPin, Plus, Save, Trash2 } from 'lucide-react';
+import { ExternalLink, ImagePlus, MapPin, Plus, Save, Trash2 } from 'lucide-react';
 import { CARNIVAL_PROGRAM, type DayProgram } from '@/data/carnivalProgram';
 import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES, type CarnivalVenue, venueColor } from '@/data/venueCatalog';
 import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
@@ -28,6 +28,7 @@ export default function VenueCatalogEditor({ onChooseImage }: { onChooseImage: (
   const [baseContent, setBaseContent] = useState<JsonRecord>(DEFAULT_SITE_CONTENT.schedule as JsonRecord);
   const [selectedId, setSelectedId] = useState(DEFAULT_VENUES[0]?.id ?? '');
   const [placing, setPlacing] = useState(false);
+  const [mapImageryConsent, setMapImageryConsent] = useState<'pending' | 'accepted' | 'rejected'>('pending');
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [message, setMessage] = useState('');
@@ -81,7 +82,7 @@ export default function VenueCatalogEditor({ onChooseImage }: { onChooseImage: (
     <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.85fr)]">
       <div className="relative h-[46vh] min-h-80 border-b border-[#E9EDE8] lg:h-[680px] lg:border-b-0 lg:border-r">
         <MapContainer center={[9.0428, 7.489]} zoom={17} className="h-full w-full">
-          <TileLayer url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}" attribution="&copy; Google Satellite Imagery" maxZoom={20} />
+          {mapImageryConsent === 'accepted' ? <TileLayer url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}" attribution="&copy; Google Satellite Imagery" maxZoom={20} /> : null}
           <PointPicker active={placing} onPick={(latitude, longitude) => { updateSelected({ latitude, longitude }); setPlacing(false); }} />
           {content.venues.map((venue, index) => {
             const selectedMarker = venue.id === selectedId;
@@ -95,6 +96,19 @@ export default function VenueCatalogEditor({ onChooseImage }: { onChooseImage: (
             return <Marker key={venue.id} position={[venue.latitude, venue.longitude]} icon={icon} title={`${index + 1}. ${venue.name}`} eventHandlers={{ click: () => { setSelectedId(venue.id); setPlacing(false); } }} />;
           })}
         </MapContainer>
+        {mapImageryConsent === 'pending' && <div className="absolute inset-x-3 top-14 z-[500] mx-auto max-w-md rounded-xl border border-[#DCE3DC] bg-white/95 p-4 text-center shadow-lg backdrop-blur-sm">
+          <p className="text-sm font-bold text-[#17251D]">Load Google satellite imagery?</p>
+          <p className="mt-1 text-xs leading-5 text-[#59635D]">Google may receive your IP address and browser information when map tiles load. Venue editing remains available without the imagery.</p>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            <button type="button" onClick={() => setMapImageryConsent('accepted')} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#1E4D38] px-4 text-xs font-bold text-white">Load map imagery <ExternalLink aria-hidden="true" size={14} /></button>
+            <button type="button" onClick={() => setMapImageryConsent('rejected')} className="min-h-10 rounded-lg border border-[#DCE3DC] px-4 text-xs font-semibold text-[#354139]">Keep imagery off</button>
+          </div>
+          <a className="mt-2 block text-[11px] font-semibold text-[#1E4D38] underline" href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>
+        </div>}
+        {mapImageryConsent === 'rejected' && <div className="absolute inset-x-3 top-14 z-[500] mx-auto flex max-w-md flex-wrap items-center justify-center gap-2 rounded-xl border border-[#DCE3DC] bg-white/95 p-3 text-center shadow-lg backdrop-blur-sm">
+          <p className="text-xs text-[#59635D]">Google imagery is off. Venue editing remains available.</p>
+          <button type="button" onClick={() => setMapImageryConsent('accepted')} className="min-h-9 rounded-lg border border-[#1E4D38]/30 px-3 text-xs font-semibold text-[#1E4D38]">Load imagery</button>
+        </div>}
         <div className="absolute left-3 top-3 z-[500] flex gap-2"><button type="button" disabled={!selected} onClick={() => setPlacing((value) => !value)} className={`inline-flex h-9 items-center gap-2 rounded-lg px-3 text-xs font-bold shadow ${placing ? 'bg-[#D4AF37] text-[#111827]' : 'bg-white text-[#1E4D38]'}`}><MapPin className="h-4 w-4" />{placing ? 'Click map to place point' : 'Place point on map'}</button></div>
       </div>
       <div className="max-h-[680px] space-y-4 overflow-y-auto p-4 sm:p-5">

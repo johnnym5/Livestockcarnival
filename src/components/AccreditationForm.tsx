@@ -37,6 +37,7 @@ export default function AccreditationForm() {
     email: '',
   });
   const [file, setFile] = useState<File | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -66,6 +67,10 @@ export default function AccreditationForm() {
       } else if (file.size > 5 * 1024 * 1024) {
         newErrors.file = 'File size exceeds 5MB limit. Please compress your PDF.';
       }
+    }
+
+    if (!termsAccepted) {
+      newErrors.termsAccepted = 'Please acknowledge the Privacy Policy and accept the Website Terms to submit.';
     }
 
     setErrors(newErrors);
@@ -172,6 +177,7 @@ export default function AccreditationForm() {
               setIsSuccess(false);
               setFormData({ fullName: '', organization: '', nin: '', email: '' });
               setFile(null);
+              setTermsAccepted(false);
               setErrors({});
             }}
             className="px-6 py-3 bg-[#1E4D38] text-white text-xs font-semibold uppercase tracking-wider rounded-xl hover:bg-opacity-90 transition-opacity"
@@ -403,6 +409,14 @@ export default function AccreditationForm() {
                 </motion.p>
               )}
             </AnimatePresence>
+          </div>
+
+          <div>
+            <label className="flex items-start gap-3 text-sm leading-6 text-[#4B5563]">
+              <input type="checkbox" checked={termsAccepted} onChange={(event) => setTermsAccepted(event.target.checked)} className="mt-1 h-4 w-4 shrink-0 accent-[#1E4D38]" />
+              <span>I have read the <Link href="/privacy" className="font-semibold text-[#1E4D38] underline">Privacy Policy</Link> and agree to the <Link href="/terms" className="font-semibold text-[#1E4D38] underline">Website Terms of Use</Link>.</span>
+            </label>
+            {errors.termsAccepted && <p role="alert" className="mt-2 text-xs text-red-600">{errors.termsAccepted}</p>}
           </div>
 
           <button

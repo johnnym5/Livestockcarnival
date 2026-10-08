@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-leaflet';
 import { divIcon } from 'leaflet';
-import { Clock3, MapPin, Navigation, CalendarPlus, Map, List } from 'lucide-react';
+import { Clock3, MapPin, Navigation, CalendarPlus, Map, List, ExternalLink } from 'lucide-react';
 import { CARNIVAL_PROGRAM, type DayProgram, type TimeBlock } from '@/data/carnivalProgram';
 import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES, type CarnivalVenue, venueColor } from '@/data/venueCatalog';
 import { generateICS } from '@/lib/ics';
@@ -91,6 +91,7 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
   const [venues, setVenues] = useState<CarnivalVenue[]>(DEFAULT_VENUES);
   const [eventVenues, setEventVenues] = useState<Record<string, string[]>>(DEFAULT_EVENT_VENUES);
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null);
+  const [mapImageryConsent, setMapImageryConsent] = useState<'pending' | 'accepted' | 'rejected'>('pending');
   const [track, setTrack] = useState('All');
   const [mobileView, setMobileView] = useState<MobileView>(initialView);
   const [urlState, setUrlState] = useState<{ day: string | null; event: string | null }>({ day: null, event: null });
@@ -208,7 +209,7 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
             <div className="relative min-h-[48dvh] flex-1 lg:min-h-0">
               <MapContainer center={[9.0428, 7.489]} zoom={17} className="absolute inset-0 h-full w-full" zoomControl scrollWheelZoom>
                 <InvalidateMapSize />
-                <TileLayer url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}" attribution="&copy; Google Satellite Imagery" maxZoom={20} />
+                {mapImageryConsent === 'accepted' ? <TileLayer url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}" attribution="&copy; Google Satellite Imagery" maxZoom={20} /> : null}
                 <FlyToSelection venue={selectedVenue} />
                 {validVenues.map((venue, index) => {
                   const active = selectedVenueId === venue.id || selectedEventVenues.some((item) => item.id === venue.id);
@@ -225,6 +226,19 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
                   </Marker>;
                 })}
               </MapContainer>
+              {mapImageryConsent === 'pending' && <div className="absolute inset-x-3 top-3 z-[500] mx-auto max-w-md rounded-xl border border-[#DCE3DC] bg-white/95 p-4 text-center shadow-lg backdrop-blur-sm">
+                <p className="text-sm font-bold text-[#17251D]">Load Google satellite imagery?</p>
+                <p className="mt-1 text-xs leading-5 text-[#59635D]">Google may receive your IP address and browser information when map tiles load. The venue pins and schedule are available without loading the imagery.</p>
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                  <button type="button" onClick={() => setMapImageryConsent('accepted')} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[#1E4D38] px-4 text-xs font-bold text-white">Load map imagery <ExternalLink aria-hidden="true" size={14} /></button>
+                  <button type="button" onClick={() => setMapImageryConsent('rejected')} className="min-h-10 rounded-lg border border-[#DCE3DC] px-4 text-xs font-semibold text-[#354139]">Keep imagery off</button>
+                </div>
+                <a className="mt-2 block text-[11px] font-semibold text-[#1E4D38] underline" href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>
+              </div>}
+              {mapImageryConsent === 'rejected' && <div className="absolute inset-x-3 top-3 z-[500] mx-auto flex max-w-md flex-wrap items-center justify-center gap-2 rounded-xl border border-[#DCE3DC] bg-white/95 p-3 text-center shadow-lg backdrop-blur-sm">
+                <p className="text-xs text-[#59635D]">Google imagery is off. Venue pins and schedule remain available.</p>
+                <button type="button" onClick={() => setMapImageryConsent('accepted')} className="min-h-9 rounded-lg border border-[#1E4D38]/30 px-3 text-xs font-semibold text-[#1E4D38]">Load imagery</button>
+              </div>}
             </div>
             {selectedVenue ? <aside className="grid shrink-0 grid-cols-[112px_1fr] gap-3 border-t border-[#E3E8E3] bg-white p-3 sm:grid-cols-[150px_1fr] sm:p-4">
               <div className="relative min-h-24 overflow-hidden rounded bg-[#E9EEE8]">{selectedVenue.image && <Image src={selectedVenue.image} alt={selectedVenue.name} fill sizes="150px" className="object-cover" />}</div>
