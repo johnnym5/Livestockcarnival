@@ -24,7 +24,7 @@ export const HOMEPAGE_MAGAZINE_DESTINATIONS: Record<string, string> = {
 export const DEFAULT_HOMEPAGE_MAGAZINE_STORIES: HomepageMagazineStory[] = [
   {
     slug: 'schedule-map',
-    eyebrow: 'PLAN YOUR VISIT · 21–23 NOVEMBER 2026',
+    eyebrow: 'PLAN YOUR VISIT · 30 NOVEMBER – 2 DECEMBER 2026',
     title: 'Three days, one festival ground',
     body: 'Browse the official program, choose an event, and see where it happens on the Abuja venue map.',
     image: '/assets/venue-map/old-parade-ground-map-annotated.jpg',

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | Livestock Carnival 2026",
   },
   description:
-    "Official public portal for the 2026 Renewed Hope National Livestock Carnival. Hosted by the Federal Government of Nigeria at Old Parade Ground, Abuja. Featuring cattle, camels, goats, sheep, poultry, and aquaculture. November 21-23, 2026.",
+    "Official public portal for the 2026 Renewed Hope National Livestock Carnival. Hosted by the Federal Government of Nigeria at Old Parade Ground, Abuja. Featuring cattle, camels, goats, sheep, poultry, and aquaculture. November 30–December 2, 2026.",
   keywords: [
     "livestock carnival",
     "Nigeria",

@@ -1202,7 +1202,7 @@ export default function FashionParadePage() {
               Claim Your Free Entry Pass
             </h2>
             <p className="text-sm sm:text-base text-slate-200 leading-relaxed mb-8 max-w-xl">
-              Complimentary public admission for families, agribusiness investors, students, and culture enthusiasts at Abuja National Grounds, November 21–23, 2026.
+              Complimentary public admission for families, agribusiness investors, students, and culture enthusiasts at Abuja National Grounds, November 30 – December 2, 2026.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4">

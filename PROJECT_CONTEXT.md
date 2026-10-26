@@ -10,7 +10,7 @@ This document is a practical orientation guide for developers and AI coding assi
 
 ## 1. Project Purpose
 
-The site is the official digital portal for the Renewed Hope National Livestock Carnival 2026, also branded as the Golden Camel & Cow Carnival. The event is described as a public festival and trade showcase at Old Parade Ground, Area 10, Garki, Abuja, scheduled for 21–23 November 2026.
+The site is the official digital portal for the Renewed Hope National Livestock Carnival 2026, also branded as the Golden Camel & Cow Carnival. The event is described as a public festival and trade showcase at Old Parade Ground, Area 10, Garki, Abuja, scheduled for November 30 – December 2, 2026.
 
 The portal serves several audiences:
 

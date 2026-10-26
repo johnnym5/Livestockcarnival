@@ -1,7 +1,7 @@
 [
   {
     "day": 1,
-    "date": "2026-11-21",
+    "date": "2026-11-30",
     "dayTitle": "Grand Opening, Presidential Commission & Livestock Parade",
     "summary": "VIP reception, ribbon cutting by Hon. Minister of Livestock, Kano Durbar horsemen display, E-tagging showcase, crafted/culinary entries intake, parade floats, beer garden, karaoke night, and opening fireworks.",
     "events": [
@@ -13,8 +13,8 @@
         "track": "Ceremony",
         "description": "VIP Arrival, Red Carpet Reception & Security Sweep by Police, Military & Agro-Rangers.",
         "speaker": "Security & Protocol Directorate",
-        "startIso": "2026-11-21T08:00:00+01:00",
-        "endIso": "2026-11-21T10:00:00+01:00"
+        "startIso": "2026-11-30T08:00:00+01:00",
+        "endIso": "2026-11-30T10:00:00+01:00"
       },
       {
         "id": "d1-b2",
@@ -24,8 +24,8 @@
         "track": "Ceremony",
         "description": "Official opening of Livestock Pavilion & Grand Parade of prize dairy cattle, camels, and bulls.",
         "speaker": "Hon. Minister of Livestock Development",
-        "startIso": "2026-11-21T10:00:00+01:00",
-        "endIso": "2026-11-21T12:30:00+01:00"
+        "startIso": "2026-11-30T10:00:00+01:00",
+        "endIso": "2026-11-30T12:30:00+01:00"
       },
       {
         "id": "d1-b3",
@@ -35,8 +35,8 @@
         "track": "Livestock",
         "description": "Arena 1: RFID tracking demo. Tech Hub: Modern husbandry workshop. Open crafted, visual, culinary, needlework, and garden entries accepted.",
         "speaker": "Veterinary & Technical Directorate",
-        "startIso": "2026-11-21T13:00:00+01:00",
-        "endIso": "2026-11-21T16:00:00+01:00"
+        "startIso": "2026-11-30T13:00:00+01:00",
+        "endIso": "2026-11-30T16:00:00+01:00"
       },
       {
         "id": "d1-b4",
@@ -46,14 +46,14 @@
         "track": "Entertainment",
         "description": "Kano Durbar Horsemen Display, Live Cultural Troupes, Animal Costume Parade Floats, Beer Garden Entertainment, Karaoke Night, and Opening Fireworks.",
         "speaker": "Cultural Heritage Directorate",
-        "startIso": "2026-11-21T17:00:00+01:00",
-        "endIso": "2026-11-21T21:00:00+01:00"
+        "startIso": "2026-11-30T17:00:00+01:00",
+        "endIso": "2026-11-30T21:00:00+01:00"
       }
     ]
   },
   {
     "day": 2,
-    "date": "2026-11-22",
+    "date": "2026-12-01",
     "dayTitle": "Agro-Investment Summit, Pastoralist Forum & Concert Night 1",
     "summary": "Concurrent forums, Queen/King of NLC Pageant, live auction, cattle formation & sheep/goat judging, Pastoralist Forum with MACBAN/Kautal Hore, Jr./Sr. Does dairy goat shows, parade floats, and live concert.",
     "events": [
@@ -65,8 +65,8 @@
         "track": "Agribusiness",
         "description": "Marquee 1: Investors Roundtable. Hall B: Agropreneur Financing Workshop. Youth Rabbit Show Check-In. Youth Arena: Queen and King of National Livestock Carnival (NLC) Pageant.",
         "speaker": "Agribusiness & Capital Directorate",
-        "startIso": "2026-11-22T09:00:00+01:00",
-        "endIso": "2026-11-22T11:30:00+01:00"
+        "startIso": "2026-12-01T09:00:00+01:00",
+        "endIso": "2026-12-01T11:30:00+01:00"
       },
       {
         "id": "d2-b2",
@@ -76,8 +76,8 @@
         "track": "Livestock",
         "description": "Auction Arena: Livestock Auction with RFID bidding. Exhibition: Meat/Dairy Tech. Cattle Formation Judging. Sheep and Goat Breed Competition.",
         "speaker": "National Breed Judges Panel",
-        "startIso": "2026-11-22T12:00:00+01:00",
-        "endIso": "2026-11-22T15:00:00+01:00"
+        "startIso": "2026-12-01T12:00:00+01:00",
+        "endIso": "2026-12-01T15:00:00+01:00"
       },
       {
         "id": "d2-b3",
@@ -87,8 +87,8 @@
         "track": "Agribusiness",
         "description": "MACBAN & Kautal Hore Dialogue, Regional Cooperative Harmonization & Awards. Youth Dairy & Meat Breeding Goat Check-In, Dairy Goat Shows Jr./Sr. Does, Goat Showmanship, Youth Market & Meat Goat Shows.",
         "speaker": "MACBAN & Kautal Hore Leadership",
-        "startIso": "2026-11-22T15:30:00+01:00",
-        "endIso": "2026-11-22T18:00:00+01:00"
+        "startIso": "2026-12-01T15:30:00+01:00",
+        "endIso": "2026-12-01T18:00:00+01:00"
       },
       {
         "id": "d2-b4",
@@ -98,14 +98,14 @@
         "track": "Entertainment",
         "description": "Parade Floats (Animal Costumes), Executive Gala Dinner, Stand-Up Comedy, and Headlining Concert featuring Top Nigerian Artist #1.",
         "speaker": "Mainstage Entertainment Directorate",
-        "startIso": "2026-11-22T18:30:00+01:00",
-        "endIso": "2026-11-22T23:00:00+01:00"
+        "startIso": "2026-12-01T18:30:00+01:00",
+        "endIso": "2026-12-01T23:00:00+01:00"
       }
     ]
   },
   {
     "day": 3,
-    "date": "2026-11-23",
+    "date": "2026-12-02",
     "dayTitle": "Commercial B2B Matchmaking, Breed Awards & Grand Finale Concert",
     "summary": "Commercial B2B Matchmaking, High Stakes Auction, Children's Workshop, Dog/Cat shows, Quilt judging, Breed Champions Awards, closing press conference, and Grand Finale Concert with Top Nigerian Artist #2.",
     "events": [
@@ -117,8 +117,8 @@
         "track": "Agribusiness",
         "description": "Commercial B2B Matchmaking, B2B Supplier Meet, High Stakes Auction, Children's Workshop, Open Crafted/Visual/Home Arts judging, Dog Show & Showmanship, Cat Show Check-in & Showmanship, Quilt Judging (Open to Public).",
         "speaker": "B2B Trade Secretariat",
-        "startIso": "2026-11-23T09:00:00+01:00",
-        "endIso": "2026-11-23T12:00:00+01:00"
+        "startIso": "2026-12-02T09:00:00+01:00",
+        "endIso": "2026-12-02T12:00:00+01:00"
       },
       {
         "id": "d3-b2",
@@ -128,8 +128,8 @@
         "track": "Ceremony",
         "description": "Livestock Judging Awards at Beef Show Ring, Exhibitor Recognition, Breed Champions Awards, Pastoralist Cooperative Grants & Trophy Presentation.",
         "speaker": "Grand Championship Directorate",
-        "startIso": "2026-11-23T13:00:00+01:00",
-        "endIso": "2026-11-23T15:00:00+01:00"
+        "startIso": "2026-12-02T13:00:00+01:00",
+        "endIso": "2026-12-02T15:00:00+01:00"
       },
       {
         "id": "d3-b3",
@@ -139,8 +139,8 @@
         "track": "Ceremony",
         "description": "Communique Readout by Steering Committee & Media Q&A Session.",
         "speaker": "Steering Committee & Ministerial Press Team",
-        "startIso": "2026-11-23T15:30:00+01:00",
-        "endIso": "2026-11-23T17:30:00+01:00"
+        "startIso": "2026-12-02T15:30:00+01:00",
+        "endIso": "2026-12-02T17:30:00+01:00"
       },
       {
         "id": "d3-b4",
@@ -150,8 +150,8 @@
         "track": "Entertainment",
         "description": "Official Closing Remarks & Patrons Recognition, Grand Finale Concert featuring superstar Top Nigerian Artist #2, Laser Light Show & Fireworks Display, and Commercial Bazaar.",
         "speaker": "Festival Executive Directorate",
-        "startIso": "2026-11-23T18:00:00+01:00",
-        "endIso": "2026-11-23T23:00:00+01:00"
+        "startIso": "2026-12-02T18:00:00+01:00",
+        "endIso": "2026-12-02T23:00:00+01:00"
       }
     ]
   }

@@ -70,7 +70,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'Experience Nigeria’s first-ever livestock fashion runway with prize cattle draped in Aso-Oke, alongside traditional dance troupes from 36 states, and the Queen/King NLC Pageant.',
     image: '/assets/home/story-live-concert-stage.jpg',
     location: 'Mainstage Arena & Fashion Runway',
-    dateBadge: 'Nov 21 & 22 · Fashion Arena',
+    dateBadge: 'Nov 30 & Dec 1 · Fashion Arena',
     ctaText: 'Explore Fashion Showcase',
     ctaLink: '/fashion-parade',
     activities: [
@@ -90,7 +90,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'Transitioning Nigerian livestock commerce from visual estimation to certified digital scales, transparent farm-gate pricing, and high-stakes seedstock auctions.',
     image: '/assets/home/story-digital-rfid-livestock-tag.jpg',
     location: 'Zone 1: Auction Ring & Trade Pavilion',
-    dateBadge: 'Nov 22 & 23 · Auction Arena',
+    dateBadge: 'Dec 1 & 2 · Auction Arena',
     ctaText: 'View Trading Schedule',
     ctaLink: '/schedule',
     activities: [
@@ -110,7 +110,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'High-level institutional roundtables connecting sovereign funds, commercial banking partners, and agropreneurs for cold-chain, feedlot, and processing capital expansion.',
     image: '/assets/home/story-carnival-entrance-gate.jpg',
     location: 'Marquee 1 & Hall B',
-    dateBadge: 'Nov 22 · 9:00 AM – 1:00 PM',
+    dateBadge: 'Dec 1 · 9:00 AM – 1:00 PM',
     ctaText: 'Visit Agribusiness Hub',
     ctaLink: '/nhesics',
     activities: [
@@ -130,7 +130,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'Constructive dialogues between MACBAN, Kautal Hore, and agricultural ministries establishing pasture-to-seaport supply agreements and cooperative development grants.',
     image: '/assets/home/story-etagging-veterinary.jpg',
     location: 'Conference Hall A',
-    dateBadge: 'Nov 22 · 3:30 PM – 6:00 PM',
+    dateBadge: 'Dec 1 · 3:30 PM – 6:00 PM',
     ctaText: 'Explore Cooperative Forum',
     ctaLink: '/about',
     activities: [
@@ -150,7 +150,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'Certified veterinary judges evaluate skeletal conformation, weight-for-age, and milk/meat genetic potential across Nigeria’s premier purebred cattle lines.',
     image: '/assets/livestock/breed-bull-cattle.jpg',
     location: 'Main Show Ring (Zone 1)',
-    dateBadge: 'Nov 22 & 23 · Main Ring',
+    dateBadge: 'Dec 1 & 2 · Main Ring',
     ctaText: 'Explore Cattle Breeds',
     ctaLink: '/livestock',
     activities: [
@@ -170,7 +170,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'Specialized showmanship heats, dairy goat shows across Junior and Senior Does divisions, and youth breeding competitions for small ruminants.',
     image: '/assets/livestock/breed-goat-sheep.jpg',
     location: 'Goat & Sheep Show Rings',
-    dateBadge: 'Nov 22 · Goat Show Ring',
+    dateBadge: 'Dec 1 · Goat Show Ring',
     ctaText: 'View Ruminants Program',
     ctaLink: '/livestock',
     activities: [
@@ -190,7 +190,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'Family-friendly highlights including youth rabbit check-ins, dog agility contests, cat showmanship, traditional quilt judging, and children’s agro-education workshops.',
     image: '/assets/home/story-puppy-petting-kids.jpg',
     location: 'Children’s Pavilion & Event Tent',
-    dateBadge: 'Nov 23 · Event Tent & Marquee',
+    dateBadge: 'Dec 2 · Event Tent & Marquee',
     ctaText: 'View Family Attractions',
     ctaLink: '/attractions',
     activities: [
@@ -211,7 +211,7 @@ const CARNIVAL_EXPECTATIONS: ExpectationItem[] = [
     summary: 'Unforgettable evening agritainment featuring headlining concerts with top Nigerian artists, stand-up comedy, closing ministerial press conference, and laser fireworks.',
     image: '/assets/home/story-live-concert-stage.jpg',
     location: 'Mainstage Arena & Amphitheater',
-    dateBadge: 'Nov 22 & 23 · Mainstage',
+    dateBadge: 'Dec 1 & 2 · Mainstage',
     ctaText: 'View Concert Lineup',
     ctaLink: '/schedule',
     activities: [

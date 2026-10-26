@@ -103,7 +103,7 @@ export function HomepageMagazineHeading({
       <div className="max-w-2xl lg:justify-self-end">
         <p className="text-sm leading-relaxed text-[#59645D] sm:text-base">{intro}</p>
         <div className="mt-4 flex flex-wrap gap-2 text-[10px] font-bold text-[#1E4D38] sm:text-xs">
-          <span className="rounded-full border border-[#1E4D38]/15 bg-[#1E4D38]/5 px-3 py-2">21–23 November 2026</span>
+          <span className="rounded-full border border-[#1E4D38]/15 bg-[#1E4D38]/5 px-3 py-2">November 30 – December 2, 2026</span>
           <span className="rounded-full border border-[#1E4D38]/15 bg-[#1E4D38]/5 px-3 py-2">Abuja National Grounds · Old Parade Ground · FCT</span>
         </div>
       </div>

@@ -120,7 +120,7 @@ export default function Footer() {
               <div className="pt-2">
                 <p className="font-semibold text-white">Abuja National Grounds</p>
                 <p>Old Parade Ground, Area 10, Garki, Abuja FCT</p>
-                <p className="mt-0.5">November 21 – 23, 2026</p>
+                <p className="mt-0.5">November 30 – December 2, 2026</p>
               </div>
             </div>
           </div>
