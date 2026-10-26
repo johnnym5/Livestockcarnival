@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import { divIcon } from 'leaflet';
 import { ExternalLink, ImagePlus, MapPin, Plus, Save, Trash2 } from 'lucide-react';
-import { CARNIVAL_PROGRAM, type DayProgram } from '@/data/carnivalProgram';
+import { CARNIVAL_PROGRAM, normalizeCarnivalProgram, type DayProgram } from '@/data/carnivalProgram';
 import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES, type CarnivalVenue, venueColor } from '@/data/venueCatalog';
 import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
 import { supabase } from '@/lib/supabase/client';
@@ -42,10 +42,11 @@ export default function VenueCatalogEditor({ onChooseImage }: { onChooseImage: (
       if (error) setMessage(`Could not load the saved schedule: ${error.message}`);
       if (data?.content && typeof data.content === 'object') {
         const saved = data.content as JsonRecord;
-        setBaseContent(saved);
         const defaults = DEFAULT_SITE_CONTENT.schedule as unknown as Content;
+        const normalizedDays = saved.days ? normalizeCarnivalProgram(saved.days as Content['days']) : defaults.days;
+        setBaseContent({ ...saved, days: normalizedDays });
         const next: Content = {
-          days: (saved.days as Content['days']) || defaults.days,
+          days: normalizedDays,
           venues: (saved.venues as CarnivalVenue[]) || defaults.venues,
           eventVenues: (saved.eventVenues as Record<string, string[]>) || defaults.eventVenues,
         };

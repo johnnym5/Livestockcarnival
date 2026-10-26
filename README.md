@@ -6,7 +6,7 @@ Official web portal and digital platform for the **Renewed Hope National Livesto
 
 ---
 
-## 📅 Official 3-Day Concurrent Event Program (21 – 23 November 2026)
+## 📅 Official 3-Day Concurrent Event Program (30 November – 2 December 2026)
 
 ### **DAY 1: Grand Opening, Presidential Commission & Livestock Parade**
 - **08:00 - 10:00 AM** — **VIP Reception & Security**: VIP Arrival, Red Carpet Reception & Security Sweep by Police, Military & Agro-Rangers.

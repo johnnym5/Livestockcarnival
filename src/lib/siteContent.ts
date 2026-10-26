@@ -16,7 +16,7 @@ export const DEFAULT_SITE_CONTENT: Record<string, Record<string, unknown>> = {
   schedule: {
     eyebrow: 'Carnival Program',
     title: '3-Day Official Carnival Program',
-    intro: '21 – 23 November 2026 • Old Parade Ground, Area 10, Garki, Abuja. Explore the ceremonies, breed judging, business forums, and live performances planned across all three days.',
+    intro: '30 November – 2 December 2026 • Old Parade Ground, Area 10, Garki, Abuja. Explore the ceremonies, breed judging, business forums, and live performances planned across all three days.',
     days: CARNIVAL_PROGRAM,
     venues: DEFAULT_VENUES,
     eventVenues: DEFAULT_EVENT_VENUES,

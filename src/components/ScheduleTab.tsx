@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { MapPin, Calendar, Filter, CheckCircle2, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CARNIVAL_PROGRAM, DayProgram, TimeBlock } from '@/data/carnivalProgram';
+import { CARNIVAL_PROGRAM, DayProgram, TimeBlock, normalizeCarnivalProgram } from '@/data/carnivalProgram';
 import { generateICS } from '@/lib/ics';
 import { supabase } from '@/lib/supabase/client';
 
@@ -18,7 +18,7 @@ export default function ScheduleTab() {
       if (!active || !data?.content || typeof data.content !== 'object') return;
       const days = (data.content as { days?: Record<string, DayProgram> }).days;
       if (days && Object.keys(days).length) {
-        setScheduleDays(days);
+        setScheduleDays(normalizeCarnivalProgram(days));
         setSelectedDayKey(Object.keys(days)[0]);
       }
     });
@@ -197,8 +197,8 @@ export default function ScheduleTab() {
                       title: block.heading,
                       venue: block.location,
                       description: `${block.details}\n\nKey Highlights:\n${block.activities.map((a) => `- ${a}`).join('\n')}`,
-                      startIso: `2026-11-2${currentDayProgram.dayNumber}T09:00:00+01:00`,
-                      endIso: `2026-11-2${currentDayProgram.dayNumber}T12:00:00+01:00`,
+                      startIso: `${["", "2026-11-30", "2026-12-01", "2026-12-02"][currentDayProgram.dayNumber]}T09:00:00+01:00`,
+                      endIso: `${["", "2026-11-30", "2026-12-01", "2026-12-02"][currentDayProgram.dayNumber]}T12:00:00+01:00`,
                     })
                   }
                   className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#FBFBFA] border border-slate-200 hover:border-[#B8D8C5] hover:bg-[#D8EADF]/30 text-[#1E4D38] text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm"

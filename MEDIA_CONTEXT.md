@@ -4,7 +4,7 @@ This document is an official orientation guide for journalists, media partners, 
 
 **Document Date:** October 2026  
 **Event Name:** Renewed Hope National Livestock Carnival 2026 (Golden Camel & Cow Carnival)  
-**Official Event Dates:** 21 – 23 November 2026  
+**Official Event Dates:** 30 November – 2 December 2026
 **Primary Venue:** Old Parade Ground, Area 10, Garki, Abuja, FCT, Nigeria  
 **Official Portal:** [https://livestockcarnival.ng](https://livestockcarnival.ng)  
 **Public Media Center:** [https://livestockcarnival.ng/media](https://livestockcarnival.ng/media)  
@@ -38,7 +38,7 @@ The **Renewed Hope National Livestock Carnival 2026** is the flagship national c
 
 ## 2. Key Event Information & Schedule Highlights
 
-- **Event Window:** Saturday, 21 November 2026 – Monday, 23 November 2026
+- **Event Window:** Monday, 30 November 2026 – Wednesday, 2 December 2026
 - **Location & Venue:** Old Parade Ground, Area 10, Garki, Abuja, FCT, Nigeria (`/schedule#map`)
 - **Key Tracks & Arenas:**
   - **Main Grand Arena**: Opening Ceremonies, Cultural Fashion Parades, Presidential & Ministerial Addresses.

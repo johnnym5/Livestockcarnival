@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-leaflet';
 import { divIcon } from 'leaflet';
 import { Clock3, MapPin, Navigation, CalendarPlus, Map, List, ExternalLink } from 'lucide-react';
-import { CARNIVAL_PROGRAM, type DayProgram, type TimeBlock } from '@/data/carnivalProgram';
+import { CARNIVAL_PROGRAM, normalizeCarnivalProgram, type DayProgram, type TimeBlock } from '@/data/carnivalProgram';
 import { DEFAULT_EVENT_VENUES, DEFAULT_VENUES, type CarnivalVenue, venueColor } from '@/data/venueCatalog';
 import { generateICS } from '@/lib/ics';
 import { supabase } from '@/lib/supabase/client';
@@ -101,7 +101,7 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
     void supabase.from('site_page_content').select('content').eq('page_key', 'schedule').eq('status', 'published').maybeSingle().then(({ data }) => {
       if (!active || !data?.content || typeof data.content !== 'object') return;
       const content = data.content as ScheduleContent;
-      if (content.days && Object.keys(content.days).length) setDays(content.days);
+      if (content.days && Object.keys(content.days).length) setDays(normalizeCarnivalProgram(content.days));
       const normalizedVenues = normalizeVenues(content.venues);
       const normalizedEventVenues = normalizeEventVenues(content.eventVenues);
       if (normalizedVenues.length) setVenues(normalizedVenues);
@@ -165,7 +165,7 @@ export default function ScheduleVenueExperience({ initialView = 'schedule' }: { 
 
   const calendar = (event: TimeBlock) => {
     const day = eventEntries.find((entry) => entry.event.id === event.id)?.day ?? currentDay;
-    const date = new Date(2026, 10, 20 + day.dayNumber);
+    const date = [null, new Date(2026, 10, 30), new Date(2026, 11, 1), new Date(2026, 11, 2)][day.dayNumber] ?? new Date(2026, 10, 30);
     const startIso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}T09:00:00+01:00`;
     const endIso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}T12:00:00+01:00`;
     generateICS({ id: event.id, title: event.heading, venue: (eventVenues[event.id] || []).map((id) => venues.find((venue) => venue.id === id)?.name).filter(Boolean).join(', ') || event.location, description: event.details, startIso, endIso });

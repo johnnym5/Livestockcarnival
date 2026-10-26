@@ -141,7 +141,7 @@ export default function FashionParadePage() {
                   </div>
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B7280]">Festival Dates</p>
-                    <p className="text-xs sm:text-sm font-black text-[#0F4A2F]">21 – 23 Nov 2026</p>
+                    <p className="text-xs sm:text-sm font-black text-[#0F4A2F]">30 Nov – 2 Dec 2026</p>
                   </div>
                 </div>
 

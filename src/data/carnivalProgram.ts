@@ -18,11 +18,11 @@ export interface DayProgram {
 export const CARNIVAL_PROGRAM: Record<string, DayProgram> = {
   // =========================================================================
   // DAY 1: Grand Opening, Presidential Commission & Livestock Parade
-  // Date: 21 November 2026
+  // Date: 30 November 2026
   // =========================================================================
   day1: {
     dayNumber: 1,
-    dateString: "Saturday, 21 November 2026",
+    dateString: "Monday, 30 November 2026",
     title: "Grand Opening, Presidential Commission & Livestock Parade",
     timeBlocks: [
       {
@@ -85,11 +85,11 @@ export const CARNIVAL_PROGRAM: Record<string, DayProgram> = {
 
   // =========================================================================
   // DAY 2: Agro-Investment Summit, Pastoralist Forum & Concert Night 1
-  // Date: 22 November 2026
+  // Date: 1 December 2026
   // =========================================================================
   day2: {
     dayNumber: 2,
-    dateString: "Sunday, 22 November 2026",
+    dateString: "Tuesday, 1 December 2026",
     title: "Agro-Investment Summit, Pastoralist Forum & Concert Night 1",
     timeBlocks: [
       {
@@ -153,11 +153,11 @@ export const CARNIVAL_PROGRAM: Record<string, DayProgram> = {
 
   // =========================================================================
   // DAY 3: Commercial B2B Matchmaking, Breed Awards & Grand Finale Concert
-  // Date: 23 November 2026
+  // Date: 2 December 2026
   // =========================================================================
   day3: {
     dayNumber: 3,
-    dateString: "Monday, 23 November 2026",
+    dateString: "Wednesday, 2 December 2026",
     title: "Commercial B2B Matchmaking, Breed Awards & Grand Finale Concert",
     timeBlocks: [
       {
@@ -219,3 +219,16 @@ export const CARNIVAL_PROGRAM: Record<string, DayProgram> = {
     ]
   }
 };
+
+const OFFICIAL_CARNIVAL_DATES: Record<string, string> = {
+  day1: 'Monday, 30 November 2026',
+  day2: 'Tuesday, 1 December 2026',
+  day3: 'Wednesday, 2 December 2026',
+};
+
+export function normalizeCarnivalProgram(days: Record<string, DayProgram>): Record<string, DayProgram> {
+  return Object.fromEntries(Object.entries(days).map(([key, day]) => [
+    key,
+    OFFICIAL_CARNIVAL_DATES[key] ? { ...day, dateString: OFFICIAL_CARNIVAL_DATES[key] } : day,
+  ]));
+}

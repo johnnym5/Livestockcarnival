@@ -101,7 +101,7 @@ export default function Home() {
         <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(228,176,58,0.09)_0%,transparent_70%)]" />
         <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-6 text-center sm:px-10">
           <span className="mb-4 inline-flex items-center gap-3 text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#E4B03A] sm:text-xs sm:tracking-[0.26em]">
-            <span className="h-px w-6 bg-[#E4B03A]/60 sm:w-8" />21 – 23 November 2026 · Abuja National Grounds<span className="h-px w-6 bg-[#E4B03A]/60 sm:w-8" />
+            <span className="h-px w-6 bg-[#E4B03A]/60 sm:w-8" />30 November – 2 December 2026 · Abuja National Grounds<span className="h-px w-6 bg-[#E4B03A]/60 sm:w-8" />
           </span>
           <h2 className="mb-5 max-w-3xl text-2xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl">Join the Grand Celebration of Culture, Agribusiness &amp; Heritage</h2>
           <p className="mb-8 max-w-2xl text-sm leading-relaxed text-gray-300 sm:text-base">Complimentary gate passes are available for all delegates, visitors, and families. Secure your passes and explore vendor booth bookings.</p>

@@ -150,7 +150,7 @@ Deno.serve(async (request: Request) => {
   if (action === 'cleanup_accreditations') {
     const secret = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '');
     if (!cronSecret || !secret || secret !== cronSecret || request.headers.get('x-push-cron') !== 'true') return respond(403, { error: 'Scheduled cleanup is not authorized.' }, origin);
-    if (Date.now() < Date.parse('2026-11-24T00:00:00+01:00')) return respond(200, { deleted: 0, reason: 'The event has not ended.' }, origin);
+    if (Date.now() < Date.parse('2026-12-03T00:00:00+01:00')) return respond(200, { deleted: 0, reason: 'The event has not ended.' }, origin);
     const { data: rows, error } = await adminClient.from('accreditations').select('id,file_path');
     if (error) return respond(500, { error: 'Could not load accreditation records for retention cleanup.' }, origin);
     let deleted = 0;
